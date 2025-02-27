@@ -11,7 +11,7 @@ authors = [
 ]
 readme = "README.md"
 packages = [{ include = "cat_ai", from = "src" }]
-license = {text = "MIT}
+license = {text = "MIT"}
 
 [tool.poetry.dependencies]
 python = "^3.13"
