@@ -4,6 +4,7 @@ import sys
 from pydrive2.auth import GoogleAuth  # type: ignore
 from pydrive2.drive import GoogleDrive  # type: ignore
 
+
 def login_with_service_account(credentials_path: str) -> GoogleAuth:
     """
     Google Drive service with a service account.

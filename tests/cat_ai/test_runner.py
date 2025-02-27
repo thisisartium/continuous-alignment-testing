@@ -2,6 +2,7 @@ import pytest
 from src.cat_ai.runner import Runner
 from src.cat_ai.reporter import Reporter
 
+
 # Dummy test function that will be passed to Runner
 def dummy_test_function(reporter: Reporter):
     # Imagine that this function does something meaningful
@@ -37,7 +38,7 @@ def test_run_loop(monkeypatch):
 
     # Create a Reporter with necessary arguments
     reporter = Reporter(test_name="test_run_loop", output_dir="/tmp")
-    
+
     # Initialize Runner with dummy test function and Reporter
     runner = Runner(test_function=dummy_test_function, reporter=reporter)
 
@@ -50,6 +51,6 @@ def test_run_loop(monkeypatch):
     expected_results = [
         "Running test with run number 0",
         "Running test with run number 1",
-        "Running test with run number 2"
+        "Running test with run number 2",
     ]
     assert results == expected_results

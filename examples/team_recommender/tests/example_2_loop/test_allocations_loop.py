@@ -69,4 +69,3 @@ def run_allocation_test(reporter) -> bool:
     except json.JSONDecodeError as e:
         print(f"JSON Exception: {e}")
     return result
-
