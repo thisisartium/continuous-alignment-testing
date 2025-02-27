@@ -53,7 +53,7 @@ def test_allocations():
     It will find exciting moments from sports highlights videos.
     """
     test_reporter = Reporter(
-        "test_allocations",
+        "test_allocations_threshold",
         metadata={
             "system_prompt": system_prompt,
             "user_prompt": project_description,

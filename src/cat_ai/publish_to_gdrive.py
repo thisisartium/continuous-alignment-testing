@@ -1,22 +1,50 @@
+import os
+import sys
+
 from pydrive2.auth import GoogleAuth  # type: ignore
 from pydrive2.drive import GoogleDrive  # type: ignore
 
-# Step 1: Authenticate and create the PyDrive client
-gauth = GoogleAuth()
-# This will open a local web server to authenticate your Google account
-gauth.LocalWebserverAuth()
-drive = GoogleDrive(gauth)
+def login_with_service_account(credentials_path: str) -> GoogleAuth:
+    """
+    Google Drive service with a service account.
+    note: for the service account to work, you need to share the folder or
+    files with the service account email.
 
-# Step 2: Create a file object and set its metadata
-upload_file = "graph-data.csv"
-gfile = drive.CreateFile({"title": "graph-data.csv", "parents": [{"id": "18caB8w7KZjq5kH-i9SDEA_V9qYCeWypL"}]})
-
-# Step 3: Set the content of the file from the local CSV
-gfile.SetContentFile(upload_file)
+    :return: google auth
+    """
+    settings = {
+        "client_config_backend": "service",
+        "service_config": {
+            "client_json_file_path": credentials_path,
+        },
+    }
+    gauth = GoogleAuth(settings=settings)
+    gauth.ServiceAuth()
+    return gauth
 
 
 if __name__ == "__main__":
-    # Step 4: Upload the file to Google Drive
+    if len(sys.argv) != 2:
+        print("Usage: python publish_to_gdrive.py <file_path>")
+        sys.exit(1)
+
+    file_path = sys.argv[1]
+    if not os.path.isfile(file_path):
+        print(f"Error: File '{file_path}' does not exist.")
+        sys.exit(1)
+
+    credentials_file_path = os.environ.get("GOOGLE_GHA_CREDS_PATH")
+    if not credentials_file_path:
+        print("Error: GOOGLE_GHA_CREDS_PATH environment variable is not set.")
+        sys.exit(1)
+
+    google_auth = login_with_service_account(credentials_file_path)
+    drive = GoogleDrive(google_auth)
+
+    file_name = os.path.basename(file_path)
+    PARENT_FOLDER_ID = os.environ.get("GOOGLE_DRIVE_TEST_OUTPUT_FOLDER_ID")
+    gfile = drive.CreateFile({"title": file_name, "parents": [{"id": PARENT_FOLDER_ID}]})
+    gfile.SetContentFile(file_path)
     gfile.Upload()
 
     print("File uploaded successfully!")

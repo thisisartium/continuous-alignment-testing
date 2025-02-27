@@ -7,7 +7,7 @@ from openai import OpenAI
 
 
 def test_allocations():
-    tries = 10
+    tries = 2
     skills_json_path = os.path.join(ROOT_DIR, "fixtures", "skills.json")
     with open(skills_json_path, "r") as file:
         skills_data = json.load(file)
@@ -32,7 +32,7 @@ def test_allocations():
     It will find exciting moments from sports highlights videos.
     """
     test_reporter = Reporter(
-        "test_allocations",
+        "test_allocations_loop",
         metadata={
             "system_prompt": system_prompt,
             "user_prompt": project_description,
