@@ -5,9 +5,13 @@ description = "Python client for running CAT tests in a Python codebase"
 authors = [
   "Mike Gehard <mikegehard@artium.ai>",
   "Randy Lutcavich <randylutcavich@artium.ai>",
+  "Erik Luetkehans <erikluetkehans@artium.ai>",
+  "Paul Zabelin <paulzabelin@artium.ai>",
+  "Tim Kersey <timkersey@artium.ai>",
 ]
 readme = "README.md"
 packages = [{ include = "cat_ai", from = "src" }]
+license = {text = "MIT}
 
 [tool.poetry.dependencies]
 python = "^3.13"
