@@ -7,6 +7,7 @@ The first step will be just to be able to run the first version of your prompt a
 
 Imagine we have a python project called `team_recommender` where we recommend teams of developers to be used on a given project. The basic structure looks like this:
 
+```
 team_recommender/
 ├── README.md
 ├── requirements.txt
@@ -21,7 +22,7 @@ team_recommender/
     ├── __init__.py
     ├── test_allocations.py
     └── settings.py
-
+```
 
 ## Single Test
 We start running a test prompt inside a pytest to check that the LLM is recommending us developers that we think have relevant skills based off our fixture data:
