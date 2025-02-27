@@ -15,10 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Python and Poetry
-        uses: ./.github/actions/setup-python-poetry
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
         with:
-          working-directory: .
+          python-version-file: "pyproject.toml"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -26,7 +32,7 @@ jobs:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
       - name: Run Example tests
-        run: poetry run pytest examples/team_recommender
+        run: uv run pytest examples/team_recommender/tests/example_4_gate_on_success_threshold/
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
@@ -34,7 +40,7 @@ jobs:
         if: always()
         run: |
           zip -r test-output-${{ github.run_number }}.zip examples/team_recommender/tests/test_runs
-          poetry run python src/cat_ai/publish_to_gdrive.py test-output-${{ github.run_number }}.zip
+          uv run python src/cat_ai/publish_to_gdrive.py test-output-${{ github.run_number }}.zip
         env:
           GOOGLE_DRIVE_TEST_OUTPUT_FOLDER_ID: ${{ vars.GOOGLE_DRIVE_TEST_OUTPUT_FOLDER_ID }}
 

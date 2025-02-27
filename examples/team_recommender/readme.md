@@ -1,8 +1,8 @@
 # Local Setup
-- install [poetry](https://python-poetry.org/docs/#installation)
-- run `poetry install`
+- install [uv](https://docs.astral.sh/uv/getting-started/installation)
+- run `uv sync`
 - run `cp .env.example .env`
     - populate your new `.env` file
 
 # Running the tests
-- run `poetry run pytest`
+- run `uv run pytest`
