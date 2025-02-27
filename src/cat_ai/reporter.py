@@ -14,10 +14,10 @@ class Reporter:
         return datetime.now().strftime("%Y%m%d_%H%M%S")
 
     def __init__(
-        self, test_name: str, output_dir: str, unique_id: str | None = None, metadata: Dict[str, Any] = {}
+        self, test_name: str, output_dir: str, unique_id: str | None = None, metadata: Dict[str, Any] = None
     ) -> None:
         self.test_name = test_name
-        self.metadata = metadata
+        self.metadata = metadata or {}
         if not unique_id:
             unique_id = self._create_unique_id_from_time()
         unique_dir_name = f"{test_name}-{unique_id}"
