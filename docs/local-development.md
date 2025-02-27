@@ -184,7 +184,7 @@ def test_allocations():
         run_allocation_test,
         reporter=test_reporter,
     )
-    results = test_runner.run_loop(tries)
+    results = test_runner.run_multiple(tries)
     assert False not in results
 
 
@@ -337,7 +337,7 @@ def test_allocations():
         ),
         reporter=test_reporter,
     )
-    results = test_runner.run_loop(tries)
+    results = test_runner.run_multiple(tries)
     assert False not in results
 
 

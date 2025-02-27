@@ -1,9 +1,11 @@
 import json
 import os
+
+from openai import OpenAI
+from tests.settings import ROOT_DIR
+
 from cat_ai.reporter import Reporter
 from cat_ai.runner import Runner
-from tests.settings import ROOT_DIR
-from openai import OpenAI
 
 
 def get_all_developer_names(skills_data) -> set[str]:
@@ -26,7 +28,7 @@ def has_expected_success_rate(results: list[bool], expected_success_rate: float)
 
 
 def test_allocations():
-    tries = Runner.sample_size(3)
+    tries = Runner.get_sample_size(3)
     skills_json_path = os.path.join(ROOT_DIR, "fixtures", "skills.json")
     with open(skills_json_path, "r") as file:
         skills_data = json.load(file)
@@ -62,7 +64,7 @@ def test_allocations():
         lambda reporter: run_allocation_test(reporter=reporter, skills_data=skills_data),
         reporter=test_reporter,
     )
-    results = test_runner.run_loop(tries)
+    results = test_runner.run_multiple(tries)
     failure_threshold = 0.8
     assert has_expected_success_rate(results, failure_threshold)
 

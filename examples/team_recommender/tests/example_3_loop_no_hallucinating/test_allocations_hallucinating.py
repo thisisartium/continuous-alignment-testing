@@ -51,7 +51,7 @@ def test_allocations():
         lambda reporter: run_allocation_test(reporter=reporter, skills_data=skills_data),
         reporter=test_reporter,
     )
-    results = test_runner.run_loop(tries)
+    results = test_runner.run_multiple(tries)
     assert False not in results
 
 

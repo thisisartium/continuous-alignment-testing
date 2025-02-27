@@ -3,9 +3,10 @@ from src.cat_ai.runner import Runner
 
 
 # Dummy test function that will be passed to Runner
-def dummy_test_function(reporter: Reporter):
+def dummy_test_function(reporter: Reporter) -> bool:
     # Imagine that this function does something meaningful
-    return f"Running test with run number {reporter.run_number}"
+    # Simply returning True instead of trying to log
+    return True
 
 
 def test_runner_sample_size(monkeypatch):
@@ -27,7 +28,7 @@ def test_run_once():
 
     # Test run_once
     result = runner.run_once(run_number=1)
-    assert result == "Running test with run number 1"
+    assert result is True
     assert reporter.run_number == 1
 
 
@@ -39,14 +40,10 @@ def test_run():
     runner = Runner(test_function=dummy_test_function, reporter=reporter)
 
     # Test with explicit sample size parameter
-    results = runner.run(sample_size=3)
+    results = runner.run_multiple(sample_size=3)
     assert len(results) == 3
-    assert all(res.startswith("Running test with run number ") for res in results)
-    expected_results = [
-        "Running test with run number 0",
-        "Running test with run number 1",
-        "Running test with run number 2",
-    ]
+    assert all(results)
+    expected_results = [True, True, True]
     assert results == expected_results
 
 
@@ -61,11 +58,7 @@ def test_run_with_env_variable(monkeypatch):
     runner = Runner(test_function=dummy_test_function, reporter=reporter)
 
     # Test without explicit sample size (should use environment variable)
-    results = runner.run()
+    results = runner.run_multiple()
     assert len(results) == 3
-    expected_results = [
-        "Running test with run number 0",
-        "Running test with run number 1",
-        "Running test with run number 2",
-    ]
+    expected_results = [True, True, True]
     assert results == expected_results

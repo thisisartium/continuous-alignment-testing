@@ -7,7 +7,7 @@ from .reporter import Reporter
 class Runner:
     """Executes test functions and collects results using a reporter."""
 
-    def __init__(self, test_function: Callable[..., bool], reporter: Reporter) -> None:
+    def __init__(self, test_function: Callable[[Reporter], bool], reporter: Reporter) -> None:
         """
         Initialize the Runner with a test function and reporter.
 
@@ -42,9 +42,9 @@ class Runner:
             Result from the test function
         """
         self.reporter.run_number = run_number
-        return self.test_function(reporter=self.reporter)
+        return self.test_function(self.reporter)
 
-    def run(self, sample_size: Optional[int] = None) -> List[bool]:
+    def run_multiple(self, sample_size: Optional[int] = None) -> List[bool]:
         """
         Execute the test function multiple times based on sample size.
 
@@ -55,5 +55,5 @@ class Runner:
         Returns:
             List of results from all test runs
         """
-        runs = sample_size or self.get_sample_size()
+        runs = sample_size if sample_size is not None else self.get_sample_size()
         return [self.run_once(i) for i in range(runs)]
