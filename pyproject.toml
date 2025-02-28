@@ -8,6 +8,7 @@ authors = [
   { name = "Erik Luetkehans", email = "erikluetkehans@artium.ai" },
   { name = "Paul Zabelin", email = "paulzabelin@artium.ai" },
   { name = "Tim Kersey", email = "timkersey@artium.ai" },
+  { name = "Michael Harris", email = "michaelharris@artium.ai" },
 ]
 requires-python = "~=3.13"
 readme = "README.md"
