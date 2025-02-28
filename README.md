@@ -14,25 +14,24 @@ CAT provides the infrastructure needed to:
 ## Example Apps
 
 - [team_recommender - Team Recommender](examples/team_recommender/readme.md)
-- [pythonCatBot - An OpenAI powered Python console chat app](examples/pythonCatBot/README.md)
 
 
 ## Run Tests
 
 ```bash
-poetry run pytest
+uv run pytest
 ```
 
 ## Code Quality
 
 ```bash
-poetry run mypy -p src
+uv run mypy -p src
 ```
 
 ## [Publishing Documentation](https://thisisartium.github.io/continuous-alignment-testing)
 
-The Sphinx based documentation is available at [https://thisisartium.github.io/continuous-alignment-testing](https://thisisartium.github.io/continuous-alignment-testing)
+The Sphinx based documentation is available at [https://thisisartium.github.io/cat-ai](https://thisisartium.github.io/cat-ai)
 
 ## [Wiki](wiki)
 
-- [Archive - To see potentially helpful previous iterations of the code](wiki/ARCHIVE.md)
+- [Archive - To see potentially helpful previous iterations of the code](wiki)

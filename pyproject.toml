@@ -1,42 +1,36 @@
-[tool.poetry]
+[project]
 name = "cat-ai"
 version = "0.0.5-alpha"
 description = "Python client for running CAT tests in a Python codebase"
 authors = [
-  "Mike Gehard <mikegehard@artium.ai>",
-  "Randy Lutcavich <randylutcavich@artium.ai>",
-  "Erik Luetkehans <erikluetkehans@artium.ai>",
-  "Paul Zabelin <paulzabelin@artium.ai>",
-  "Tim Kersey <timkersey@artium.ai>",
+  { name = "Mike Gehard", email = "mikegehard@artium.ai" },
+  { name = "Randy Lutcavich", email = "randylutcavich@artium.ai" },
+  { name = "Erik Luetkehans", email = "erikluetkehans@artium.ai" },
+  { name = "Paul Zabelin", email = "paulzabelin@artium.ai" },
+  { name = "Tim Kersey", email = "timkersey@artium.ai" },
 ]
+requires-python = "~=3.13"
 readme = "README.md"
+dependencies = ["pydantic>=2.10.6,<3", "pydrive2>=1.21.3,<2"]
 packages = [{ include = "cat_ai", from = "src" }]
 license = "MIT"
 
-[tool.poetry.dependencies]
-python = "^3.13"
-pydantic = "^2.10.6"
-pydrive2 = "^1.21.3"
+[dependency-groups]
+test = [
+  "pytest>=8.3.4,<9",
+  "pytest-asyncio>=0.21.0,<0.22",
+  "mypy>=1.8.0,<2",
+  "black>=24.2.0,<25",
+]
+examples = ["openai>=1.63.2,<2", "python-dotenv>=1.0.1,<2"]
+dev = [
+  "sphinx>=8.1.3,<9",
+  "sphinx-rtd-theme>=3.0.2,<4",
+  "sphinx-markdown-builder>=0.6.8,<0.7",
+]
 
-[tool.poetry.group.test.dependencies]
-pytest = "^8.3.4"
-pytest-asyncio = "^0.21.0"
-mypy = "^1.8.0"
-black = "^24.2.0"
-flake8 = "^7.0.0"
-
-[tool.poetry.group.examples.dependencies]
-openai = "^1.63.2"
-python-dotenv = "^1.0.1"
-
-[tool.poetry.group.dev.dependencies]
-sphinx = "^8.1.3"
-sphinx-rtd-theme = "^3.0.2"
-sphinx-markdown-builder = "^0.6.8"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.uv]
+default-groups = ["test", "examples", "dev"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -63,3 +57,11 @@ mypy_path = ["src"]
 line-length = 120
 target-version = ['py313']
 include = '\.pyi?$'
+
+[tool.ruff]
+# Rule selection and configuration
+line-length = 120
+lint.extend-ignore = ["E203"]
+exclude = [".git", "__pycache__", "build", "dist"]
+# Equivalent to max-complexity
+lint.mccabe = { max-complexity = 10 }

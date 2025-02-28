@@ -8,6 +8,10 @@ title: Getting Started
 ## Poetry
 ```sh
 poetry install cat-ai
+
+## UV
+
+uv add cat-ai
 ```
 
 # Driving out non-deterministic projects with CAT
