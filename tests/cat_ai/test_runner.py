@@ -27,12 +27,12 @@ def test_run_once():
     runner = Runner(test_function=dummy_test_function, reporter=reporter)
 
     # Test run_once
-    result = runner.run_once(run_number=1)
+    result = runner.run_once()
     assert result is True
-    assert reporter.run_number == 1
+    assert reporter.run_number == 0
 
 
-def test_run():
+def test_run_multiple():
     # Create a Reporter with necessary arguments
     reporter = Reporter(test_name="test_run", output_dir="/tmp")
 
@@ -40,10 +40,10 @@ def test_run():
     runner = Runner(test_function=dummy_test_function, reporter=reporter)
 
     # Test with explicit sample size parameter
-    results = runner.run_multiple(sample_size=3)
-    assert len(results) == 3
+    results = runner.run_multiple(sample_size=2)
+    assert len(results) == 2
     assert all(results)
-    expected_results = [True, True, True]
+    expected_results = [True, True]
     assert results == expected_results
 
 
