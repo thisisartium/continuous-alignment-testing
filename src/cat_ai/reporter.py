@@ -1,7 +1,7 @@
 import json
 import os
 from datetime import datetime
-from typing import Any, Dict
+from typing import Optional, Any, Dict
 
 
 class Reporter:
@@ -14,7 +14,7 @@ class Reporter:
         return datetime.now().strftime("%Y%m%d_%H%M%S")
 
     def __init__(
-        self, test_name: str, output_dir: str, unique_id: str | None = None, metadata: Dict[str, Any] = None
+        self, test_name: str, output_dir: str, unique_id: str | None = None, metadata: Optional[Dict[str, Any]] = None
     ) -> None:
         self.test_name = test_name
         self.metadata = metadata or {}
