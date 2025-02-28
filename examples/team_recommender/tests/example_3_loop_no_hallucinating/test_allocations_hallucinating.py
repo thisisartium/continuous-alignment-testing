@@ -7,11 +7,7 @@ from openai import OpenAI
 
 
 def get_all_developer_names(skills_data) -> set[str]:
-    return {
-        developer["developer"]["name"]
-        for skill in skills_data["skills"]
-        for developer in skill["developerSkills"]
-    }
+    return {developer["developer"]["name"] for skill in skills_data["skills"] for developer in skill["developerSkills"]}
 
 
 def get_developer_names_from_response(response) -> set[str]:
@@ -52,12 +48,10 @@ def test_allocations():
         output_dir=ROOT_DIR,
     )
     test_runner = Runner(
-        lambda reporter: run_allocation_test(
-            reporter=reporter, skills_data=skills_data
-        ),
+        lambda reporter: run_allocation_test(reporter=reporter, skills_data=skills_data),
         reporter=test_reporter,
     )
-    results = test_runner.run_loop(tries)
+    results = test_runner.run_multiple(tries)
     assert False not in results
 
 
@@ -82,9 +76,7 @@ def run_allocation_test(reporter, skills_data) -> bool:
     try:
         json_object = json.loads(response)
         developer_names = get_developer_names_from_response(json_object)
-        no_developer_name_is_hallucinated = False not in [
-            name in all_developers for name in developer_names
-        ]
+        no_developer_name_is_hallucinated = False not in [name in all_developers for name in developer_names]
 
         reporter.report(
             json_object,

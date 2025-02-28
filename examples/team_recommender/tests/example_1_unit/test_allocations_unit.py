@@ -42,8 +42,5 @@ def test_allocations():
         response_format={"type": "json_object"},
     )
     response = completion.choices[0].message.content
-    person_with_relevant_skill_was_selected = any(
-        name in response for name in acceptable_people
-    )
+    person_with_relevant_skill_was_selected = any(name in response for name in acceptable_people)
     assert person_with_relevant_skill_was_selected
-

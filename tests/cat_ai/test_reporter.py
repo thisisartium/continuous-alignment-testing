@@ -1,8 +1,8 @@
 import json
 import time
 from unittest.mock import mock_open, patch, MagicMock
-from cat_ai.reporter import Reporter
-from cat_ai.helpers.helpers import root_dir
+from src.cat_ai.reporter import Reporter
+from src.cat_ai.helpers.helpers import root_dir
 
 
 def test_reporter_create_a_unique_folder_path() -> None:
@@ -18,18 +18,14 @@ def test_reporter_create_a_unique_folder_path() -> None:
 def test_reporter_can_accept_unique_id_override() -> None:
     test_name = "id_override"
     unique_id = "some_string"
-    reporter1 = Reporter(
-        test_name=test_name, output_dir=root_dir(), unique_id=unique_id
-    )
+    reporter1 = Reporter(test_name=test_name, output_dir=root_dir(), unique_id=unique_id)
     expected_dir_path = f"{root_dir()}/test_runs/{test_name}-{unique_id}"
     assert str(expected_dir_path) == str(reporter1.folder_path)
 
 
 @patch("os.makedirs")
 @patch("builtins.open", new_callable=mock_open)
-def test_report_creates_correct_json(
-    mock_open: MagicMock, mock_makedirs: MagicMock
-) -> None:
+def test_report_creates_correct_json(mock_open: MagicMock, mock_makedirs: MagicMock) -> None:
     test_name = "report_creates_correct_json"
     unique_id = "20231001_120000"
     reporter = Reporter(test_name=test_name, output_dir=root_dir(), unique_id=unique_id)
