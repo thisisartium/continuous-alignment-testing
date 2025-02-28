@@ -34,4 +34,4 @@ The Sphinx based documentation is available at [https://thisisartium.github.io/c
 
 ## [Wiki](wiki)
 
-- [Archive - To see potentially helpful previous iterations of the code](wiki)
+[wiki](https://github.com/thisisartium/continuous-alignment-testing/wiki)
