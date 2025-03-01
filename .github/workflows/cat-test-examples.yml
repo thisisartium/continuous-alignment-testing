@@ -36,6 +36,16 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
+#      - name: Upload artifacts to MinIO
+#        run: |
+#          zip -r test-output-${{ github.run_number }}.zip examples/team_recommender/tests/test_runs
+#            curl -X PUT -T "/path/to/yourfile.zip" \
+#            -H "Host: localhost:9000" \
+#            -H "Date: $(date -R)" \
+#            -H "Content-Type: application/zip" \
+#            -H "Authorization: AWS minioadmin:minioadmin" \
+#            http://localhost:9000/yourbucket/yourfile.zip
+
       - name: Upload artifacts to Google Drive
         if: always()
         run: |
