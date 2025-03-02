@@ -13,12 +13,10 @@ def test_response_shows_developer_names():
         Pick only developers who are available after the project start date. Pick people with higher skill levels first.
 
         Here is the skills data:
-        Sam Thomas - iOS, Swift, Objective-C
-        Drew Anderson - iOS, Swift, Objective-C, on vacation June 1st - June 10th
+        Sam Thomas - Objective-C
+        Drew Anderson - Swift, on vacation June 1st - June 10th
         Joe Smith - Android
         Robert Sanders - React Native
-        
-        Do not show your thinking, just return the list of recommended developers.
         """
 
     project_description = """
@@ -27,7 +25,7 @@ def test_response_shows_developer_names():
         The tech stack is iOS Native.
         """
     completion = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": project_description},

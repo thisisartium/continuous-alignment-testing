@@ -34,7 +34,7 @@ def test_allocations():
         It will find exciting moments from sports highlights videos.
         """
     completion = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4-turbo",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": project_description},
@@ -42,5 +42,5 @@ def test_allocations():
         response_format={"type": "json_object"},
     )
     response = completion.choices[0].message.content
-    person_with_relevant_skill_was_selected = any(name in response for name in acceptable_people)
-    assert person_with_relevant_skill_was_selected
+    person_with_relevant_skill_was_selected = all(name in acceptable_people for name in response)
+    assert person_with_relevant_skill_was_selected, response
