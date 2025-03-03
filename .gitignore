@@ -317,4 +317,4 @@ ENV/
 # Test artifacts
 
 test_runs/
-data-store/
+minio_data/
