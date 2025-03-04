@@ -33,4 +33,4 @@ def test_response_shows_developer_names():
     response = completion.choices[0].message.content
     print(response)
     assert "Sam Thomas" in response
-    assert "Drew Anderson" in response, "Suprisingly Drew Anderson is on vacation but still in the response"
+    assert "Drew Anderson" in response, "Surprisingly Drew Anderson is on vacation but still in the response"
