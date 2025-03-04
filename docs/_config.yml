@@ -25,7 +25,7 @@ description: >- # this means to ignore newlines until "baseurl:"
 baseurl: "/continuous-alignment-testing" # the subpath of your site, e.g. /blog
 url: "https://thisisartium.github.io/continuous-alignment-testing" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
-# github_username:  jekyll
+github_username:  thisisartium
 show_excerpts: false 
 # Build settings
 theme: minima
