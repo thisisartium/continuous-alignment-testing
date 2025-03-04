@@ -27,4 +27,7 @@ jobs:
         run: uv sync --all-extras --dev
 
       - name: Run unit tests
-        run: uv run mypy src && uv run pytest
+        run: uv run pytest
+      
+      - name: Type check Python code
+        run: uv run mypy src
