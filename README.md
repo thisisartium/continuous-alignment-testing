@@ -4,34 +4,25 @@ A framework for implementing Continuous Alignment Testing (CAT) for LLM-based ap
 
 ## Overview
 
-CAT provides the infrastructure needed to:
+CAT provides the infrastructure to:
 
-- Run and track CATs against LLM outputs
-- Store and analyze test results over time
-- Monitor changes in LLM behavior as prompts/models/data evolve
-- Integrate validation into CI/CD pipelines
+- Run and track automated tests against an AI application.
+- Store and analyze AI test results over iterations.
+- Monitor reliability changes in an AI application as prompts, models, code, and data evolve.
+- Integrate AI tests into the CI pipeline.
+- Build the AI application as an API service.
+- Ensure AI applications are reliable while maintaining creativity.
+- Iterate on prompts and code while measuring improvements.
 
 ## Example Apps
 
 - [team_recommender - Team Recommender](examples/team_recommender/readme.md)
 
 
-## Run Tests
+## Documentation
 
-```bash
-uv run pytest
-```
+Github Pages: https://thisisartium.github.io/continuous-alignment-testing/
 
-## Code Quality
+## Wiki
 
-```bash
-uv run mypy -p src
-```
-
-## [Publishing Documentation](https://thisisartium.github.io/continuous-alignment-testing)
-
-The Sphinx based documentation is available at [https://thisisartium.github.io/cat-ai](https://thisisartium.github.io/cat-ai)
-
-## [Wiki](wiki)
-
-[wiki](https://github.com/thisisartium/continuous-alignment-testing/wiki)
+https://github.com/thisisartium/continuous-alignment-testing/wiki
