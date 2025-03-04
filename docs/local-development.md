@@ -8,20 +8,25 @@ The first step will be just to be able to run the first version of your prompt a
 Imagine we have a python project called `team_recommender` where we recommend teams of developers to be used on a given project. The basic structure looks like this:
 
 ```
-team_recommender/
-├── README.md
-├── requirements.txt
-├── src/
-│   ├── __init__.py
-│   ├── main.py
-│   └── utils.py
-└── tests/
-    ├── fixtures/
-    |   ├── example_output.json
-    |   └── skills.json
-    ├── __init__.py
-    ├── test_allocations.py
+examples/team_recommender
+├── conftest.py
+├── readme.md
+└── tests
+    ├── example_0_text_output
+    ├── example_1_unit
+    │   └── test_allocations_unit.py
+    ├── example_2_loop
+    │   └── test_allocations_loop.py
+    ├── example_3_loop_no_hallucinating
+    │   └── test_allocations_hallucinating.py
+    ├── example_4_gate_on_success_threshold
+    │   └── test_allocations_threshold.py
+    ├── fixtures
+    │   ├── example_output.json
+    │   ├── output_schema.json
+    │   └── skills.json
     └── settings.py
+
 ```
 
 ## Single Test
@@ -457,4 +462,4 @@ O.k! Great! Lets look at our second failure:
     }
 }
 ```
-WOW! We didn't get any developers at all. Great! We can work with this! From here we can update our prompt to be more reslient. Once we make our updates, we will want to make sure these promblems are decreasing and not not regressing over time. Obviously, that isn't something you would try to control on your local machine, and the amount of test runs to get statisticle confidence about the rates of failure/hallucination are staying low. The best surface to gate and monitor this is going to be in your [Continous Integration](running-in-ci.md).
+WOW! We didn't get any developers at all. Great! We can work with this! From here we can update our prompt to be more resilient. Once we make our updates, we will want to make sure these problems are decreasing and not not regressing over time. Obviously, that isn't something you would try to control on your local machine, and the amount of test runs to get statisticle confidence about the rates of failure/hallucination are staying low. The best surface to gate and monitor this is going to be in your [Continous Integration](running-in-ci.html).

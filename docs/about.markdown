@@ -1,18 +1,16 @@
 ---
 layout: page
 title: About
-permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
+## Overview
 
-You can find the source code for Minima at GitHub:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
+CAT Harness provides the infrastructure needed to:
 
-You can find the source code for Jekyll at GitHub:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
+- Run and track CAT tests against LLM outputs
+- Store and analyze test results over time
+- Monitor changes in LLM behavior as prompts/models/data evolve
+- Integrate validation into CI/CD pipelines
 
-
-[jekyll-organization]: https://github.com/jekyll
+[Getting Started](getting-started.html)
+[Reference](api/index.html)
