@@ -8,4 +8,4 @@ layout: home
 ## Index
 
 - [Getting Started](getting-started.html)
-- [API Refernece](api/index.html)
+- [API Reference](api/index.html)

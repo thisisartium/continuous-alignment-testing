@@ -13,4 +13,4 @@ CAT Harness provides the infrastructure needed to:
 - Integrate validation into CI/CD pipelines
 
 [Getting Started](getting-started.html)
-[Refernece](api/index.html)
+[Reference](api/index.html)
