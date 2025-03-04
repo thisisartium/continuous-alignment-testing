@@ -462,4 +462,4 @@ O.k! Great! Lets look at our second failure:
     }
 }
 ```
-WOW! We didn't get any developers at all. Great! We can work with this! From here we can update our prompt to be more reslient. Once we make our updates, we will want to make sure these promblems are decreasing and not not regressing over time. Obviously, that isn't something you would try to control on your local machine, and the amount of test runs to get statisticle confidence about the rates of failure/hallucination are staying low. The best surface to gate and monitor this is going to be in your [Continous Integration](running-in-ci.html).
+WOW! We didn't get any developers at all. Great! We can work with this! From here we can update our prompt to be more resilient. Once we make our updates, we will want to make sure these problems are decreasing and not not regressing over time. Obviously, that isn't something you would try to control on your local machine, and the amount of test runs to get statisticle confidence about the rates of failure/hallucination are staying low. The best surface to gate and monitor this is going to be in your [Continous Integration](running-in-ci.html).
