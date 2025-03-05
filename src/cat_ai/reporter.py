@@ -11,7 +11,7 @@ class Reporter:
 
     @staticmethod
     def _create_unique_id_from_time() -> str:
-        return datetime.now().strftime("%Y%m%d_%H%M%S")
+        return datetime.now().strftime("%m%d-%H_%M_%S")
 
     def __init__(
         self, test_name: str, output_dir: str, unique_id: str | None = None, metadata: Optional[Dict[str, Any]] = None
