@@ -5,7 +5,7 @@ from src.cat_ai.reporter import Reporter
 from src.cat_ai.helpers.helpers import root_dir
 
 
-def test_reporter_create_a_unique_folder_path() -> None:
+def test_reporter_creates_a_unique_folder_path() -> None:
     test_name = "unique_folder_path"
     reporter1 = Reporter(test_name=test_name, output_dir=root_dir())
     expected_dir_path = f"{root_dir()}/test_runs/{test_name}"
