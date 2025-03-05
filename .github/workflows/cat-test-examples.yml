@@ -28,7 +28,7 @@ jobs:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
       - name: Run Example tests
-        run: uv run pytest examples/team_recommender/tests/example_5_gate_on_success_threshold/
+        run: uv run pytest examples/team_recommender/tests/example_4_loop_no_hallucinating/
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
