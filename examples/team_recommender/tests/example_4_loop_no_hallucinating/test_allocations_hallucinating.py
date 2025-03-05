@@ -2,6 +2,7 @@ import json
 import os
 from cat_ai.reporter import Reporter
 from cat_ai.runner import Runner
+from pyparsing import empty
 from tests.settings import ROOT_DIR
 from openai import OpenAI
 
@@ -15,7 +16,6 @@ def get_developer_names_from_response(response) -> set[str]:
 
 
 def test_allocations():
-    tries = 10
     skills_json_path = os.path.join(ROOT_DIR, "fixtures", "skills.json")
     with open(skills_json_path, "r") as file:
         skills_data = json.load(file)
@@ -51,7 +51,7 @@ def test_allocations():
         lambda reporter: run_allocation_test(reporter=reporter, skills_data=skills_data),
         reporter=test_reporter,
     )
-    results = test_runner.run_multiple(tries)
+    results = test_runner.run_multiple()
     assert False not in results
 
 
@@ -71,21 +71,30 @@ def run_allocation_test(reporter, skills_data) -> bool:
         response_format={"type": "json_object"},
     )
     response = completion.choices[0].message.content
-    developer_is_appropriate = any(name in response for name in acceptable_people)
     result = False
+    json_load_success = False
+    not_empty_response = True
+    no_developer_name_is_hallucinated = True
+    developer_is_appropriate = True
     try:
         json_object = json.loads(response)
+        json_load_success = True
         developer_names = get_developer_names_from_response(json_object)
-        no_developer_name_is_hallucinated = False not in [name in all_developers for name in developer_names]
-
-        reporter.report(
-            json_object,
-            {
-                "correct_developer_suggested": developer_is_appropriate,
-                "no_developer_name_is_hallucinated": no_developer_name_is_hallucinated,
-            },
-        )
-        result: bool = developer_is_appropriate and no_developer_name_is_hallucinated
+        not_empty_response = len(developer_names) != 0
+        developer_is_appropriate = any(name in developer_names for name in acceptable_people)
+        if not not_empty_response:
+            no_developer_name_is_hallucinated = False not in [name in all_developers for name in developer_names]
     except json.JSONDecodeError as e:
         print(f"JSON Exception: {e}")
-    return result
+
+
+    reporter.report(
+        json_object,
+        {
+            "correct_developer_suggested": developer_is_appropriate,
+            "no_developer_name_is_hallucinated": no_developer_name_is_hallucinated,
+            "not_empty_response": not_empty_response,
+            "valid_json_returned": json_load_success,
+        },
+    )
+    return developer_is_appropriate and no_developer_name_is_hallucinated and not_empty_response and json_load_success
