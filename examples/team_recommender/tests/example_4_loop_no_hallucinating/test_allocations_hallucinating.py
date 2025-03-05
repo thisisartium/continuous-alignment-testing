@@ -2,7 +2,7 @@ import json
 import os
 from cat_ai.reporter import Reporter
 from cat_ai.runner import Runner
-from settings import ROOT_DIR
+from tests.settings import ROOT_DIR
 from openai import OpenAI
 
 

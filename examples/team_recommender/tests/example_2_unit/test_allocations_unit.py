@@ -1,8 +1,7 @@
 import json
 import os
+from tests.settings import ROOT_DIR
 from openai import OpenAI
-
-from settings import ROOT_DIR
 
 
 def test_allocations():
