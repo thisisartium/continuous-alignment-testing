@@ -2,6 +2,12 @@ name: CAT
 
 on:
   workflow_dispatch:
+    inputs:
+      rounds:
+        description: "Number of Rounds"
+        type: number
+        required: true
+        default: 10
 
 jobs:
   ai_tests:
@@ -26,6 +32,14 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
+      - name: Set number of runs
+        id: set-number-of-runs
+        run: |
+          ROUNDS=${{ inputs.rounds || 10 }}
+          echo "::notice::Starting $ROUNDS Runs: number_of_runs=$ROUNDS"
+          echo "number_of_runs=$ROUNDS" >> "$GITHUB_OUTPUT"
+          echo "CAT_AI_SAMPLE_SIZE=$ROUNDS" >> $GITHUB_ENV
 
       - name: Run Example tests
         run: uv run pytest examples/team_recommender/tests/example_4_loop_no_hallucinating/
