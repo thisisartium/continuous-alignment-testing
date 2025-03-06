@@ -9,7 +9,11 @@ from cat_ai.runner import Runner
 
 
 def get_all_developer_names(skills_data) -> set[str]:
-    return {developer["developer"]["name"] for skill in skills_data["skills"] for developer in skill["developerSkills"]}
+    return {
+        developer["developer"]["name"]
+        for skill in skills_data["skills"]
+        for developer in skill["developerSkills"]
+    }
 
 
 def get_developer_names_from_response(response) -> set[str]:
@@ -28,7 +32,7 @@ def has_expected_success_rate(results: list[bool], expected_success_rate: float)
 
 
 def test_fast_with_n_generations():
-    generations = Runner.get_sample_size(10)
+    generations = Runner.get_sample_size()
     skills_json_path = os.path.join(ROOT_DIR, "fixtures", "skills.json")
     with open(skills_json_path, "r") as file:
         skills_data = json.load(file)
@@ -56,8 +60,11 @@ def test_fast_with_n_generations():
     assert client is not None
 
     completion = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": project_description}],
+        model="gpt-4-1106-preview",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": project_description},
+        ],
         response_format={"type": "json_object"},
         n=generations,
     )
@@ -75,7 +82,10 @@ def test_fast_with_n_generations():
             output_dir=ROOT_DIR,
         )
         test_runner = Runner(
-            lambda reporter: run_allocation_test(reporter, skills_data=skills_data, response=response), reporter=test_reporter
+            lambda reporter: run_allocation_test(
+                reporter, skills_data=skills_data, response=response
+            ),
+            reporter=test_reporter,
         )
         results.append(test_runner.run_once(run))
 
@@ -98,7 +108,9 @@ def run_allocation_test(reporter, skills_data, response) -> bool:
         not_empty_response = len(developer_names) != 0
         developer_is_appropriate = any(name in developer_names for name in acceptable_people)
         if not not_empty_response:
-            no_developer_name_is_hallucinated = False not in [name in all_developers for name in developer_names]
+            no_developer_name_is_hallucinated = False not in [
+                name in all_developers for name in developer_names
+            ]
     except json.JSONDecodeError as e:
         print(f"JSON Exception: {e}")
 
@@ -111,4 +123,9 @@ def run_allocation_test(reporter, skills_data, response) -> bool:
             "valid_json_returned": json_load_success,
         },
     )
-    return developer_is_appropriate and no_developer_name_is_hallucinated and not_empty_response and json_load_success
+    return (
+        developer_is_appropriate
+        and no_developer_name_is_hallucinated
+        and not_empty_response
+        and json_load_success
+    )

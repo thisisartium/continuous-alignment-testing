@@ -13,8 +13,8 @@ authors = [
 requires-python = "~=3.13"
 readme = "README.md"
 dependencies = [
-    # this small library should be kept independent
-    # consider adding dependencies to on of the dependency groups
+  # this small library should be kept independent
+  # consider adding dependencies to on of the dependency groups
 ]
 packages = [{ include = "cat_ai", from = "src" }]
 license = "MIT"
@@ -67,7 +67,7 @@ include = '\.pyi?$'
 
 [tool.ruff]
 # Rule selection and configuration
-line-length = 120
+line-length = 100
 lint.extend-ignore = ["E203"]
 # Equivalent to max-complexity
 lint.mccabe = { max-complexity = 10 }
