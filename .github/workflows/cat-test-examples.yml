@@ -37,7 +37,7 @@ jobs:
         id: set-number-of-runs
         run: |
           ROUNDS=${{ inputs.rounds || 10 }}
-          echo "::notice::Starting $ROUNDS Runs: number_of_runs=$ROUNDS"
+          echo "::notice::Starting $ROUNDS runs"
           echo "number_of_runs=$ROUNDS" >> "$GITHUB_OUTPUT"
           echo "CAT_AI_SAMPLE_SIZE=$ROUNDS" >> $GITHUB_ENV
 
@@ -55,6 +55,13 @@ jobs:
 #            -H "Content-Type: application/zip" \
 #            -H "Authorization: AWS minioadmin:minioadmin" \
 #            http://localhost:9000/yourbucket/yourfile.zip
+
+      - name: Show number of test failures
+        run: |
+          FAILURE_COUNT=$(find examples/team_recommender/tests/test_runs -type f -name "fail-*" | wc -l)
+          if [ "$FAILURE_COUNT" -gt 0 ]; then
+            echo "::warning::There are $FAILURE_COUNT failures"
+          fi
 
       - name: Upload artifacts to Google Drive
         if: always()
