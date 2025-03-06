@@ -1,6 +1,8 @@
 name: CAT
 
 on:
+  push:
+    branches: [ ci-experiment/** ]
   workflow_dispatch:
     inputs:
       rounds:
@@ -57,11 +59,10 @@ jobs:
 #            http://localhost:9000/yourbucket/yourfile.zip
 
       - name: Show number of test failures
+        if: always()
         run: |
-          FAILURE_COUNT=$(find examples/team_recommender/tests/test_runs -type f -name "fail-*" | wc -l)
-          if [ "$FAILURE_COUNT" -gt 0 ]; then
-            echo "::warning::There are $FAILURE_COUNT failures"
-          fi
+          FAILURES=$(find examples/team_recommender/tests/test_runs -type f -name "fail-*" | wc -l)
+          .github/workflows/calculate-error-margin.sh $FAILURES $CAT_AI_SAMPLE_SIZE >> $GITHUB_STEP_SUMMARY
 
       - name: Upload artifacts to Google Drive
         if: always()
