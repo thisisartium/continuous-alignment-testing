@@ -1,6 +1,8 @@
 name: CAT
 
 on:
+  push:
+    branches: [ ci-experiment/** ]
   workflow_dispatch:
     inputs:
       rounds:
