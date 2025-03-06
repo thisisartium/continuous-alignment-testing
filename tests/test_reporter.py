@@ -39,7 +39,7 @@ def test_report_creates_correct_json(mock_open: MagicMock, mock_makedirs: MagicM
     expected_metadata = {
         "test_name": test_name,
         "folder_path": f"{root_dir()}/test_runs/{test_name}-{unique_id}",
-        "output_file": "0-False.json",
+        "output_file": "fail-0.json",
         "metadata_path": f"{root_dir()}/test_runs/{test_name}-{unique_id}/metadata.json",
         "validations": results,
         "response": response,
