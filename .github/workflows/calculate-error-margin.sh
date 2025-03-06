@@ -27,8 +27,8 @@ LOWER_BOUND_COUNT=$(echo "$LOWER_BOUND_PROP * $SAMPLE_SIZE" | bc | awk '{print (
 UPPER_BOUND_COUNT=$(echo "$UPPER_BOUND_PROP * $SAMPLE_SIZE / 1"  | bc)
 
 echo "::warning::There are $FAILURE_COUNT failures out of $SAMPLE_SIZE generations.
-Sample Proportion (p̂): $p_hat
-Standard Error (SE): $SE
-Margin of Error (ME): $ME
-95% Confidence Interval: [$LOWER_BOUND_PROP, $UPPER_BOUND_PROP]
-95% Confidence Interval (Count): [$LOWER_BOUND_COUNT, $UPPER_BOUND_COUNT]"
+\nSample Proportion (p̂): $p_hat
+\nStandard Error (SE): $SE
+\nMargin of Error (ME): $ME
+\n95% Confidence Interval: [$LOWER_BOUND_PROP, $UPPER_BOUND_PROP]
+\n95% Confidence Interval (Count): [$LOWER_BOUND_COUNT, $UPPER_BOUND_COUNT]"
