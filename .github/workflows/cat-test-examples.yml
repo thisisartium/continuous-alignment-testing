@@ -58,10 +58,8 @@ jobs:
 
       - name: Show number of test failures
         run: |
-          FAILURE_COUNT=$(find examples/team_recommender/tests/test_runs -type f -name "fail-*" | wc -l)
-          if [ "$FAILURE_COUNT" -gt 0 ]; then
-            echo "::warning::There are $FAILURE_COUNT failures"
-          fi
+          FAILURES=$(find examples/team_recommender/tests/test_runs -type f -name "fail-*" | wc -l)
+          .github/workflows/calculate-error-margin.sh $FAILURES $CAT_AI_SAMPLE_SIZE
 
       - name: Upload artifacts to Google Drive
         if: always()
