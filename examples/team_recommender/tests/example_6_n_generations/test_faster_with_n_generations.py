@@ -17,7 +17,7 @@ def get_all_developer_names(skills_data) -> set[str]:
 
 
 def get_developer_names_from_response(response) -> set[str]:
-    if "developers" not in response:
+    if "developers" in response:
         return {developer["name"] for developer in response["developers"]}
     else:
         return []
