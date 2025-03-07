@@ -20,7 +20,7 @@ def get_developer_names_from_response(response) -> set[str]:
     if "developers" in response:
         return {developer["name"] for developer in response["developers"]}
     else:
-        return []
+        return set()
 
 
 def has_expected_success_rate(results: list[bool], expected_success_rate: float) -> bool:
