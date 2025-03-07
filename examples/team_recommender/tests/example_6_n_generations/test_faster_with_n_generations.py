@@ -17,7 +17,10 @@ def get_all_developer_names(skills_data) -> set[str]:
 
 
 def get_developer_names_from_response(response) -> set[str]:
-    return {developer["name"] for developer in response["developers"]}
+    if "developers" not in response:
+        return {developer["name"] for developer in response["developers"]}
+    else:
+        return []
 
 
 def has_expected_success_rate(results: list[bool], expected_success_rate: float) -> bool:
