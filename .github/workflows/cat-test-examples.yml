@@ -62,7 +62,7 @@ jobs:
         if: always()
         run: |
           FAILURES=$(find examples/team_recommender/tests/test_runs -type f -name "fail-*" | wc -l)
-          .github/workflows/calculate-error-margin.sh $FAILURES $CAT_AI_SAMPLE_SIZE >> $GITHUB_STEP_SUMMARY
+          uv run python src/cat_ai/reporter.py $FAILURES $CAT_AI_SAMPLE_SIZE >> $GITHUB_STEP_SUMMARY
 
       - name: Upload artifacts to Google Drive
         if: always()

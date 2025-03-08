@@ -1,6 +1,7 @@
 import json
 import math
 import os
+import sys
 from datetime import datetime
 from typing import Optional, Any, Dict
 
@@ -101,6 +102,12 @@ class Reporter:
 
         return output
 
-    # Example usage:
-    # result = calculate_error_margin(10, 100)
-    # print(result)
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python reporter.py failure_count sample_size")
+        sys.exit(1)
+
+    failure_count = int(sys.argv[1])
+    sample_size = int(sys.argv[2])
+
+    print(Reporter.error_margin_summary(failure_count, sample_size))
