@@ -49,3 +49,14 @@ def test_report_creates_correct_json(mock_open: MagicMock, mock_makedirs: MagicM
     mock_makedirs.assert_called_once_with(reporter.folder_path, exist_ok=True)
 
     mock_open().write.assert_called_with(expected_json_string)
+
+def test_margin_of_error():
+    notice = Reporter.error_margin_summary(6, 100)
+    assert notice == ('> [!NOTE]\n'
+                      '> ### There are 6 failures out of 100 generations.\n'
+                      '> Sample Proportion (p̂): 0.0600\n'
+                      '> Standard Error (SE): 0.023749\n'
+                      '> Margin of Error (ME): 0.039067\n'
+                      '> 90% Confidence Interval: [0.020933, 0.099067]\n'
+                      '> 90% Confidence Interval (Count): [3, 9]'
+                      )

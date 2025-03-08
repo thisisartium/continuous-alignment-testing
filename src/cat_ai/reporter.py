@@ -1,4 +1,5 @@
 import json
+import math
 import os
 from datetime import datetime
 from typing import Optional, Any, Dict
@@ -56,3 +57,50 @@ class Reporter:
             file.write(json_object)
 
         return final_result
+
+    @staticmethod
+    def error_margin_summary(failure_count, sample_size):
+        """
+        Calculate the error margin and confidence interval for a given sample.
+
+        Args:
+            failure_count (int): Number of failures in the sample
+            sample_size (int): Total size of the sample
+
+        Returns:
+            str: Formatted string with the error margin calculations and confidence interval
+        """
+        # Calculate sample proportion
+        p_hat = failure_count / sample_size
+
+        # Determine z-score for 90% confidence level (approximately 1.645)
+        z = 1.645
+
+        # Calculate standard error
+        se = math.sqrt(p_hat * (1 - p_hat) / sample_size)
+
+        # Calculate margin of error
+        me = z * se
+
+        # Calculate confidence interval bounds as proportions
+        lower_bound_prop = p_hat - me
+        upper_bound_prop = p_hat + me
+
+        # Convert proportion bounds to integer counts
+        lower_bound_count = math.ceil(lower_bound_prop * sample_size)
+        upper_bound_count = int(upper_bound_prop * sample_size)
+
+        # Format the output string
+        output = f"> [!NOTE]\n"
+        output += f"> ### There are {failure_count} failures out of {sample_size} generations.\n"
+        output += f"> Sample Proportion (p̂): {p_hat:.4f}\n"
+        output += f"> Standard Error (SE): {se:.6f}\n"
+        output += f"> Margin of Error (ME): {me:.6f}\n"
+        output += f"> 90% Confidence Interval: [{lower_bound_prop:.6f}, {upper_bound_prop:.6f}]\n"
+        output += f"> 90% Confidence Interval (Count): [{lower_bound_count}, {upper_bound_count}]"
+
+        return output
+
+    # Example usage:
+    # result = calculate_error_margin(10, 100)
+    # print(result)
