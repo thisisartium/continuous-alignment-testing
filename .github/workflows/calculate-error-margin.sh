@@ -3,14 +3,13 @@
 # Input variables
 FAILURE_COUNT=$1
 SAMPLE_SIZE=$2
-CONFIDENCE_LEVEL=0.95
 
 # Calculate sample proportion
 p_hat=$(echo "scale=4; $FAILURE_COUNT / $SAMPLE_SIZE" | bc)
 
 # Determine z-score for the given confidence level
-# For 95% confidence level, z-score is approximately 1.96
-z=1.96
+# For 90% confidence level, z-score is approximately 1.645
+z=1.645
 
 # Calculate standard error
 SE=$(echo "scale=6; sqrt($p_hat * (1 - $p_hat) / $SAMPLE_SIZE)" | bc)
