@@ -31,5 +31,5 @@ echo "> [!NOTE]
 > Sample Proportion (p̂): $p_hat
 > Standard Error (SE): $SE
 > Margin of Error (ME): $ME
-> 95% Confidence Interval: [$LOWER_BOUND_PROP, $UPPER_BOUND_PROP]
-> 95% Confidence Interval (Count): [$LOWER_BOUND_COUNT, $UPPER_BOUND_COUNT]"
+> 90% Confidence Interval: [$LOWER_BOUND_PROP, $UPPER_BOUND_PROP]
+> 90% Confidence Interval (Count): [$LOWER_BOUND_COUNT, $UPPER_BOUND_COUNT]"
