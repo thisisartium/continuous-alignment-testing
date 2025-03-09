@@ -60,7 +60,7 @@ class Reporter:
         return final_result
 
     @staticmethod
-    def error_margin_summary(failure_count, sample_size):
+    def error_margin_summary(failure_count: int, sample_size: int) -> str:
         """
         Calculate the error margin and confidence interval for a given sample.
 
