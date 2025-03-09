@@ -16,8 +16,8 @@ def test_reporter_creates_a_unique_folder_path() -> None:
 
 
 def test_reporter_can_accept_unique_id_override() -> None:
-    test_name = "id_override"
-    unique_id = "some_string"
+    test_name = "example_test"
+    unique_id = "timestamp_or_any_unique_id"
     reporter1 = Reporter(test_name=test_name, output_dir=root_dir(), unique_id=unique_id)
     expected_dir_path = f"{root_dir()}/test_runs/{test_name}-{unique_id}"
     assert str(expected_dir_path) == str(reporter1.folder_path)
