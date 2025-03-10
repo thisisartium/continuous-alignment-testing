@@ -66,7 +66,7 @@ jobs:
         run: |
           FOLDER="examples/team_recommender/tests/test_runs"
           FAILURE_COUNT=$(find "$FOLDER" -type f -name "fail-*" | wc -l)
-          uv run python src/cat_ai/reporter.py \
+          uv run python -m cat_ai.reporter \
             "$FAILURE_COUNT" \
             "$CAT_AI_SAMPLE_SIZE" \
             >> "$GITHUB_STEP_SUMMARY"

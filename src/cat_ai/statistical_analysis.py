@@ -1,5 +1,5 @@
 import math
-from dataclasses import dataclass, astuple
+from dataclasses import astuple, dataclass
 from typing import Tuple, Any
 from statistics import NormalDist
 
