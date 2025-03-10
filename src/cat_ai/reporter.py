@@ -71,7 +71,7 @@ class Reporter:
         Returns:
             str: Formatted string with the error margin calculations and confidence interval
         """
-        output = f"> [!NOTE]\n"
+        output = "> [!NOTE]\n"
         output += f"> ### There are {analysis.failure_count} failures out of {analysis.sample_size} generations.\n"
         output += f"> Sample Proportion (p̂): {analysis.proportion:.4f}\n"
         output += f"> Standard Error (SE): {analysis.standard_error:.6f}\n"

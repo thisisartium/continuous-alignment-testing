@@ -64,7 +64,7 @@ jobs:
       - name: Show CAT AI Statistical Report
         if: always()
         run: >
-          uv run python src/cat_ai/reporter.py
+          uv run python -m cat_ai.reporter
             "$FAILURE_COUNT"
             "$CAT_AI_SAMPLE_SIZE"
             >> "$GITHUB_STEP_SUMMARY"
