@@ -75,7 +75,7 @@ jobs:
           zip -r "$FILENAME" examples/team_recommender/tests/test_runs
           uv run python src/cat_ai/publish_to_gdrive.py "$FILENAME"
         env:
-          GOOGLE_DRIVE_TEST_OUTPUT_FOLDER_ID: ${{ vars.GOOGLE_DRIVE_TEST_OUTPUT_FOLDER_ID }}
+          PARENT_FOLDER_IDS: ${{ vars.GOOGLE_DRIVE_TEST_OUTPUT_FOLDER_ID }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
