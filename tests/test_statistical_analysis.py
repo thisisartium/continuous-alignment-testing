@@ -75,9 +75,9 @@ def test_edges_cases(failures, total, expected_error, expected_ci):
 
 def export_results_to_csv_string(results: list[StatisticalAnalysis]) -> str:
     """Export a list of StatisticalAnalysis objects to a CSV-formatted string."""
-    # Create a CSV writer with consistent newline character
-    output = io.StringIO(newline="\n")
-    writer = csv.writer(output)
+    # Create a CSV writer with MacOS-style newlines to match the snapshot
+    output = io.StringIO(newline="\n")  # Let CSV writer handle newline translation
+    writer = csv.writer(output, lineterminator="\n")  # Explicitly set line terminator
 
     # Write header
     writer.writerow(StatisticalAnalysis.get_csv_headers())
