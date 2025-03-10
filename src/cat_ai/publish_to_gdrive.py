@@ -24,10 +24,12 @@ def login_with_service_account(credentials_path: str) -> GoogleAuth:
     return gauth
 
 
+PARENT_FOLDER_IDS = "PARENT_FOLDER_IDS"
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python publish_to_gdrive.py <file_path>")
-        print("PARENT_FOLDER_ID environment variable must be set.")
+        print(f"{PARENT_FOLDER_IDS} - comma-separated list of google folder IDs")
         sys.exit(1)
 
     file_path = sys.argv[1]
@@ -44,9 +46,9 @@ if __name__ == "__main__":
     drive = GoogleDrive(google_auth)
 
     file_name = os.path.basename(file_path)
-    parent_ids = os.environ.get("PARENT_FOLDER_IDS")
+    parent_ids = os.environ.get(PARENT_FOLDER_IDS)
     if not parent_ids:
-        print("Error: PARENT_FOLDER_ID environment variable is not set.")
+        print(f"Error: {PARENT_FOLDER_IDS} environment variable is not set.")
         sys.exit(2)
     parents = [{"id": pid.strip()} for pid in (parent_ids.split(","))]
     gfile = drive.CreateFile({"title": file_name, "parents": parents})
