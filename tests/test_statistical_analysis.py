@@ -1,4 +1,5 @@
 import io
+import json
 import os
 
 import pytest
@@ -75,11 +76,15 @@ def test_edges_cases(failures, total, expected_error, expected_ci):
 def test_failure_rate_bar_graph(snapshot):
     # Sample data points - choosing strategic values to test boundary conditions
     failure_counts = list(range(101))
+    assert failure_counts[0] == 0
+    assert failure_counts[100] == 100
     sample_size = 100
 
     # Calculate results for each data point
     results = [analyse_sample_from_test(f, sample_size) for f in failure_counts]
-
+    snapshot.assert_match(
+        json.dumps([result.__dict__ for result in results], indent=4), "failure_rate_results.json"
+    )
     # Extract data for plotting
     rates = [r.proportion for r in results]
     errors = [r.margin_of_error for r in results]
@@ -110,7 +115,7 @@ def test_failure_rate_bar_graph(snapshot):
     ax.set_ylabel("Failure Rate")
     ax.set_title("Failure Rate with Error Margins")
     ax.set_ylim(0, 1.2)  # Set y-axis to accommodate annotations
-    ax.grid(True, linestyle="--", alpha=0.7, axis="y")
+    ax.grid(True, linestyle="--", alpha=0.7, axis="both")
 
     # Deterministic rendering for snapshot testing
     plt.tight_layout()
