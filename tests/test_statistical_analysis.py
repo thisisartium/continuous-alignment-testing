@@ -72,6 +72,60 @@ def test_edges_cases(failures, total, expected_error, expected_ci):
     assert result.confidence_interval_count == expected_ci
 
 
+def test_failure_rate_bar_graph(snapshot):
+    # Sample data points - choosing strategic values to test boundary conditions
+    failure_counts = [0, 10, 25, 50, 75, 90, 100]
+    sample_size = 100
+
+    # Calculate results for each data point
+    results = [analyse_sample_from_test(f, sample_size) for f in failure_counts]
+
+    # Extract data for plotting
+    rates = [r.proportion for r in results]
+    errors = [r.margin_of_error for r in results]
+
+    # Create the bar plot
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Plot bars with error bars
+    bars = ax.bar(
+        failure_counts, rates, yerr=errors, capsize=5, color="steelblue", alpha=0.7, width=8
+    )
+
+    # Add annotations on top of each bar
+    for bar, rate, error in zip(bars, rates, errors):
+        height = bar.get_height()
+        ax.text(
+            bar.get_x() + bar.get_width() / 2.0,
+            height + error + 0.01,
+            f"{rate:.2f}±{error:.2f}",
+            ha="center",
+            va="bottom",
+            rotation=0,
+            fontsize=9,
+        )
+
+    # Add labels and title
+    ax.set_xlabel("Number of Failures")
+    ax.set_ylabel("Failure Rate")
+    ax.set_title("Failure Rate with Error Margins")
+    ax.set_ylim(0, 1.2)  # Set y-axis to accommodate annotations
+    ax.grid(True, linestyle="--", alpha=0.7, axis="y")
+
+    # Deterministic rendering for snapshot testing
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.rcParams["svg.hashsalt"] = "matplotlib"
+    os.environ["SOURCE_DATE_EPOCH"] = "1234567890"
+    fig.savefig(buf, format="svg")
+    buf.seek(0)
+
+    # Compare with snapshot
+    snapshot.assert_match(buf.read(), "failure_rate_bar_graph.svg")
+
+    plt.close()
+
+
 def test_failure_rate_graph(snapshot):
     # Generate a series of failure rates
     totals = np.ones(100) * 100
