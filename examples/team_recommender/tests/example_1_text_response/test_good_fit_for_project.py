@@ -32,6 +32,12 @@ def test_response_shows_developer_names():
     )
     response = completion.choices[0].message.content
     print(response)
+    # For the iOS Native project starting on June 3rd, the best developers based on the given list would be:
+    #
+    # 1. Sam Thomas - Specializes in Swift and Objective-C, and is available for the project.
+    # 2. Drew Anderson - Specializes in Swift but will be on vacation from June 1st to June 10th, so they are not available when the project starts.
+    #
+    # Therefore, Sam Thomas is the most suitable developer for this project.
     assert "Sam Thomas" in response
     assert "Drew Anderson" in response, "Surprisingly Drew Anderson is on vacation but still in the response"
 
@@ -63,6 +69,29 @@ def test_llm_will_hallucinate_given_no_data():
     )
     response = completion.choices[0].message.content
     print(response)
+    # Here is the list of developers with their skills and availability:
+    #
+    # 1. Sarah Johnson
+    #    - Skills: iOS Native, Mobile Development
+    #    - Availability: Available starting May 1st
+    #
+    # 2. Alex Kim
+    #    - Skills: iOS Native, iPhone Development, Video Processing
+    #    - Availability: Available starting June 10th
+    #
+    # 3. Jamie Smith
+    #    - Skills: iOS Native, Mobile UI Design
+    #    - Availability: Available starting May 20th
+    #
+    # Based on the project requirements and availability, the best developer for this mobile iOS project for the telecom company would be:
+    #
+    # 1. Sarah Johnson
+    #     - Skills: iOS Native, Mobile Development
+    #     - Availability: Available starting May 1st
+    #
+    # 2. Jamie Smith
+    #     - Skills: iOS Native, Mobile UI Design
+    #     - Availability: Available starting May 20th
     assert "Sam Thomas" not in response, "LLM obviously could not get our expected developer and will hallucinate"
     assert "Drew Anderson" not in response, "Response will contain made up names"
     assert len(response.split('\n')) > 5, "response contains list of made up developers in multiple lines"
