@@ -63,15 +63,15 @@ jobs:
 
       - name: Show CAT AI Statistical Report
         if: always()
-        run: >
-          uv run python -m cat_ai.reporter
-            "$FAILURE_COUNT"
-            "$CAT_AI_SAMPLE_SIZE"
+        run: |
+          FAILURE_COUNT=$(find "$FOLDER" -type f -name "fail-*" | wc -l)
+          PYTHONPATH=$(pwd)/src
+          uv run python -m cat_ai.reporter \
+            "$FAILURE_COUNT" \
+            "$CAT_AI_SAMPLE_SIZE" \
             >> "$GITHUB_STEP_SUMMARY"
         env:
           FOLDER: examples/team_recommender/tests/test_runs
-          FAILURE_COUNT: $(find "$FOLDER" -type f -name "fail-*" | wc -l)
-          PYTHONPATH: $(pwd)/src
 
       - name: Upload main artifacts to Google Drive
         if: always() && github.ref == 'refs/heads/main'
