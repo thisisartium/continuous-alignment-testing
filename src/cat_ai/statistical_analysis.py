@@ -7,6 +7,7 @@ from statistics import NormalDist
 @dataclass
 class StatisticalAnalysis:
     """Class for statistical analysis results of test runs."""
+
     failure_count: int
     sample_size: int
     proportion: float
@@ -14,6 +15,7 @@ class StatisticalAnalysis:
     margin_of_error: float
     confidence_interval_prop: Tuple[float, float]
     confidence_interval_count: Tuple[int, int]
+
 
 def analyse_sample_from_test(failure_count: int, sample_size: int) -> StatisticalAnalysis:
     """
@@ -39,8 +41,8 @@ def analyse_sample_from_test(failure_count: int, sample_size: int) -> Statistica
     me = z * se
 
     # Calculate confidence interval bounds as proportions
-    lower_bound_prop = max(0.0, p_hat - me)  # Ensure non-negative proportion
-    upper_bound_prop = min(1.0, p_hat + me)  # Ensure proportion doesn't exceed 1
+    lower_bound_prop = p_hat - me
+    upper_bound_prop = p_hat + me
 
     # Convert proportion bounds to integer counts
     lower_bound_count = math.ceil(lower_bound_prop * sample_size)
@@ -53,5 +55,5 @@ def analyse_sample_from_test(failure_count: int, sample_size: int) -> Statistica
         standard_error=se,
         margin_of_error=me,
         confidence_interval_prop=(lower_bound_prop, upper_bound_prop),
-        confidence_interval_count=(lower_bound_count, upper_bound_count)
+        confidence_interval_count=(lower_bound_count, upper_bound_count),
     )
