@@ -74,7 +74,9 @@ def test_edges_cases(failures, total, expected_error, expected_ci):
 
 
 def export_results_to_csv_string(results: list[StatisticalAnalysis]) -> str:
-    output = io.StringIO()
+    """Export a list of StatisticalAnalysis objects to a CSV-formatted string."""
+    # Create a CSV writer with consistent newline character
+    output = io.StringIO(newline="\n")
     writer = csv.writer(output)
 
     # Write header
