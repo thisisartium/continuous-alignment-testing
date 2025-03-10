@@ -1,9 +1,10 @@
 import json
-import math
 import os
 import sys
 from datetime import datetime
 from typing import Optional, Any, Dict
+
+from .statistical_analysis import StatisticalAnalysis, analyse_sample_from_test
 
 
 class Reporter:
@@ -60,45 +61,23 @@ class Reporter:
         return final_result
 
     @staticmethod
-    def error_margin_summary(failure_count: int, sample_size: int) -> str:
+    def format_summary(analysis: StatisticalAnalysis) -> str:
         """
-        Calculate the error margin and confidence interval for a given sample.
+        Format the statistical analysis as a markdown string.
 
         Args:
-            failure_count (int): Number of failures in the sample
-            sample_size (int): Total size of the sample
+            analysis: StatisticalAnalysis object containing analysis data
 
         Returns:
             str: Formatted string with the error margin calculations and confidence interval
         """
-        # Calculate sample proportion
-        p_hat = failure_count / sample_size
-
-        # Determine z-score for 90% confidence level (approximately 1.645)
-        z = 1.645
-
-        # Calculate standard error
-        se = math.sqrt(p_hat * (1 - p_hat) / sample_size)
-
-        # Calculate margin of error
-        me = z * se
-
-        # Calculate confidence interval bounds as proportions
-        lower_bound_prop = p_hat - me
-        upper_bound_prop = p_hat + me
-
-        # Convert proportion bounds to integer counts
-        lower_bound_count = math.ceil(lower_bound_prop * sample_size)
-        upper_bound_count = int(upper_bound_prop * sample_size)
-
-        # Format the output string
         output = f"> [!NOTE]\n"
-        output += f"> ### There are {failure_count} failures out of {sample_size} generations.\n"
-        output += f"> Sample Proportion (p̂): {p_hat:.4f}\n"
-        output += f"> Standard Error (SE): {se:.6f}\n"
-        output += f"> Margin of Error (ME): {me:.6f}\n"
-        output += f"> 90% Confidence Interval: [{lower_bound_prop:.6f}, {upper_bound_prop:.6f}]\n"
-        output += f"> 90% Confidence Interval (Count): [{lower_bound_count}, {upper_bound_count}]"
+        output += f"> ### There are {analysis.failure_count} failures out of {analysis.sample_size} generations.\n"
+        output += f"> Sample Proportion (p̂): {analysis.proportion:.4f}\n"
+        output += f"> Standard Error (SE): {analysis.standard_error:.6f}\n"
+        output += f"> Margin of Error (ME): {analysis.margin_of_error:.6f}\n"
+        output += f"> 90% Confidence Interval: [{analysis.confidence_interval_prop[0]:.6f}, {analysis.confidence_interval_prop[1]:.6f}]\n"
+        output += f"> 90% Confidence Interval (Count): [{analysis.confidence_interval_count[0]}, {analysis.confidence_interval_count[1]}]"
 
         return output
 
@@ -110,4 +89,6 @@ if __name__ == "__main__":
     failure_count = int(sys.argv[1])
     sample_size = int(sys.argv[2])
 
-    print(Reporter.error_margin_summary(failure_count, sample_size))
+    analysis = analyse_sample_from_test(failure_count, sample_size)
+
+    print(Reporter.format_summary(analysis))
