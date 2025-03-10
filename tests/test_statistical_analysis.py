@@ -1,5 +1,5 @@
+import csv
 import io
-import json
 import os
 
 import pytest
@@ -8,7 +8,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-from cat_ai.statistical_analysis import analyse_sample_from_test
+from cat_ai.statistical_analysis import analyse_sample_from_test, StatisticalAnalysis
 
 
 @pytest.mark.parametrize(
@@ -73,6 +73,20 @@ def test_edges_cases(failures, total, expected_error, expected_ci):
     assert result.confidence_interval_count == expected_ci
 
 
+def export_results_to_csv_string(results: list[StatisticalAnalysis]) -> str:
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    # Write header
+    writer.writerow(StatisticalAnalysis.get_csv_headers())
+
+    # Write rows
+    for result in results:
+        writer.writerow(result.as_csv_row())
+
+    return output.getvalue()
+
+
 def test_failure_rate_bar_graph(snapshot):
     # Sample data points - choosing strategic values to test boundary conditions
     failure_counts = list(range(101))
@@ -82,10 +96,9 @@ def test_failure_rate_bar_graph(snapshot):
 
     # Calculate results for each data point
     results = [analyse_sample_from_test(f, sample_size) for f in failure_counts]
-    snapshot.assert_match(
-        json.dumps([result.__dict__ for result in results], indent=4), "failure_rate_results.json"
-    )
-    # Extract data for plotting
+    csv = export_results_to_csv_string(results)
+    csv_bytes = io.BytesIO(csv.encode("utf-8"))
+    snapshot.assert_match(csv_bytes.getvalue(), "failure_rate_results.csv")
     rates = [r.proportion for r in results]
     errors = [r.margin_of_error for r in results]
 
