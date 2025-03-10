@@ -71,6 +71,7 @@ jobs:
         env:
           FOLDER: examples/team_recommender/tests/test_runs
           FAILURE_COUNT: $(find "$FOLDER" -type f -name "fail-*" | wc -l)
+          PYTHONPATH: $(pwd)/src
 
       - name: Upload main artifacts to Google Drive
         if: always() && github.ref == 'refs/heads/main'
