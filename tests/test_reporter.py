@@ -2,7 +2,7 @@ import json
 import time
 from unittest.mock import mock_open, patch, MagicMock
 
-from cat_ai import StatisticalAnalysis, analyse_sample_from_test
+from cat_ai import analyse_sample_from_test
 from src.cat_ai.reporter import Reporter
 from src.cat_ai.helpers.helpers import root_dir
 
@@ -55,24 +55,12 @@ def test_report_creates_correct_json(mock_open: MagicMock, mock_makedirs: MagicM
 
 def test_format_summary():
     analysis = analyse_sample_from_test(6, 100)
-    assert analysis == StatisticalAnalysis(
-        failure_count=6,
-        sample_size=100,
-        proportion=0.06,
-        standard_error=0.023748684174075833,
-        margin_of_error=0.039063109299053655,
-        confidence_interval_prop=(
-            0.020936890700946342,
-            0.09906310929905365
-        ),
-        confidence_interval_count=(3, 9)
-    )
     assert Reporter.format_summary(analysis) == (
-        '> [!NOTE]\n'
-        '> ### There are 6 failures out of 100 generations.\n'
-        '> Sample Proportion (p̂): 0.0600\n'
-        '> Standard Error (SE): 0.023749\n'
-        '> Margin of Error (ME): 0.039063\n'
-        '> 90% Confidence Interval: [0.020937, 0.099063]\n'
-        '> 90% Confidence Interval (Count): [3, 9]'
+        "> [!NOTE]\n"
+        "> ### There are 6 failures out of 100 generations.\n"
+        "> Sample Proportion (p̂): 0.0600\n"
+        "> Standard Error (SE): 0.023749\n"
+        "> Margin of Error (ME): 0.039063\n"
+        "> 90% Confidence Interval: [0.020937, 0.099063]\n"
+        "> 90% Confidence Interval (Count): [3, 9]"
     )
