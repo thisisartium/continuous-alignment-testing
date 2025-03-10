@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass, astuple
-from typing import Tuple
+from typing import Tuple, Any
 from statistics import NormalDist
 
 
@@ -16,10 +16,10 @@ class StatisticalAnalysis:
     confidence_interval_prop: Tuple[float, float]
     confidence_interval_count: Tuple[int, int]
 
-    def as_csv_row(self):
+    def as_csv_row(self) -> list:
         """Return a flat tuple representation suitable for CSV writing."""
         # Unpack nested tuples for CSV-friendly format
-        flat_data = []
+        flat_data: list[Any] = []
         for item in astuple(self):
             if isinstance(item, tuple):
                 flat_data.extend(item)
@@ -28,7 +28,7 @@ class StatisticalAnalysis:
         return flat_data
 
     @classmethod
-    def get_csv_headers(cls):
+    def get_csv_headers(cls) -> list[str]:
         """Generate CSV headers based on class fields."""
         headers = [
             "failure_count",
