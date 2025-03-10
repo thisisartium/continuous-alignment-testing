@@ -42,6 +42,8 @@ jobs:
         id: set-number-of-runs
         run: |
           ROUNDS=${{ inputs.rounds || 10 }}
+          [[ $GITHUB_REF_NAME == ci-experiment* ]] && ROUNDS=1
+
           echo "::notice::Starting $ROUNDS runs"
           echo "number_of_runs=$ROUNDS" >> "$GITHUB_OUTPUT"
           echo "CAT_AI_SAMPLE_SIZE=$ROUNDS" >> $GITHUB_ENV
@@ -64,9 +66,9 @@ jobs:
       - name: Show CAT AI Statistical Report
         if: always()
         run: |
-          FOLDER="examples/team_recommender/tests/test_runs"
+          FOLDER=examples/team_recommender/tests/test_runs
           FAILURE_COUNT=$(find "$FOLDER" -type f -name "fail-*" | wc -l)
-          uv run python -m cat_ai.reporter \
+          PYTHONPATH=src uv run python -m cat_ai.reporter \
             "$FAILURE_COUNT" \
             "$CAT_AI_SAMPLE_SIZE" \
             >> "$GITHUB_STEP_SUMMARY"
