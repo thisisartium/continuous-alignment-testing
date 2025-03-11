@@ -38,3 +38,6 @@ jobs:
 
       - name: Type check Python code
         run: uv run mypy src
+
+      - name: Check package build
+        run: uv build --verbose
