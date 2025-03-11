@@ -30,7 +30,7 @@ jobs:
         run: uv sync --all-extras --dev
 
       - name: Run unit tests
-        run: uv run pytest
+        run: uv run pytest --verbose --verbosity=10 --capture=no --tb=native --color=yes --showlocals
       
       - name: Type check Python code
         run: uv run mypy src
