@@ -37,6 +37,7 @@ dev = [
     "pydrive2>=1.21.3,<2",
     "pydantic>=2.10.6,<3",
     "ruff>=0.9.10",
+    "pytest-timeout>=2.3.1",
 ]
 
 [tool.uv]
@@ -46,6 +47,7 @@ default-groups = ["test", "examples", "dev"]
 asyncio_mode = "auto"
 pythonpath = [".", "src"]
 testpaths = ["tests"]
+faulthandler_timeout="100"
 
 [tool.mypy]
 python_version = "3.13"
