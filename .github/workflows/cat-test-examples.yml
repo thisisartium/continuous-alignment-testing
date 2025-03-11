@@ -91,7 +91,7 @@ jobs:
         if: always()
         with:
             name: test-output-${{ github.run_number }}
-            path: ${{env.FOLDER}}
+            path: ${{ env.TEST_RESULTS_FOLDER }}
 
 #      - name: Debugging with tmate
 #        if: failure()
