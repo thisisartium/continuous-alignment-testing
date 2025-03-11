@@ -16,7 +16,7 @@ jobs:
     name: AI Tests
     runs-on: ubuntu-latest
     env:
-      FOLDER: examples/team_recommender/test_runs
+      TEST_RESULTS_FOLDER: examples/team_recommender/test_runs
 
     steps:
       - uses: actions/checkout@v4
@@ -71,7 +71,7 @@ jobs:
       - name: Show CAT AI Statistical Report
         if: always()
         run: |          
-          FAILURE_COUNT=$(find "$FOLDER" -type f -name "fail-*.json" | wc -l)
+          FAILURE_COUNT=$(find "$TEST_RESULTS_FOLDER" -type f -name "fail-*.json" | wc -l)
           PYTHONPATH=src uv run python -m cat_ai.reporter \
             "$FAILURE_COUNT" \
             "$CAT_AI_SAMPLE_SIZE" \
@@ -80,11 +80,11 @@ jobs:
       - name: Upload main artifacts to Google Drive
         if: always() && github.ref == 'refs/heads/main'
         run: |
-          zip -r "$FILENAME" "$FOLDER"
-          uv run python src/cat_ai/publish_to_gdrive.py "$FILENAME"
+          zip -r "$ZIP_WITH_RUN" "$TEST_RESULTS_FOLDER"
+          uv run python src/cat_ai/publish_to_gdrive.py "$ZIP_WITH_RUN"
         env:
           PARENT_FOLDER_IDS: ${{ vars.GOOGLE_DRIVE_TEST_OUTPUT_FOLDER_ID }}
-          FILENAME: test-output-${{ github.run_number }}.zip
+          ZIP_WITH_RUN: test-output-${{ github.run_number }}.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
