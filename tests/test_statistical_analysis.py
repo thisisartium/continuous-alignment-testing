@@ -141,8 +141,7 @@ def test_failure_rate_bar_graph(snapshot):
     plt.tight_layout()
     buf = io.BytesIO()
     plt.rcParams["svg.hashsalt"] = "matplotlib"
-    os.environ["SOURCE_DATE_EPOCH"] = "1234567890"
-    fig.savefig(buf, format="png")
+    fig.savefig(buf, format="png", metadata={"CreationDate": None})
     buf.seek(0)
 
     # Compare with snapshot
@@ -191,8 +190,7 @@ def test_failure_rate_graph(snapshot):
     plt.tight_layout()
     buf = io.BytesIO()
     plt.rcParams["svg.hashsalt"] = "matplotlib"
-    os.environ["SOURCE_DATE_EPOCH"] = "1234567890"
-    fig.savefig(buf, format="png")
+    fig.savefig(buf, format="png", metadata={"CreationDate": None})
     buf.seek(0)
 
     # Compare with snapshot
