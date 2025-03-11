@@ -137,11 +137,11 @@ def test_failure_rate_bar_graph(snapshot):
     buf = io.BytesIO()
     plt.rcParams["svg.hashsalt"] = "matplotlib"
     os.environ["SOURCE_DATE_EPOCH"] = "1234567890"
-    fig.savefig(buf, format="svg")
+    fig.savefig(buf, format="png")
     buf.seek(0)
 
     # Compare with snapshot
-    snapshot.assert_match(buf.read(), "failure_rate_bar_graph.svg")
+    snapshot.assert_match(buf.read(), "failure_rate_bar_graph.png")
 
     plt.close()
 
@@ -186,10 +186,10 @@ def test_failure_rate_graph(snapshot):
     buf = io.BytesIO()
     plt.rcParams["svg.hashsalt"] = "matplotlib"
     os.environ["SOURCE_DATE_EPOCH"] = "1234567890"
-    fig.savefig(buf, format="svg")
+    fig.savefig(buf, format="png")
     buf.seek(0)
 
     # Compare with snapshot
-    snapshot.assert_match(buf.read(), "failure_rate_graph.svg")
+    snapshot.assert_match(buf.read(), "failure_rate_graph.png")
 
     plt.close()
