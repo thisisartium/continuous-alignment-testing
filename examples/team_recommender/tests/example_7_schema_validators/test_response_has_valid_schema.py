@@ -1,5 +1,4 @@
 import json
-import os
 from typing import List
 
 import openai
@@ -7,7 +6,7 @@ from jsonschema import FormatChecker, validate
 from openai import OpenAI
 from openai.types.chat.chat_completion import Choice
 
-from settings import ROOT_DIR
+from settings import root_path, root_dir
 from retry import retry
 
 from cat_ai.reporter import Reporter
@@ -49,7 +48,7 @@ def load_json_fixture(file_name: str) -> dict:
     :param file_name: Name of the JSON file to load.
     :return: Parsed JSON data as a dictionary.
     """
-    json_path = os.path.join(ROOT_DIR, "fixtures", file_name)
+    json_path = root_path() / "tests" / "fixtures" / file_name
     with open(json_path, "r") as file:
         return json.load(file)
 
@@ -110,7 +109,7 @@ def test_response_has_valid_schema():
                 "system_prompt": system_prompt,
                 "user_prompt": project_description,
             },
-            output_dir=ROOT_DIR,
+            output_dir=root_dir(),
         )
         test_runner = Runner(
             lambda reporter: run_allocation_test(
