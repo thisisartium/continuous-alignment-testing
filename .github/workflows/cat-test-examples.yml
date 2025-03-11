@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       rounds:
-        description: "Number of Rounds"
+        description: "Number of Rounds 1 - 128"
         type: number
         required: true
         default: 10
@@ -15,6 +15,8 @@ jobs:
   ai_tests:
     name: AI Tests
     runs-on: ubuntu-latest
+    env:
+      TEST_RESULTS_FOLDER: examples/team_recommender/test_runs
 
     steps:
       - uses: actions/checkout@v4
@@ -41,21 +43,30 @@ jobs:
       - name: Set number of runs
         id: set-number-of-runs
         run: |
-          ROUNDS=${{ inputs.rounds || 10 }}
-          [[ $GITHUB_REF_NAME == ci-experiment* ]] && ROUNDS=1
+          [[ "${GITHUB_REF_NAME}" =~ ^ci-experiment/ ]] && ROUNDS=1 || ROUNDS=10
+          ROUNDS=${INPUT_ROUNDS:-$ROUNDS}
+          
+          if [ "$ROUNDS" -gt 128 ] || [ "$ROUNDS" -le 0 ]
+          then
+            echo "Invalid number of rounds: $ROUNDS"
+            exit 1
+          fi
 
-          echo "::notice::Starting $ROUNDS runs"
+          echo "::notice::Starting ${ROUNDS} run$([ "$ROUNDS" -eq 1 ] || echo "s")"
           echo "number_of_runs=$ROUNDS" >> "$GITHUB_OUTPUT"
           echo "CAT_AI_SAMPLE_SIZE=$ROUNDS" >> $GITHUB_ENV
 
       - name: Run Example tests
-        run: uv run pytest examples/team_recommender/tests/example_7_*
+        run: >
+          uv run pytest
+          --verbose --verbosity=10 --capture=no --tb=native --color=yes --showlocals
+          examples/team_recommender/tests/example_7_*
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
 #      - name: Upload artifacts to MinIO
 #        run: |
-#          zip -r test-output-${{ github.run_number }}.zip examples/team_recommender/tests/test_runs
+#          zip -r test-output-${{ github.run_number }}.zip "examples/team_recommender/test_runs"
 #            curl -X PUT -T "/path/to/yourfile.zip" \
 #            -H "Host: localhost:9000" \
 #            -H "Date: $(date -R)" \
@@ -65,32 +76,31 @@ jobs:
 
       - name: Show CAT AI Statistical Report
         if: always()
-        run: |
-          FOLDER=examples/team_recommender/tests/test_runs
-          FAILURE_COUNT=$(find "$FOLDER" -type f -name "fail-*" | wc -l)
+        run: |          
+          FAILURE_COUNT=$(find "$TEST_RESULTS_FOLDER" -type f -name "fail-*.json" | wc -l)
           PYTHONPATH=src uv run python -m cat_ai.reporter \
             "$FAILURE_COUNT" \
             "$CAT_AI_SAMPLE_SIZE" \
             >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload main artifacts to Google Drive
-        if: always() && github.ref == 'refs/heads/main'
+        if: always() && github.ref_name == 'main'
         run: |
-          zip -r "$FILENAME" examples/team_recommender/tests/test_runs
-          uv run python src/cat_ai/publish_to_gdrive.py "$FILENAME"
+          zip -r "$ZIP_WITH_RUN" "$TEST_RESULTS_FOLDER"
+          uv run python src/cat_ai/publish_to_gdrive.py "$ZIP_WITH_RUN"
         env:
           PARENT_FOLDER_IDS: ${{ vars.GOOGLE_DRIVE_TEST_OUTPUT_FOLDER_ID }}
-          FILENAME: test-output-${{ github.run_number }}.zip
+          ZIP_WITH_RUN: test-output-${{ github.run_number }}.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
             name: test-output-${{ github.run_number }}
-            path: examples/team_recommender/tests/test_runs
+            path: ${{ env.TEST_RESULTS_FOLDER }}
 
-#      - name: Debugging with tmate
-#        if: failure()
-#        uses: lhotari/action-upterm@v1
-#        with:
-#          wait-timeout-minutes: 5
+      - name: Debugging with tmate
+        if: failure()
+        uses: lhotari/action-upterm@v1
+        with:
+          wait-timeout-minutes: 5

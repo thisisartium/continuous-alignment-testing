@@ -61,24 +61,25 @@ class Reporter:
         return final_result
 
     @staticmethod
-    def format_summary(analysis: StatisticalAnalysis) -> str:
+    def format_summary(to_report: StatisticalAnalysis) -> str:
         """
         Format the statistical analysis as a markdown string.
 
         Args:
-            analysis: StatisticalAnalysis object containing analysis data
+            to_report: StatisticalAnalysis object containing analysis data
 
         Returns:
             str: Formatted string with the error margin calculations and confidence interval
         """
-        output = f"> [!NOTE]\n"
-        output += f"> ### There are {analysis.failure_count} failures out of {analysis.sample_size} generations.\n"
-        output += f"> Sample Proportion (p̂): {analysis.proportion:.4f}\n"
-        output += f"> Standard Error (SE): {analysis.standard_error:.6f}\n"
-        output += f"> Margin of Error (ME): {analysis.margin_of_error:.6f}\n"
-        output += f"> 90% Confidence Interval: [{analysis.confidence_interval_prop[0]:.6f}, {analysis.confidence_interval_prop[1]:.6f}]\n"
-        output += f"> 90% Confidence Interval (Count): [{analysis.confidence_interval_count[0]}, {analysis.confidence_interval_count[1]}]"
-
+        output = "> [!NOTE]\n"
+        output += f"> ## {to_report.failure_count} ± {to_report.margin_of_error_count} failures detected ({to_report.sample_size} samples)\n"
+        output += "> \n"
+        output += f"> **90% Confidence Range:** {to_report.confidence_interval_count[0]}-{to_report.confidence_interval_count[1]} failures\n"
+        output += "> \n"
+        output += "> **Details:**\n"
+        output += f"> - Proportion: {to_report.proportion:.4f} [{to_report.confidence_interval_prop[0]:.4f}, {to_report.confidence_interval_prop[1]:.4f}]\n"
+        output += f"> - Standard Error: {to_report.standard_error:.4f}\n"
+        output += f"> - Margin of Error: {to_report.margin_of_error:.4f}\n"
         return output
 
 

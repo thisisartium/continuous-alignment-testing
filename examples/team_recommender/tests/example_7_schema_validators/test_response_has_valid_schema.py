@@ -1,9 +1,13 @@
 import json
-import os
+from typing import List
 
+import openai
 from jsonschema import FormatChecker, validate
 from openai import OpenAI
-from tests.settings import ROOT_DIR
+from openai.types.chat.chat_completion import Choice
+
+from settings import root_path, root_dir
+from retry import retry
 
 from cat_ai.reporter import Reporter
 from cat_ai.runner import Runner
@@ -44,7 +48,7 @@ def load_json_fixture(file_name: str) -> dict:
     :param file_name: Name of the JSON file to load.
     :return: Parsed JSON data as a dictionary.
     """
-    json_path = os.path.join(ROOT_DIR, "fixtures", file_name)
+    json_path = root_path() / "tests" / "fixtures" / file_name
     with open(json_path, "r") as file:
         return json.load(file)
 
@@ -91,30 +95,18 @@ def test_response_has_valid_schema():
     It will find exciting moments from sports highlights videos.
     """
 
-    client = OpenAI()
-    assert client is not None
-
-    completion = client.chat.completions.create(
-        model="gpt-4-1106-preview",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": project_description},
-        ],
-        response_format={"type": "json_object"},
-        n=generations,
-    )
-    responses = completion.choices
+    responses = generate_choices(generations, project_description, system_prompt)
 
     results = []
     for run in range(0, generations):
         response = responses[run].message.content
         test_reporter = Reporter(
-            "test_fast_with_n_generations",
+            f"test_fast_with_{generations}_generation{'' if generations == 1 else 's'}",
             metadata={
                 "system_prompt": system_prompt,
                 "user_prompt": project_description,
             },
-            output_dir=ROOT_DIR,
+            output_dir=root_dir(),
         )
         test_runner = Runner(
             lambda reporter: run_allocation_test(
@@ -128,7 +120,31 @@ def test_response_has_valid_schema():
     assert has_expected_success_rate(results, failure_threshold)
 
 
-def run_allocation_test(reporter, skills_data, response) -> bool:
+@retry(
+    max_attempts=4,
+    exceptions=(openai.APIConnectionError,),
+    initial_delay=1.0,
+    backoff_factor=2.0,
+    logger_name="openai.api",
+)
+def generate_choices(generations, project_description, system_prompt) -> List[Choice]:
+    client = OpenAI()
+    assert client is not None
+
+    completion = client.chat.completions.create(
+        model="gpt-4-1106-preview",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": project_description},
+        ],
+        response_format={"type": "json_object"},
+        n=generations,
+    )
+    responses = completion.choices
+    return responses
+
+
+def run_allocation_test(reporter: Reporter, skills_data, response: str) -> bool:
     acceptable_people = ["Sam Thomas", "Drew Anderson", "Alex Wilson", "Alex Johnson"]
     all_developers = get_all_developer_names(skills_data)
 
@@ -138,6 +154,7 @@ def run_allocation_test(reporter, skills_data, response) -> bool:
     not_empty_response = True
     no_developer_name_is_hallucinated = True
     developer_is_appropriate = True
+    json_object = {}
     try:
         json_object = json.loads(response)
         has_valid_json_schema = response_matches_json_schema(json_object, schema)
