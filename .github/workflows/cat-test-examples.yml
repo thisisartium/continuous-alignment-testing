@@ -43,6 +43,7 @@ jobs:
       - name: Set number of runs
         id: set-number-of-runs
         run: |
+          echo github.ref_name = ${{ github.ref_name }}
           ROUNDS=${{ inputs.rounds || (github.ref_name == 'ci-experiment/**' && 1 || 10) }}
           echo "::notice::Starting ${ROUNDS} run$([ "$ROUNDS" -eq 1 ] || echo "s")"
           echo "number_of_runs=$ROUNDS" >> "$GITHUB_OUTPUT"
@@ -91,8 +92,8 @@ jobs:
             name: test-output-${{ github.run_number }}
             path: ${{ env.TEST_RESULTS_FOLDER }}
 
-#      - name: Debugging with tmate
-#        if: failure()
-#        uses: lhotari/action-upterm@v1
-#        with:
-#          wait-timeout-minutes: 5
+      - name: Debugging with tmate
+        if: failure()
+        uses: lhotari/action-upterm@v1
+        with:
+          wait-timeout-minutes: 5
