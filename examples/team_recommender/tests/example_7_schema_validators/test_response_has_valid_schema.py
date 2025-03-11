@@ -95,16 +95,13 @@ def test_response_has_valid_schema():
     It will find exciting moments from sports highlights videos.
     """
 
-    client = OpenAI()
-    assert client is not None
-
-    responses = generate_choices(client, generations, project_description, system_prompt)
+    responses = generate_choices(generations, project_description, system_prompt)
 
     results = []
     for run in range(0, generations):
         response = responses[run].message.content
         test_reporter = Reporter(
-            "test_fast_with_n_generations",
+            f"test_fast_with_{generations}_generation{'' if generations == 1 else 's'}",
             metadata={
                 "system_prompt": system_prompt,
                 "user_prompt": project_description,
@@ -130,7 +127,10 @@ def test_response_has_valid_schema():
     backoff_factor=2.0,
     logger_name="openai.api",
 )
-def generate_choices(client, generations, project_description, system_prompt) -> List[Choice]:
+def generate_choices(generations, project_description, system_prompt) -> List[Choice]:
+    client = OpenAI()
+    assert client is not None
+
     completion = client.chat.completions.create(
         model="gpt-4-1106-preview",
         messages=[
@@ -144,7 +144,7 @@ def generate_choices(client, generations, project_description, system_prompt) ->
     return responses
 
 
-def run_allocation_test(reporter, skills_data, response) -> bool:
+def run_allocation_test(reporter: Reporter, skills_data, response: str) -> bool:
     acceptable_people = ["Sam Thomas", "Drew Anderson", "Alex Wilson", "Alex Johnson"]
     all_developers = get_all_developer_names(skills_data)
 
@@ -154,6 +154,7 @@ def run_allocation_test(reporter, skills_data, response) -> bool:
     not_empty_response = True
     no_developer_name_is_hallucinated = True
     developer_is_appropriate = True
+    json_object = {}
     try:
         json_object = json.loads(response)
         has_valid_json_schema = response_matches_json_schema(json_object, schema)
