@@ -49,7 +49,10 @@ jobs:
           echo "CAT_AI_SAMPLE_SIZE=$ROUNDS" >> $GITHUB_ENV
 
       - name: Run Example tests
-        run: uv run pytest examples/team_recommender/tests/example_7_*
+        run: >
+          uv run pytest
+          --verbose --verbosity=10 --capture=no --tb=native --color=yes --showlocals
+          examples/team_recommender/tests/example_7_*
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
