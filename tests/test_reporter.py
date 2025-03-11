@@ -57,10 +57,12 @@ def test_format_summary():
     analysis = analyse_sample_from_test(6, 100)
     assert Reporter.format_summary(analysis) == (
         "> [!NOTE]\n"
-        "> ### There are 6 failures out of 100 generations.\n"
-        "> Sample Proportion (p̂): 0.0600\n"
-        "> Standard Error (SE): 0.023749\n"
-        "> Margin of Error (ME): 0.039063\n"
-        "> 90% Confidence Interval: [0.020937, 0.099063]\n"
-        "> 90% Confidence Interval (Count): [3, 9]"
+        "> ## 6 ± 3 failures detected (100 samples)\n"
+        "> \n"
+        "> **90% Confidence Range:** 3-9 failures\n"
+        "> \n"
+        "> **Details:**\n"
+        "> - Proportion: 0.0600 [0.0209, 0.0991]\n"
+        "> - Standard Error: 0.0237\n"
+        "> - Margin of Error: 0.0391\n"
     )
