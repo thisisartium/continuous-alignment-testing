@@ -87,7 +87,7 @@ jobs:
         if: always()
         with:
             name: test-output-${{ github.run_number }}
-            path: examples/team_recommender/tests/test_runs
+            path: examples/team_recommender/test_runs
 
 #      - name: Debugging with tmate
 #        if: failure()
