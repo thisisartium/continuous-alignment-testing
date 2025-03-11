@@ -228,7 +228,6 @@ examples = [
     { name = "python-dotenv" },
 ]
 test = [
-    { name = "black" },
     { name = "matplotlib" },
     { name = "mypy" },
     { name = "pytest" },
@@ -273,7 +272,6 @@ examples = [
     { name = "python-dotenv", specifier = ">=1.0.1,<2" },
 ]
 test = [
-    { name = "black", specifier = ">=24.2.0,<25" },
     { name = "matplotlib", specifier = ">=3.10.1" },
     { name = "mypy", specifier = ">=1.8.0,<2" },
     { name = "pytest", specifier = ">=8.3.4,<9" },
