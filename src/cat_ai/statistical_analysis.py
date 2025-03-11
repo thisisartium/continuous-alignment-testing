@@ -1,7 +1,7 @@
 import math
 from dataclasses import astuple, dataclass
-from typing import Tuple, Any
 from statistics import NormalDist
+from typing import Any, Tuple
 
 
 @dataclass
@@ -17,7 +17,7 @@ class StatisticalAnalysis:
     margin_of_error: float
     confidence_interval_prop: Tuple[float, float]
 
-    def as_csv_row(self) -> list:
+    def as_csv_row(self: dataclass) -> list:
         """Return a flat tuple representation suitable for CSV writing."""
         # Unpack nested tuples for CSV-friendly format
         flat_data: list[Any] = []
