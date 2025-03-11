@@ -43,8 +43,8 @@ jobs:
       - name: Set number of runs
         id: set-number-of-runs
         run: |
-          [ "${{ github.ref_name }}" == "ci-experiment/**" ] && ROUNDS=1 || ROUNDS=10
-          ROUNDS=${"${{ inputs.rounds }}":-$ROUNDS}
+          [ "${GITHUB_REF_NAME}" == "ci-experiment/**" ] && ROUNDS=1 || ROUNDS=10
+          ROUNDS=${INPUT_ROUNDS:-$ROUNDS}
           echo "::notice::Starting ${ROUNDS} run$([ "$ROUNDS" -eq 1 ] || echo "s")"
           echo "number_of_runs=$ROUNDS" >> "$GITHUB_OUTPUT"
           echo "CAT_AI_SAMPLE_SIZE=$ROUNDS" >> $GITHUB_ENV
