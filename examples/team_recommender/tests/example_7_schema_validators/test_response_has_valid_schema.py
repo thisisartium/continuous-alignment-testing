@@ -1,9 +1,14 @@
 import json
 import os
+from typing import List
 
+import openai
 from jsonschema import FormatChecker, validate
 from openai import OpenAI
-from tests.settings import ROOT_DIR
+from openai.types.chat.chat_completion import Choice
+
+from settings import ROOT_DIR
+from retry import retry
 
 from cat_ai.reporter import Reporter
 from cat_ai.runner import Runner
@@ -94,16 +99,7 @@ def test_response_has_valid_schema():
     client = OpenAI()
     assert client is not None
 
-    completion = client.chat.completions.create(
-        model="gpt-4-1106-preview",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": project_description},
-        ],
-        response_format={"type": "json_object"},
-        n=generations,
-    )
-    responses = completion.choices
+    responses = generate_choices(client, generations, project_description, system_prompt)
 
     results = []
     for run in range(0, generations):
@@ -126,6 +122,27 @@ def test_response_has_valid_schema():
 
     failure_threshold = 0.8
     assert has_expected_success_rate(results, failure_threshold)
+
+
+@retry(
+    max_attempts=4,
+    exceptions=(openai.APIConnectionError,),
+    initial_delay=1.0,
+    backoff_factor=2.0,
+    logger_name="openai.api",
+)
+def generate_choices(client, generations, project_description, system_prompt) -> List[Choice]:
+    completion = client.chat.completions.create(
+        model="gpt-4-1106-preview",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": project_description},
+        ],
+        response_format={"type": "json_object"},
+        n=generations,
+    )
+    responses = completion.choices
+    return responses
 
 
 def run_allocation_test(reporter, skills_data, response) -> bool:
