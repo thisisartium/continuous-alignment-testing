@@ -49,8 +49,8 @@ def retry(
                         raise
 
                     local_logger.warning(
-                        f"Attempt {attempt}/{max_attempts} failed with " + details,
-                        f"Retrying in {current_delay:.2f}s...",
+                        f"Attempt {attempt}/{max_attempts} failed with {details}. "
+                        f"Retrying in {current_delay:.2f}s..."
                     )
 
                     time.sleep(current_delay)
