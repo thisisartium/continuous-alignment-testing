@@ -45,7 +45,7 @@ jobs:
         id: set-number-of-runs
         run: |
           [[ "${GITHUB_REF_NAME}" =~ ^ci-experiment/ ]] && ROUNDS=1 || ROUNDS=10
-          ROUNDS=${INPUT_ROUNDS:-$ROUNDS}
+          ROUNDS=${${{inputs.rounds}}:-$ROUNDS}
           
           if [ "$ROUNDS" -gt 128 ] || [ "$ROUNDS" -le 0 ]
           then
