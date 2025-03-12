@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TEST_RESULTS_FOLDER: examples/team_recommender/test_runs
+      PYTHONUNBUFFERED: 1
 
     steps:
       - uses: actions/checkout@v4
@@ -42,9 +43,11 @@ jobs:
 
       - name: Set number of runs
         id: set-number-of-runs
+        env:
+          INPUTS_ROUNDS_OR_EMPTY: ${{ inputs.rounds }}
         run: |
           [[ "${GITHUB_REF_NAME}" =~ ^ci-experiment/ ]] && ROUNDS=1 || ROUNDS=10
-          ROUNDS=${INPUT_ROUNDS:-$ROUNDS}
+          ROUNDS=${INPUTS_ROUNDS_OR_EMPTY:-$ROUNDS}
           
           if [ "$ROUNDS" -gt 128 ] || [ "$ROUNDS" -le 0 ]
           then
@@ -60,7 +63,7 @@ jobs:
         run: >
           uv run pytest
           --verbose --verbosity=10 --capture=no --tb=native --color=yes --showlocals
-          examples/team_recommender/tests/example_7_*
+          examples/team_recommender/tests/example_8_*
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
