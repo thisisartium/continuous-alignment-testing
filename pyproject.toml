@@ -53,6 +53,7 @@ test = [
     "pytest-asyncio>=0.21.0,<0.22",
     "mypy>=1.8.0,<2",
     "pytest-snapshot>=0.9.0",
+    "pytest-timeout>=2.3.1",
 ]
 examples = ["openai>=1.63.2,<2", "python-dotenv>=1.0.1,<2"]
 dev = [
@@ -63,7 +64,6 @@ dev = [
     "pydrive2>=1.21.3,<2",
     "pydantic>=2.10.6,<3",
     "ruff>=0.9.10",
-    "pytest-timeout>=2.3.1",
 ]
 
 [tool.uv]
