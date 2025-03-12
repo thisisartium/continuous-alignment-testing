@@ -11,6 +11,8 @@ jobs:
   unit_tests:
     name: Unit Tests
     runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: 1
 
     steps:
       - uses: actions/checkout@v4
