@@ -36,6 +36,13 @@ jobs:
       - name: Install the project
         run: uv sync --all-extras --dev
 
+      - name: Check if GOOGLE_CREDENTIALS is set
+        run: |
+          if [ -z "${{ secrets.GOOGLE_CREDENTIALS }}" ]; then
+            echo "Error: GOOGLE_CREDENTIALS secret is not set!"
+            exit 1
+          fi
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
