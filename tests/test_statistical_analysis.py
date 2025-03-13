@@ -1,14 +1,14 @@
 import csv
 import io
-import os
-
-import pytest
-from statistics import NormalDist
 import math
+import os
+from statistics import NormalDist
+
 import matplotlib.pyplot as plt
 import numpy as np
+import pytest
 
-from cat_ai.statistical_analysis import analyse_sample_from_test, StatisticalAnalysis
+from cat_ai.statistical_analysis import StatisticalAnalysis, analyse_sample_from_test
 
 
 @pytest.mark.parametrize(
@@ -113,9 +113,7 @@ def test_failure_rate_bar_graph(snapshot):
     fig, ax = plt.subplots(figsize=(10, 6))
 
     # Plot bars with error bars
-    bars = ax.bar(
-        failure_counts, rates, yerr=errors, capsize=5, color="steelblue", alpha=0.7, width=8
-    )
+    ax.bar(failure_counts, rates, yerr=errors, capsize=5, color="steelblue", alpha=0.7, width=8)
 
     # # Add annotations on top of each bar
     # for bar, rate, error in zip(bars, rates, errors):
@@ -157,7 +155,7 @@ def test_failure_rate_graph(snapshot):
     failures = np.arange(0, 100)
 
     # Calculate results for each rate
-    results = [analyse_sample_from_test(f, t) for f, t in zip(failures, totals)]
+    results = [analyse_sample_from_test(f, t) for f, t in zip(failures, totals, strict=True)]
 
     # Extract data for plotting
     rates = [r.proportion for r in results]
