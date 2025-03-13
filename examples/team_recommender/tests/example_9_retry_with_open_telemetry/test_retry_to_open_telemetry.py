@@ -62,7 +62,7 @@ def has_expected_success_rate(results: list[bool], expected_success_rate: float)
 
 
 def test_open_telemetry_receives_message():
-    generations = Runner.get_sample_size(128)
+    generations = Runner.get_sample_size()
 
     skills_data = load_json_fixture("skills.json")
     example_output = load_json_fixture("example_output.json")
