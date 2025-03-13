@@ -1,10 +1,10 @@
 import json
-import logging
 from typing import List
 
 import openai
 from helpers import load_json_fixture
 from jsonschema import FormatChecker, validate
+from logger_to_opentelemetry import configure_logger_for_opentelemetry
 from openai import OpenAI
 from openai.types.chat.chat_completion import Choice
 from retry import retry
@@ -61,8 +61,8 @@ def has_expected_success_rate(results: list[bool], expected_success_rate: float)
     return expected_success_rate <= (1.0 - failure_rate)
 
 
-def test_response_pass_all_validations_and_retried():
-    generations = Runner.get_sample_size()
+def test_open_telemetry_receives_message():
+    generations = Runner.get_sample_size(128)
 
     skills_data = load_json_fixture("skills.json")
     example_output = load_json_fixture("example_output.json")
@@ -84,8 +84,8 @@ def test_response_pass_all_validations_and_retried():
     It will find exciting moments from sports highlights videos.
     """
 
-    logger = logging.getLogger("openai.api")
-    logger.debug("Logging retries for OpenAI API")
+    retry_logger = configure_logger_for_opentelemetry("openai.api")
+    retry_logger.debug("Prepared to retry generate_choices")
     responses = generate_choices(generations, project_description, system_prompt)
 
     results = []
