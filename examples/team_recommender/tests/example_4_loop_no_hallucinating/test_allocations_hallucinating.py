@@ -16,7 +16,7 @@ def get_all_developer_names(skills_data) -> set[str]:
     }
 
 
-def get_developer_names_from_response(response: dict[str, dict[str, str]]) -> set[str]:
+def get_developer_names_from_response(response: dict) -> set[str]:
     return {developer["name"] for developer in response["developers"]}
 
 
