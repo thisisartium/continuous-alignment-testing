@@ -1,11 +1,8 @@
 import logging
 import sys
-from typing import Any, Dict, Optional
+from typing import Optional
 
-# OpenTelemetry imports
 from opentelemetry import trace
-from opentelemetry.semconv.resource import ResourceAttributes
-from opentelemetry.trace import TracerProvider
 from opentelemetry.trace.span import Span
 
 
@@ -26,6 +23,7 @@ class OpenTelemetryLogHandler(logging.Handler):
         """
         Convert a LogRecord to an OpenTelemetry span event.
         """
+        # noinspection PyBroadException
         try:
             # Get the current active span, if available
             current_span: Span = trace.get_current_span()
@@ -51,7 +49,7 @@ class OpenTelemetryLogHandler(logging.Handler):
                     attributes.update(record.otel_attributes)
 
             # Format the message
-            message = self.format(record)
+            self.format(record)
 
             # Add event to the current span
             current_span.add_event(name=f"log.{record.levelname.lower()}", attributes=attributes)
@@ -73,52 +71,31 @@ class OpenTelemetryLogHandler(logging.Handler):
             self.handleError(record)
 
 
-def configure_opentelemetry(
-    service_name: str, extra_resources: Optional[Dict[str, Any]] = None
-) -> None:
-    """Configure OpenTelemetry tracer with console exporter for demonstration."""
-    # Create a resource with service info
-    resource_attributes = {ResourceAttributes.SERVICE_NAME: service_name}
-
-    if extra_resources:
-        resource_attributes.update(extra_resources)
-
-    # Create and set the TracerProvider
-    resource = Resource.create(resource_attributes)
-    trace.set_tracer_provider(TracerProvider(resource=resource))
-
-    # Add console exporter for demo purposes
-    # In production, you'd use OTLP, Jaeger, Zipkin, etc.
-    processor = BatchSpanProcessor(ConsoleSpanExporter())
-    trace.get_tracer_provider().add_span_processor(processor)
-
-
 def configure_logger_for_opentelemetry(logger_name: Optional[str] = None) -> logging.Logger:
     """Configure a logger to send events to OpenTelemetry."""
     # Get logger
-    logger = logging.getLogger(logger_name)
+    ot_logger = logging.getLogger(logger_name)
 
     # Create and add OpenTelemetry handler
-    otel_handler = OpenTelemetryLogHandler()
+    ot_handler = OpenTelemetryLogHandler()
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    otel_handler.setFormatter(formatter)
-    logger.addHandler(otel_handler)
+    ot_handler.setFormatter(formatter)
+    ot_logger.addHandler(ot_handler)
 
     # You can keep console output for local development
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
+    ot_logger.addHandler(console_handler)
 
     # Set level
-    logger.setLevel(logging.INFO)
+    ot_logger.setLevel(logging.INFO)
 
-    return logger
+    return ot_logger
 
 
 # Example usage
 if __name__ == "__main__":
     # Configure OpenTelemetry
-    configure_opentelemetry("example-service")
 
     # Configure logger
     logger = configure_logger_for_opentelemetry("example.app")
@@ -136,7 +113,7 @@ if __name__ == "__main__":
         try:
             # Simulate an error
             result = 1 / 0
-        except Exception:
-            logger.exception("Operation failed")
+        except Exception as simulated_error:
+            logger.exception(f"Operation failed: {simulated_error}")
 
         logger.info("Operation completed")

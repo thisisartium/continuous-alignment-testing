@@ -1,5 +1,4 @@
 import json
-import os
 
 from helpers import load_json_fixture
 from jsonschema import FormatChecker, validate
@@ -38,18 +37,6 @@ def response_matches_json_schema(response: str, schema: any) -> bool:
         return False
 
 
-def load_json_fixture(file_name: str) -> dict:
-    """
-    Utility function to load a JSON fixture file.
-
-    :param file_name: Name of the JSON file to load.
-    :return: Parsed JSON data as a dictionary.
-    """
-    json_path = os.path.join(ROOT_DIR, "tests/fixtures", file_name)
-    with open(json_path, "r") as file:
-        return json.load(file)
-
-
 def test_response_matches_json_schema():
     # Load example output and schema
     example_output = load_json_fixture("example_output.json")
@@ -76,15 +63,17 @@ def test_response_has_valid_schema():
     example_output = load_json_fixture("example_output.json")
 
     system_prompt = f"""
-        You will get a description of a project, and your task is to tell me the best developers from the given list for the project
-         based on their skills.
+        You will get a description of a project, and your task is 
+        to tell me the best developers from the given list for the project based on their skills.
         Today's date is April 15th, 2025.
-        Pick only developers who are available after the project start date. Pick people with higher skill levels first.
-        respond in json with this structure:
+        Pick only developers who are available after the project start date. 
+        Pick people with higher skill levels first.
+        Respond in json with this structure:
             {example_output}
 
         Here is the skills data:
         """
+
     system_prompt = system_prompt + str(skills_data)
 
     project_description = """
@@ -118,8 +107,8 @@ def test_response_has_valid_schema():
             output_dir=ROOT_DIR,
         )
         test_runner = Runner(
-            lambda reporter: run_allocation_test(
-                reporter, skills_data=skills_data, response=response
+            lambda reporter, content=response: run_allocation_test(
+                reporter, skills_data=skills_data, response=content
             ),
             reporter=test_reporter,
         )

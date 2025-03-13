@@ -41,5 +41,10 @@ jobs:
       - name: Type check Python code
         run: uv run mypy src
 
+      - name: Run ruff linter and formatter
+        run: |
+          uv run ruff check src tests examples
+          uv run ruff format src tests examples
+
       - name: Check package build
         run: uv build --verbose

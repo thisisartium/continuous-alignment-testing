@@ -106,6 +106,8 @@ include = '\.pyi?$'
 [tool.ruff]
 line-length = 100
 target-version = "py313"
+[tool.ruff.lint.pycodestyle]
+max-line-length = 120 # E501 reports lines that exceed the length
 
 [tool.ruff.lint]
 extend-ignore = ["E203"]

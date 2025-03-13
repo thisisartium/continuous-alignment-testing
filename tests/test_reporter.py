@@ -1,10 +1,10 @@
 import json
 import time
-from unittest.mock import mock_open, patch, MagicMock
+from unittest.mock import MagicMock, mock_open, patch
 
 from cat_ai import analyse_sample_from_test
-from src.cat_ai.reporter import Reporter
 from src.cat_ai.helpers.helpers import root_dir
+from src.cat_ai.reporter import Reporter
 
 
 def test_reporter_creates_a_unique_folder_path() -> None:
