@@ -2,7 +2,6 @@ import logging
 import sys
 from typing import Optional
 
-# OpenTelemetry imports
 from opentelemetry import trace
 from opentelemetry.trace.span import Span
 
