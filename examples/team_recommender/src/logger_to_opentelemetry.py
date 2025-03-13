@@ -1,11 +1,9 @@
 import logging
 import sys
-from typing import Any, Dict, Optional
+from typing import Optional
 
 # OpenTelemetry imports
 from opentelemetry import trace
-from opentelemetry.semconv.resource import ResourceAttributes
-from opentelemetry.trace import TracerProvider
 from opentelemetry.trace.span import Span
 
 
@@ -51,7 +49,7 @@ class OpenTelemetryLogHandler(logging.Handler):
                     attributes.update(record.otel_attributes)
 
             # Format the message
-            message = self.format(record)
+            self.format(record)
 
             # Add event to the current span
             current_span.add_event(name=f"log.{record.levelname.lower()}", attributes=attributes)
@@ -71,26 +69,6 @@ class OpenTelemetryLogHandler(logging.Handler):
             # Never let an error in our handler cause application issues
             # This is a cardinal rule of logging handlers - fail silently
             self.handleError(record)
-
-
-def configure_opentelemetry(
-    service_name: str, extra_resources: Optional[Dict[str, Any]] = None
-) -> None:
-    """Configure OpenTelemetry tracer with console exporter for demonstration."""
-    # Create a resource with service info
-    resource_attributes = {ResourceAttributes.SERVICE_NAME: service_name}
-
-    if extra_resources:
-        resource_attributes.update(extra_resources)
-
-    # Create and set the TracerProvider
-    resource = Resource.create(resource_attributes)
-    trace.set_tracer_provider(TracerProvider(resource=resource))
-
-    # Add console exporter for demo purposes
-    # In production, you'd use OTLP, Jaeger, Zipkin, etc.
-    processor = BatchSpanProcessor(ConsoleSpanExporter())
-    trace.get_tracer_provider().add_span_processor(processor)
 
 
 def configure_logger_for_opentelemetry(logger_name: Optional[str] = None) -> logging.Logger:
@@ -118,7 +96,6 @@ def configure_logger_for_opentelemetry(logger_name: Optional[str] = None) -> log
 # Example usage
 if __name__ == "__main__":
     # Configure OpenTelemetry
-    configure_opentelemetry("example-service")
 
     # Configure logger
     logger = configure_logger_for_opentelemetry("example.app")

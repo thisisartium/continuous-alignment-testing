@@ -2,7 +2,7 @@ import json
 import os
 import sys
 from datetime import datetime
-from typing import Optional, Any, Dict
+from typing import Any, Dict, Optional
 
 from .statistical_analysis import StatisticalAnalysis, analyse_sample_from_test
 
@@ -72,12 +72,21 @@ class Reporter:
             str: Formatted string with the error margin calculations and confidence interval
         """
         output = "> [!NOTE]\n"
-        output += f"> ## {to_report.failure_count} ± {to_report.margin_of_error_count} failures detected ({to_report.sample_size} samples)\n"
+        output += (
+            f"> ## {to_report.failure_count} ± {to_report.margin_of_error_count} "
+            "failures detected ({to_report.sample_size} samples)\n"
+        )
         output += "> \n"
-        output += f"> **90% Confidence Range:** {to_report.confidence_interval_count[0]}-{to_report.confidence_interval_count[1]} failures\n"
+        output += (
+            f"> **90% Confidence Range:** {to_report.confidence_interval_count[0]}-"
+            "{to_report.confidence_interval_count[1]} failures\n"
+        )
         output += "> \n"
         output += "> **Details:**\n"
-        output += f"> - Proportion: {to_report.proportion:.4f} [{to_report.confidence_interval_prop[0]:.4f}, {to_report.confidence_interval_prop[1]:.4f}]\n"
+        output += (
+            f"> - Proportion: {to_report.proportion:.4f} "
+            "[{to_report.confidence_interval_prop[0]:.4f}, {to_report.confidence_interval_prop[1]:.4f}]\n"
+        )
         output += f"> - Standard Error: {to_report.standard_error:.4f}\n"
         output += f"> - Margin of Error: {to_report.margin_of_error:.4f}\n"
         return output
