@@ -1,8 +1,8 @@
 import json
-import os
 
+from helpers import load_json_fixture
 from openai import OpenAI
-from tests.settings import ROOT_DIR
+from settings import ROOT_DIR
 
 from cat_ai.reporter import Reporter
 from cat_ai.runner import Runner
@@ -33,13 +33,8 @@ def has_expected_success_rate(results: list[bool], expected_success_rate: float)
 
 def test_fast_with_n_generations():
     generations = Runner.get_sample_size()
-    skills_json_path = os.path.join(ROOT_DIR, "fixtures", "skills.json")
-    with open(skills_json_path, "r") as file:
-        skills_data = json.load(file)
-
-    example_json_path = os.path.join(ROOT_DIR, "fixtures", "example_output.json")
-    with open(example_json_path, "r") as file:
-        example_output = json.load(file)
+    skills_data = load_json_fixture("skills.json")
+    example_output = load_json_fixture("example_output.json")
     system_prompt = f"""
         You will get a description of a project, and your task is to tell me the best developers from the given list for the project
          based on their skills.

@@ -1,15 +1,19 @@
 import json
-import os
 
+from helpers import load_json_fixture
 from openai import OpenAI
-from tests.settings import ROOT_DIR
+from settings import ROOT_DIR
 
 from cat_ai.reporter import Reporter
 from cat_ai.runner import Runner
 
 
 def get_all_developer_names(skills_data) -> set[str]:
-    return {developer["developer"]["name"] for skill in skills_data["skills"] for developer in skill["developerSkills"]}
+    return {
+        developer["developer"]["name"]
+        for skill in skills_data["skills"]
+        for developer in skill["developerSkills"]
+    }
 
 
 def get_developer_names_from_response(response) -> set[str]:
@@ -29,13 +33,8 @@ def has_expected_success_rate(results: list[bool], expected_success_rate: float)
 
 def test_allocations():
     tries = Runner.get_sample_size(3)
-    skills_json_path = os.path.join(ROOT_DIR, "fixtures", "skills.json")
-    with open(skills_json_path, "r") as file:
-        skills_data = json.load(file)
-
-    example_json_path = os.path.join(ROOT_DIR, "fixtures", "example_output.json")
-    with open(example_json_path, "r") as file:
-        example_output = json.load(file)
+    skills_data = load_json_fixture("skills.json")
+    example_output = load_json_fixture("example_output.json")
     system_prompt = f"""
         You will get a description of a project, and your task is to tell me the best developers from the given list for the project
          based on their skills.
@@ -90,7 +89,9 @@ def run_allocation_test(reporter, skills_data) -> bool:
     try:
         json_object = json.loads(response)
         developer_names = get_developer_names_from_response(json_object)
-        no_developer_name_is_hallucinated = False not in [name in all_developers for name in developer_names]
+        no_developer_name_is_hallucinated = False not in [
+            name in all_developers for name in developer_names
+        ]
 
         reporter.report(
             json_object,
