@@ -96,10 +96,10 @@ def running_in_ci() -> bool:
 @pytest.mark.skipif(running_in_ci(), reason="Unstable image comparison in CI")
 def test_failure_rate_bar_graph(snapshot):
     # Sample data points - choosing strategic values to test boundary conditions
-    failure_counts = list(range(101))
-    assert failure_counts[0] == 0
-    assert failure_counts[100] == 100
     sample_size = 100
+    failure_counts = list(range(sample_size + 1))
+    assert failure_counts[0] == 0
+    assert failure_counts[sample_size] == sample_size
 
     # Calculate results for each data point
     results = [analyse_sample_from_test(f, sample_size) for f in failure_counts]
