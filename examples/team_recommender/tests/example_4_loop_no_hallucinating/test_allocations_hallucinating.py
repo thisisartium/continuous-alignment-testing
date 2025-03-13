@@ -1,13 +1,19 @@
 import json
-import os
+
+from helpers import load_json_fixture
+from openai import OpenAI
+from settings import ROOT_DIR
+
 from cat_ai.reporter import Reporter
 from cat_ai.runner import Runner
-from tests.settings import ROOT_DIR
-from openai import OpenAI
 
 
 def get_all_developer_names(skills_data) -> set[str]:
-    return {developer["developer"]["name"] for skill in skills_data["skills"] for developer in skill["developerSkills"]}
+    return {
+        developer["developer"]["name"]
+        for skill in skills_data["skills"]
+        for developer in skill["developerSkills"]
+    }
 
 
 def get_developer_names_from_response(response) -> set[str]:
@@ -15,13 +21,8 @@ def get_developer_names_from_response(response) -> set[str]:
 
 
 def test_allocations():
-    skills_json_path = os.path.join(ROOT_DIR, "fixtures", "skills.json")
-    with open(skills_json_path, "r") as file:
-        skills_data = json.load(file)
-
-    example_json_path = os.path.join(ROOT_DIR, "fixtures", "example_output.json")
-    with open(example_json_path, "r") as file:
-        example_output = json.load(file)
+    skills_data = load_json_fixture("skills.json")
+    example_output = load_json_fixture("example_output.json")
     system_prompt = f"""
         You will get a description of a project, and your task is to tell me the best developers from the given list for the project
          based on their skills.
@@ -82,10 +83,11 @@ def run_allocation_test(reporter, skills_data) -> bool:
         not_empty_response = len(developer_names) != 0
         developer_is_appropriate = any(name in developer_names for name in acceptable_people)
         if not not_empty_response:
-            no_developer_name_is_hallucinated = False not in [name in all_developers for name in developer_names]
+            no_developer_name_is_hallucinated = False not in [
+                name in all_developers for name in developer_names
+            ]
     except json.JSONDecodeError as e:
         print(f"JSON Exception: {e}")
-
 
     reporter.report(
         json_object,
@@ -96,4 +98,9 @@ def run_allocation_test(reporter, skills_data) -> bool:
             "valid_json_returned": json_load_success,
         },
     )
-    return developer_is_appropriate and no_developer_name_is_hallucinated and not_empty_response and json_load_success
+    return (
+        developer_is_appropriate
+        and no_developer_name_is_hallucinated
+        and not_empty_response
+        and json_load_success
+    )

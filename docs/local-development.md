@@ -75,7 +75,7 @@ We start running a test prompt inside a pytest to check that the LLM is recommen
 #test_allocations
 import json
 import os
-from tests.settings import ROOT_DIR
+from settings import ROOT_DIR
 from openai import OpenAI
 
 def get_all_developer_names(skills_data) -> set[str]:
@@ -187,7 +187,7 @@ import json
 import os
 from cat_ai.reporter import Reporter
 from cat_ai.runner import Runner
-from tests.settings import ROOT_DIR
+from settings import ROOT_DIR
 from openai import OpenAI
 
 
@@ -326,7 +326,7 @@ import json
 import os
 from cat_ai.reporter import Reporter
 from cat_ai.runner import Runner
-from tests.settings import ROOT_DIR
+from settings import ROOT_DIR
 from openai import OpenAI
 
 

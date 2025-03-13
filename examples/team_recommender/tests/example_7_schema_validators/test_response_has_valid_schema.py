@@ -1,6 +1,7 @@
 import json
 import os
 
+from helpers import load_json_fixture
 from jsonschema import FormatChecker, validate
 from openai import OpenAI
 from settings import ROOT_DIR

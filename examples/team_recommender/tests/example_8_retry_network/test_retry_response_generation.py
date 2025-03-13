@@ -2,11 +2,12 @@ import json
 from typing import List
 
 import openai
+from helpers import load_json_fixture
 from jsonschema import FormatChecker, validate
 from openai import OpenAI
 from openai.types.chat.chat_completion import Choice
 from retry import retry
-from settings import root_dir, root_path
+from settings import root_dir
 
 from cat_ai.reporter import Reporter
 from cat_ai.runner import Runner
@@ -38,18 +39,6 @@ def response_matches_json_schema(response: str, schema: any) -> bool:
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         return False
-
-
-def load_json_fixture(file_name: str) -> dict:
-    """
-    Utility function to load a JSON fixture file.
-
-    :param file_name: Name of the JSON file to load.
-    :return: Parsed JSON data as a dictionary.
-    """
-    json_path = root_path() / "tests" / "fixtures" / file_name
-    with open(json_path, "r") as file:
-        return json.load(file)
 
 
 def test_response_matches_json_schema():

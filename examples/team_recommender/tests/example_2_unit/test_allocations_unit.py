@@ -1,19 +1,12 @@
-import json
-import os
-from tests.settings import ROOT_DIR
+from helpers import load_json_fixture
 from openai import OpenAI
 
 
 def test_allocations():
     client = OpenAI()
     assert client is not None
-    json_path = os.path.join(ROOT_DIR, "fixtures", "skills.json")
-    with open(json_path, "r") as file:
-        skills_data = json.load(file)
-
-    json_path = os.path.join(ROOT_DIR, "fixtures", "example_output.json")
-    with open(json_path, "r") as file:
-        example_output = json.load(file)
+    skills_data = load_json_fixture("skills.json")
+    example_output = load_json_fixture("example_output.json")
 
     acceptable_people = ["Sam Thomas", "Drew Anderson", "Alex Wilson", "Alex Johnson"]
 
