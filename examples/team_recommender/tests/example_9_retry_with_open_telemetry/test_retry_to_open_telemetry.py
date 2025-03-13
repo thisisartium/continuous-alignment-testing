@@ -100,8 +100,8 @@ def test_open_telemetry_receives_message():
             output_dir=root_dir(),
         )
         test_runner = Runner(
-            lambda reporter: run_allocation_test(
-                reporter, skills_data=skills_data, response=response
+            lambda reporter, content=response: run_allocation_test(
+                reporter, skills_data=skills_data, response=content
             ),
             reporter=test_reporter,
         )
