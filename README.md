@@ -1,3 +1,6 @@
+[![Python Tests](https://github.com/thisisartium/continuous-alignment-testing/actions/workflows/python-tests.yml/badge.svg)](https://github.com/thisisartium/continuous-alignment-testing/actions/workflows/python-tests.yml)
+[![CAT](https://github.com/thisisartium/continuous-alignment-testing/actions/workflows/cat-test-examples.yml/badge.svg)](https://github.com/thisisartium/continuous-alignment-testing/actions/workflows/cat-test-examples.yml)
+
 # Continuous Alignment Testing (CAT) Framework
 
 A framework for implementing Continuous Alignment Testing (CAT) for LLM-based applications.
