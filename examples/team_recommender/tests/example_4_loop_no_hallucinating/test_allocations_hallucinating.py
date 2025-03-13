@@ -16,7 +16,7 @@ def get_all_developer_names(skills_data) -> set[str]:
     }
 
 
-def get_developer_names_from_response(response) -> set[str]:
+def get_developer_names_from_response(response: dict[str, dict[str, str]]) -> set[str]:
     return {developer["name"] for developer in response["developers"]}
 
 
@@ -24,11 +24,12 @@ def test_allocations():
     skills_data = load_json_fixture("skills.json")
     example_output = load_json_fixture("example_output.json")
     system_prompt = f"""
-        You will get a description of a project, and your task is to tell me the best developers from the given list for the project
-         based on their skills.
+        You will get a description of a project, and your task is 
+        to tell me the best developers from the given list for the project based on their skills.
         Today's date is April 15th, 2025.
-        Pick only developers who are available after the project start date. Pick people with higher skill levels first.
-        respond in json with this structure:
+        Pick only developers who are available after the project start date. 
+        Pick people with higher skill levels first.
+        Respond in json with this structure:
             {example_output}
 
         Here is the skills data:
@@ -71,11 +72,11 @@ def run_allocation_test(reporter, skills_data) -> bool:
         response_format={"type": "json_object"},
     )
     response = completion.choices[0].message.content
-    result = False
     json_load_success = False
     not_empty_response = True
     no_developer_name_is_hallucinated = True
     developer_is_appropriate = True
+    json_object = {}
     try:
         json_object = json.loads(response)
         json_load_success = True

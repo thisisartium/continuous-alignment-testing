@@ -24,6 +24,7 @@ class OpenTelemetryLogHandler(logging.Handler):
         """
         Convert a LogRecord to an OpenTelemetry span event.
         """
+        # noinspection PyBroadException
         try:
             # Get the current active span, if available
             current_span: Span = trace.get_current_span()
@@ -74,23 +75,23 @@ class OpenTelemetryLogHandler(logging.Handler):
 def configure_logger_for_opentelemetry(logger_name: Optional[str] = None) -> logging.Logger:
     """Configure a logger to send events to OpenTelemetry."""
     # Get logger
-    logger = logging.getLogger(logger_name)
+    ot_logger = logging.getLogger(logger_name)
 
     # Create and add OpenTelemetry handler
-    otel_handler = OpenTelemetryLogHandler()
+    ot_handler = OpenTelemetryLogHandler()
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    otel_handler.setFormatter(formatter)
-    logger.addHandler(otel_handler)
+    ot_handler.setFormatter(formatter)
+    ot_logger.addHandler(ot_handler)
 
     # You can keep console output for local development
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
+    ot_logger.addHandler(console_handler)
 
     # Set level
-    logger.setLevel(logging.INFO)
+    ot_logger.setLevel(logging.INFO)
 
-    return logger
+    return ot_logger
 
 
 # Example usage
@@ -113,7 +114,7 @@ if __name__ == "__main__":
         try:
             # Simulate an error
             result = 1 / 0
-        except Exception:
-            logger.exception("Operation failed")
+        except Exception as simulated_error:
+            logger.exception(f"Operation failed: {simulated_error}")
 
         logger.info("Operation completed")
