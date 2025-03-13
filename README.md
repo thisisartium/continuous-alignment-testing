@@ -22,10 +22,15 @@ CAT provides the infrastructure to:
 - [team_recommender - Team Recommender](examples/team_recommender/readme.md)
 
 
-## Documentation
+## Documentation [![github-pages-badge]][github-pages-deploy-link]
 
-Github Pages: https://thisisartium.github.io/continuous-alignment-testing/
+[Github Pages][github-pages-index]
 
 ## Wiki
 
-https://github.com/thisisartium/continuous-alignment-testing/wiki
+[Wiki Pages][wiki]
+
+[wiki]: https://github.com/thisisartium/continuous-alignment-testing/wiki
+[github-pages-index]: https://thisisartium.github.io/continuous-alignment-testing/
+[github-pages-badge]: https://github.com/thisisartium/continuous-alignment-testing/actions/workflows/pages/pages-build-deployment/badge.svg
+[github-pages-deploy-link]: https://github.com/thisisartium/continuous-alignment-testing/actions/workflows/pages/pages-build-deployment
