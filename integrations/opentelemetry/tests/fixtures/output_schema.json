@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "developers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "availableStartDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "relevantSkills": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "skill": {
+                  "type": "string"
+                },
+                "level": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "skill",
+                "level"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "name",
+          "availableStartDate",
+          "relevantSkills"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "developers"
+  ],
+  "additionalProperties": false
+}
