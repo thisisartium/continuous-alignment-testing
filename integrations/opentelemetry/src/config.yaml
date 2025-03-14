@@ -1,0 +1,91 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:4318"
+
+processors:
+  transform:
+    error_mode: ignore
+    trace_statements:
+      - context: spanevent
+        statements:
+          # useful variables
+          - set(cache["response"], ParseJSON(attributes["gen_ai.completion"]))
+          - set(cache["developers"], cache["response"]["developers"])
+          - set(cache["count"], Len(cache["developers"]))
+
+          # validation variables
+          - set(cache["not_empty_response"], false)
+          - set(cache["correct_developer_suggested"], false)
+          - set(cache["no_developer_name_is_hallucinated"], false)
+
+          # not empty response
+          - set(cache["not_empty_response"], true) where cache["count"] > 0
+
+          # validate developers
+          - set(cache["0_name"], cache["developers"][0]["name"]) where cache["count"] > 0
+          - set(cache["correct_developer_suggested"], true) where IsMatch(cache["0_name"], "Sam\\sThomas|Drew\\sAnderson|Alex\\sWilson|Alex\\sJohnson") and cache["0_name"] != nil
+          - set(cache["no_developer_name_is_hallucinated"], true) where IsMatch(cache["0_name"], "Alex\\sAnderson|Alex\\sJohnson|Alex\\sWilson|Blake\\sDavis|Blake\\sJohnson|Blake\\sWilson|Casey\\sMoore|Casey\\sThomas|Casey\\sWilson|Drew\\sAnderson|Jamie\\sJohnson|Jamie\\sMiller|Jamie\\sMoore|Morgan\\sBrown|Sam\\sJohnson|Sam\\sMiller|Sam\\sThomas|Sam\\sWilson|Taylor\\sAnderson|Taylor\\sBrown|Taylor\\sJohnson|Taylor\\sWilson") and cache["0_name"] != nil
+
+          - set(cache["1_name"], cache["developers"][1]["name"]) where cache["count"] > 1
+          - set(cache["correct_developer_suggested"], true) where IsMatch(cache["1_name"], "Sam\\sThomas|Drew\\sAnderson|Alex\\sWilson|Alex\\sJohnson") and cache["1_name"] != nil
+          - set(cache["no_developer_name_is_hallucinated"], true) where IsMatch(cache["1_name"], "Alex\\sAnderson|Alex\\sJohnson|Alex\\sWilson|Blake\\sDavis|Blake\\sJohnson|Blake\\sWilson|Casey\\sMoore|Casey\\sThomas|Casey\\sWilson|Drew\\sAnderson|Jamie\\sJohnson|Jamie\\sMiller|Jamie\\sMoore|Morgan\\sBrown|Sam\\sJohnson|Sam\\sMiller|Sam\\sThomas|Sam\\sWilson|Taylor\\sAnderson|Taylor\\sBrown|Taylor\\sJohnson|Taylor\\sWilson") and cache["1_name"] != nil and cache["no_developer_name_is_hallucinated"] == true
+
+          - set(cache["2_name"], cache["developers"][2]["name"]) where cache["count"] > 2
+          - set(cache["correct_developer_suggested"], true) where IsMatch(cache["2_name"], "Sam\\sThomas|Drew\\sAnderson|Alex\\sWilson|Alex\\sJohnson") and cache["2_name"] != nil
+          - set(cache["no_developer_name_is_hallucinated"], true) where IsMatch(cache["2_name"], "Alex\\sAnderson|Alex\\sJohnson|Alex\\sWilson|Blake\\sDavis|Blake\\sJohnson|Blake\\sWilson|Casey\\sMoore|Casey\\sThomas|Casey\\sWilson|Drew\\sAnderson|Jamie\\sJohnson|Jamie\\sMiller|Jamie\\sMoore|Morgan\\sBrown|Sam\\sJohnson|Sam\\sMiller|Sam\\sThomas|Sam\\sWilson|Taylor\\sAnderson|Taylor\\sBrown|Taylor\\sJohnson|Taylor\\sWilson") and cache["2_name"] != nil and cache["no_developer_name_is_hallucinated"] == true
+
+          - set(cache["3_name"], cache["developers"][3]["name"]) where cache["count"] > 3
+          - set(cache["correct_developer_suggested"], true) where IsMatch(cache["3_name"], "Sam\\sThomas|Drew\\sAnderson|Alex\\sWilson|Alex\\sJohnson") and cache["3_name"] != nil
+          - set(cache["no_developer_name_is_hallucinated"], true) where IsMatch(cache["3_name"], "Alex\\sAnderson|Alex\\sJohnson|Alex\\sWilson|Blake\\sDavis|Blake\\sJohnson|Blake\\sWilson|Casey\\sMoore|Casey\\sThomas|Casey\\sWilson|Drew\\sAnderson|Jamie\\sJohnson|Jamie\\sMiller|Jamie\\sMoore|Morgan\\sBrown|Sam\\sJohnson|Sam\\sMiller|Sam\\sThomas|Sam\\sWilson|Taylor\\sAnderson|Taylor\\sBrown|Taylor\\sJohnson|Taylor\\sWilson") and cache["3_name"] != nil and cache["no_developer_name_is_hallucinated"] == true
+
+          - set(cache["4_name"], cache["developers"][4]["name"]) where cache["count"] > 4
+          - set(cache["correct_developer_suggested"], true) where IsMatch(cache["4_name"], "Sam\\sThomas|Drew\\sAnderson|Alex\\sWilson|Alex\\sJohnson") and cache["4_name"] != nil
+          - set(cache["no_developer_name_is_hallucinated"], true) where IsMatch(cache["4_name"], "Alex\\sAnderson|Alex\\sJohnson|Alex\\sWilson|Blake\\sDavis|Blake\\sJohnson|Blake\\sWilson|Casey\\sMoore|Casey\\sThomas|Casey\\sWilson|Drew\\sAnderson|Jamie\\sJohnson|Jamie\\sMiller|Jamie\\sMoore|Morgan\\sBrown|Sam\\sJohnson|Sam\\sMiller|Sam\\sThomas|Sam\\sWilson|Taylor\\sAnderson|Taylor\\sBrown|Taylor\\sJohnson|Taylor\\sWilson") and cache["4_name"] != nil and cache["no_developer_name_is_hallucinated"] == true
+
+          - set(cache["5_name"], cache["developers"][5]["name"]) where cache["count"] > 5
+          - set(cache["correct_developer_suggested"], true) where IsMatch(cache["5_name"], "Sam\\sThomas|Drew\\sAnderson|Alex\\sWilson|Alex\\sJohnson") and cache["5_name"] != nil
+          - set(cache["no_developer_name_is_hallucinated"], true) where IsMatch(cache["5_name"], "Alex\\sAnderson|Alex\\sJohnson|Alex\\sWilson|Blake\\sDavis|Blake\\sJohnson|Blake\\sWilson|Casey\\sMoore|Casey\\sThomas|Casey\\sWilson|Drew\\sAnderson|Jamie\\sJohnson|Jamie\\sMiller|Jamie\\sMoore|Morgan\\sBrown|Sam\\sJohnson|Sam\\sMiller|Sam\\sThomas|Sam\\sWilson|Taylor\\sAnderson|Taylor\\sBrown|Taylor\\sJohnson|Taylor\\sWilson") and cache["5_name"] != nil and cache["no_developer_name_is_hallucinated"] == true
+
+          - set(cache["6_name"], cache["developers"][6]["name"]) where cache["count"] > 6
+          - set(cache["correct_developer_suggested"], true) where IsMatch(cache["6_name"], "Sam\\sThomas|Drew\\sAnderson|Alex\\sWilson|Alex\\sJohnson") and cache["6_name"] != nil
+          - set(cache["no_developer_name_is_hallucinated"], true) where IsMatch(cache["6_name"], "Alex\\sAnderson|Alex\\sJohnson|Alex\\sWilson|Blake\\sDavis|Blake\\sJohnson|Blake\\sWilson|Casey\\sMoore|Casey\\sThomas|Casey\\sWilson|Drew\\sAnderson|Jamie\\sJohnson|Jamie\\sMiller|Jamie\\sMoore|Morgan\\sBrown|Sam\\sJohnson|Sam\\sMiller|Sam\\sThomas|Sam\\sWilson|Taylor\\sAnderson|Taylor\\sBrown|Taylor\\sJohnson|Taylor\\sWilson") and cache["6_name"] != nil and cache["no_developer_name_is_hallucinated"] == true
+
+          - set(cache["7_name"], cache["developers"][7]["name"]) where cache["count"] > 7
+          - set(cache["correct_developer_suggested"], true) where IsMatch(cache["7_name"], "Sam\\sThomas|Drew\\sAnderson|Alex\\sWilson|Alex\\sJohnson") and cache["7_name"] != nil
+          - set(cache["no_developer_name_is_hallucinated"], true) where IsMatch(cache["7_name"], "Alex\\sAnderson|Alex\\sJohnson|Alex\\sWilson|Blake\\sDavis|Blake\\sJohnson|Blake\\sWilson|Casey\\sMoore|Casey\\sThomas|Casey\\sWilson|Drew\\sAnderson|Jamie\\sJohnson|Jamie\\sMiller|Jamie\\sMoore|Morgan\\sBrown|Sam\\sJohnson|Sam\\sMiller|Sam\\sThomas|Sam\\sWilson|Taylor\\sAnderson|Taylor\\sBrown|Taylor\\sJohnson|Taylor\\sWilson") and cache["7_name"] != nil and cache["no_developer_name_is_hallucinated"] == true
+
+          - set(cache["8_name"], cache["developers"][8]["name"]) where cache["count"] > 8
+          - set(cache["correct_developer_suggested"], true) where IsMatch(cache["8_name"], "Sam\\sThomas|Drew\\sAnderson|Alex\\sWilson|Alex\\sJohnson") and cache["8_name"] != nil
+          - set(cache["no_developer_name_is_hallucinated"], true) where IsMatch(cache["8_name"], "Alex\\sAnderson|Alex\\sJohnson|Alex\\sWilson|Blake\\sDavis|Blake\\sJohnson|Blake\\sWilson|Casey\\sMoore|Casey\\sThomas|Casey\\sWilson|Drew\\sAnderson|Jamie\\sJohnson|Jamie\\sMiller|Jamie\\sMoore|Morgan\\sBrown|Sam\\sJohnson|Sam\\sMiller|Sam\\sThomas|Sam\\sWilson|Taylor\\sAnderson|Taylor\\sBrown|Taylor\\sJohnson|Taylor\\sWilson") and cache["8_name"] != nil and cache["no_developer_name_is_hallucinated"] == true
+
+          - set(cache["9_name"], cache["developers"][9]["name"]) where cache["count"] > 9
+          - set(cache["correct_developer_suggested"], true) where IsMatch(cache["9_name"], "Sam\\sThomas|Drew\\sAnderson|Alex\\sWilson|Alex\\sJohnson") and cache["9_name"] != nil
+          - set(cache["no_developer_name_is_hallucinated"], true) where IsMatch(cache["9_name"], "Alex\\sAnderson|Alex\\sJohnson|Alex\\sWilson|Blake\\sDavis|Blake\\sJohnson|Blake\\sWilson|Casey\\sMoore|Casey\\sThomas|Casey\\sWilson|Drew\\sAnderson|Jamie\\sJohnson|Jamie\\sMiller|Jamie\\sMoore|Morgan\\sBrown|Sam\\sJohnson|Sam\\sMiller|Sam\\sThomas|Sam\\sWilson|Taylor\\sAnderson|Taylor\\sBrown|Taylor\\sJohnson|Taylor\\sWilson") and cache["9_name"] != nil and cache["no_developer_name_is_hallucinated"] == true
+
+          # save results
+          - set(attributes["validations"]["correct_developer_suggested"], cache["correct_developer_suggested"])
+          - set(attributes["validations"]["no_developer_name_is_hallucinated"], cache["no_developer_name_is_hallucinated"])
+          - set(attributes["validations"]["not_empty_response"], cache["not_empty_response"])
+
+          # cleanup
+          - set(cache, {})
+
+exporters:
+  debug:
+    verbosity: detailed
+
+service:
+  telemetry:
+    logs:
+      level: debug
+
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [transform]
+      exporters: [debug]
+
