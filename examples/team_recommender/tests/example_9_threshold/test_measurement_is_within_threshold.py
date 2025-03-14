@@ -63,6 +63,9 @@ def test_is_within_expected():
     assert not is_within_expected(0.8, 5, 5)
     assert is_within_expected(0.8, 26, 100)
     assert is_within_expected(0.8, 14, 100)
+    assert is_within_expected(0.97, 1, 2)
+    small_size_warning =  "after measuring 2x 100 runs and getting 3 failures"
+    assert not is_within_expected(0.97, 0, 1), small_size_warning
 
 
 def is_within_expected(success_rate: float, failure_count: int, sample_size: int):
@@ -227,8 +230,8 @@ def run_allocation_test(reporter: Reporter, skills_data, response: str) -> bool:
         },
     )
     return (
-        developer_is_appropriate
-        and no_developer_name_is_hallucinated
-        and not_empty_response
-        and has_valid_json_schema
+            developer_is_appropriate
+            and no_developer_name_is_hallucinated
+            and not_empty_response
+            and has_valid_json_schema
     )
