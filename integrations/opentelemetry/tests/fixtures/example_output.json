@@ -1,0 +1,24 @@
+{
+  "developers": [
+    {
+      "name": "Bob",
+      "availableStartDate": "2025-05-19T00:00:00Z",
+      "relevantSkills": [
+        {
+          "skill": "Javascript",
+          "level": "3"
+        }
+      ]
+    },
+    {
+      "name": "Alice",
+      "availableStartDate": "2025-05-19T00:00:00Z",
+      "relevantSkills": [
+        {
+          "skill": "Python",
+          "level": "4"
+        }
+      ]
+    }
+  ]
+}
