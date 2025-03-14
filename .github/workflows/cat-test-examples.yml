@@ -66,18 +66,11 @@ jobs:
           echo "number_of_runs=$ROUNDS" >> "$GITHUB_OUTPUT"
           echo "CAT_AI_SAMPLE_SIZE=$ROUNDS" >> $GITHUB_ENV
 
-      - name: Find latest example
-        uses: mathiasvr/command-output@v2.0.0
-        id: find-latest-example
-        with:
-          run: find examples/team_recommender/tests -maxdepth 1 -name "example_*" -type d | sort -V | tail -n 1
-
       - name: Run Latest Example tests
         run: >
           uv run pytest
           --verbose --verbosity=10 --capture=no --tb=native --color=yes --showlocals
-          ${{ steps.find-latest-example.outputs.stdout }}
-        # examples/team_recommender/tests/example_9*
+          examples/team_recommender/tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
