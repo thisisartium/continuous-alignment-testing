@@ -55,12 +55,23 @@ def is_within_a_range(value, left, right):
     return left <= value <= right
 
 
+def test_is_within_expected():
+    assert is_within_expected(0.8, 0, 5)
+    assert is_within_expected(0.8, 2, 5)
+    assert not is_within_expected(0.8, 3, 5)
+    assert not is_within_expected(0.8, 4, 5)
+    assert not is_within_expected(0.8, 5, 5)
+    assert is_within_expected(0.8, 26, 100)
+    assert is_within_expected(0.8, 14, 100)
+
+
 def is_within_expected(success_rate: float, failure_count: int, sample_size: int):
-    success_analysis = analyse_sample_from_test(sample_size - failure_count, sample_size)
+    success_portion = int(success_rate * sample_size)
+    success_analysis = analyse_sample_from_test(success_portion, sample_size)
     return is_within_a_range(
-        success_rate,
-        success_analysis.confidence_interval_prop[0],
-        success_analysis.confidence_interval_prop[1],
+        sample_size - failure_count,
+        success_analysis.confidence_interval_count[0],
+        success_analysis.confidence_interval_count[1],
     )
 
 
