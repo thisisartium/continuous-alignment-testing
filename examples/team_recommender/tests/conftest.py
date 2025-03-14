@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import pytest
@@ -27,9 +28,11 @@ def example_dirs() -> set[Path]:
     return set([d for d in tests_dir.glob("example_*") if d.is_dir()])
 
 
-def natural_sort_key(s):
+def natural_sort_key(s: Path):
     """Sort strings with embedded numbers in natural order."""
-    return [int(text) if text.isdigit() else text.lower() for text in re.split(r"(\d+)", s)]
+    return [
+        int(text) if text.isdigit() else text.lower() for text in re.split(r"(\d+)", str(s.name))
+    ]
 
 
 def find_latest_example() -> str | None:
