@@ -1,4 +1,5 @@
 import json
+import re
 from typing import List
 
 import openai
@@ -71,6 +72,38 @@ def test_success_rate():
     assert interval[0] <= 0 and interval[1] >= 1, (
         f"interval includes all possible values: {interval} does not contain [0, 1]"
     )
+
+
+def natural_sort_key(s):
+    """Sort strings with embedded numbers in natural order."""
+    return [int(text) if text.isdigit() else text.lower() for text in re.split(r"(\d+)", s)]
+
+
+def test_sort_names_with_numbers():
+    unsorted = [
+        "example_1_text_response",
+        "example_10_threshold",
+        "example_2_unit",
+        "example_8_retry_network",
+        "example_9_retry_with_open_telemetry",
+    ]
+    incorrectly_sorted = [
+        "example_10_threshold",
+        "example_1_text_response",
+        "example_2_unit",
+        "example_8_retry_network",
+        "example_9_retry_with_open_telemetry",
+    ]
+    assert incorrectly_sorted == sorted(unsorted)
+
+    correctly_sorted = [
+        "example_1_text_response",
+        "example_2_unit",
+        "example_8_retry_network",
+        "example_9_retry_with_open_telemetry",
+        "example_10_threshold",
+    ]
+    assert correctly_sorted == sorted(unsorted, key=natural_sort_key)
 
 
 def test_metrics_within_range():
