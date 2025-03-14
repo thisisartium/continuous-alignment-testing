@@ -181,7 +181,7 @@ def generate_choices(generations, project_description, system_prompt) -> List[Ch
     assert client is not None
 
     completion = client.chat.completions.create(
-        model="gpt-4-1106-preview",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": project_description},
