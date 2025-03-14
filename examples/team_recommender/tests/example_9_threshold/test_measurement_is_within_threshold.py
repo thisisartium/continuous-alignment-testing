@@ -163,8 +163,8 @@ def test_metrics_within_range():
         )
         results.append(test_runner.run_once(run))
 
-    failure_threshold = 0.9
-    assert generations <= 1 or is_within_expected(
+    failure_threshold = 0.97
+    assert is_within_expected(
         failure_threshold, sum(not result for result in results), generations
     ), f"Expected {failure_threshold} to be within the confidence interval of the success rate"
 
