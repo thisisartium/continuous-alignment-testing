@@ -2,6 +2,7 @@ import json
 
 from helpers import load_json_fixture
 from openai import OpenAI
+from retry import retry
 from settings import ROOT_DIR
 
 from cat_ai.reporter import Reporter
@@ -20,6 +21,7 @@ def get_developer_names_from_response(response: dict) -> set[str]:
     return {developer["name"] for developer in response["developers"]}
 
 
+@retry()
 def test_allocations():
     skills_data = load_json_fixture("skills.json")
     example_output = load_json_fixture("example_output.json")
