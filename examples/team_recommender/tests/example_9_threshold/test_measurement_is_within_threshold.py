@@ -1,9 +1,10 @@
 import json
-import re
+from pathlib import Path
 from typing import List
 
 import openai
-from helpers import load_json_fixture
+import pytest
+from helpers import load_json_fixture, natural_sort_key
 from jsonschema import FormatChecker, validate
 from openai import OpenAI
 from openai.types.chat.chat_completion import Choice
@@ -64,11 +65,13 @@ def test_is_within_expected():
     assert is_within_expected(0.8, 26, 100)
     assert is_within_expected(0.8, 14, 100)
     assert is_within_expected(0.97, 1, 2)
-    small_size_warning =  "after measuring 2x 100 runs and getting 3 failures"
-    assert not is_within_expected(0.97, 0, 1), small_size_warning
+    small_size_warning = "after measuring 2x 100 runs and getting 3 failures"
+    assert is_within_expected(0.97, 0, 1), small_size_warning
 
 
-def is_within_expected(success_rate: float, failure_count: int, sample_size: int):
+def is_within_expected(success_rate: float, failure_count: int, sample_size: int) -> bool:
+    if sample_size <= 1:
+        return True
     success_portion = int(success_rate * sample_size)
     success_analysis = analyse_sample_from_test(success_portion, sample_size)
     return is_within_a_range(
@@ -88,11 +91,6 @@ def test_success_rate():
     )
 
 
-def natural_sort_key(s):
-    """Sort strings with embedded numbers in natural order."""
-    return [int(text) if text.isdigit() else text.lower() for text in re.split(r"(\d+)", s)]
-
-
 def test_sort_names_with_numbers():
     unsorted = [
         "example_1_text_response",
@@ -101,14 +99,13 @@ def test_sort_names_with_numbers():
         "example_8_retry_network",
         "example_9_retry_with_open_telemetry",
     ]
-    incorrectly_sorted = [
+    assert [
         "example_10_threshold",
         "example_1_text_response",
         "example_2_unit",
         "example_8_retry_network",
         "example_9_retry_with_open_telemetry",
-    ]
-    assert incorrectly_sorted == sorted(unsorted)
+    ] == sorted(unsorted), "The list should be sorted by the number in the name"
 
     correctly_sorted = [
         "example_1_text_response",
@@ -117,7 +114,9 @@ def test_sort_names_with_numbers():
         "example_9_retry_with_open_telemetry",
         "example_10_threshold",
     ]
-    assert correctly_sorted == sorted(unsorted, key=natural_sort_key)
+    assert sorted([Path(p) for p in unsorted], key=natural_sort_key) == [
+        Path(p) for p in correctly_sorted
+    ], "example_10_threshold should be last, while example_1_text_response should be first"
 
 
 def test_metrics_within_range():
@@ -166,10 +165,101 @@ def test_metrics_within_range():
         )
         results.append(test_runner.run_once(run))
 
-    failure_threshold = 0.97
-    assert generations <= 1 or is_within_expected(
-        failure_threshold, sum(not result for result in results), generations
-    ), f"Expected {failure_threshold} to be within the confidence interval of the success rate"
+    expected_success_rate_measured = 0.97
+    failure_count = sum(not result for result in results)
+    sample_size = len(results)
+    assert is_within_expected(expected_success_rate_measured, failure_count, sample_size), (
+        f"Expected {expected_success_rate_measured} to be within of the success rate"
+    )
+
+
+@pytest.fixture
+def assert_success_rate():
+    def _assert_success_rate(actual: list[bool], expected: float):
+        number_of_successes = sum(1 for r in actual if r)
+        actual_success_rate = number_of_successes / len(actual)
+        assert actual_success_rate >= 0.0, (
+            f"Cannot have less than 0% success rate, was: {actual_success_rate}"
+        )
+        assert actual_success_rate <= 1.0, (
+            f"Cannot have more than 100% success rate, was: {actual_success_rate}"
+        )
+        actual_count = len(actual)
+        analysis = analyse_sample_from_test(number_of_successes, actual_count)
+        # Handle case when a list of results is passed
+        lower_boundary = analysis.confidence_interval_prop[0]
+        higher_boundary = analysis.confidence_interval_prop[1]
+        assert expected > lower_boundary, f"""
+            Broken Record:  
+            New Success rate {analysis.proportion:.3f} with 90% confidence exceeds expected: {expected}
+            Expecting: {lower_boundary:.2f} <= {expected:.2f} <= {higher_boundary:.2f}
+            Got: expected={expected} <= analysis.lower_interval={lower_boundary}
+            """
+        assert expected < higher_boundary, f"""
+            Failure rate {analysis.proportion} not within 90% confidence of expected {expected}
+            New Success rate {analysis.proportion} with 90% confidence lower that expected: {expected}
+            Expecting: {lower_boundary} <= {expected} <= {higher_boundary}
+            Got:  analysis.higher_boundary={higher_boundary} <= expected={expected}
+            """
+
+    return _assert_success_rate
+
+
+def process_row(row: tuple[int, int, float]) -> str:
+    return f"{row[0]} failures out of {row[1]} is within {row[2] * 100:.0f}% success rate"
+
+
+@pytest.mark.parametrize(
+    "row",
+    [(1, 5, 0.97), (2, 5, 0.95), (6, 100, 0.97), (15, 100, 0.80), (27, 100, 0.80)],
+    ids=lambda row: process_row(row),
+)
+def test_success_rate_is_within_expected_error_margin_with_90_percent_confidence(
+    assert_success_rate, row
+):
+    failure_count, total_test_runs, expected_rate = row
+    results = generate_examples(failure_count, total_test_runs)
+    assert_success_rate(results, expected_rate)
+
+
+def generate_examples(failure_count, total_test_runs):
+    return failure_count * [False] + (total_test_runs - failure_count) * [True]
+
+
+@pytest.mark.parametrize(
+    "row",
+    [
+        (1, 10, 0.70, "New Success rate 0.900 with 90% confidence exceeds expected: 0.7"),
+        (1, 1000, 0.98, "New Success rate 0.999 with 90% confidence exceeds expected: 0.98"),
+    ],
+)
+def test_beyond_expected_success_rate(assert_success_rate, row):
+    failure_count, total_test_runs, expected_rate, new_success_message = row
+    results = generate_examples(failure_count, total_test_runs)
+    with pytest.raises(AssertionError) as excinfo:
+        assert_success_rate(results, expected_rate)
+
+    message = str(excinfo.value)
+    assert new_success_message in message
+    assert "Expecting: " in message
+    assert "Got: expected=0" in message
+    assert "<= analysis.lower_interval=0." in message
+    assert "assert " in message
+
+
+def test_exceeding_expected_success_rate(assert_success_rate):
+    results = [True] * 1000  # example results
+    results[0] = False
+    expected_rate = 0.97
+
+    try:
+        assert_success_rate(results, expected_rate)
+    except AssertionError as e:
+        message = e.args[0]
+        assert "with 90% confidence" in message
+        assert "Expecting: 1.00 <= 0.97 <= 1.00" in message
+        assert "Got: expected=0.97 <= analysis.lower_interval=0.99735" in message
+        print(f"Assertion failed: {e}")
 
 
 @retry(
@@ -230,8 +320,8 @@ def run_allocation_test(reporter: Reporter, skills_data, response: str) -> bool:
         },
     )
     return (
-            developer_is_appropriate
-            and no_developer_name_is_hallucinated
-            and not_empty_response
-            and has_valid_json_schema
+        developer_is_appropriate
+        and no_developer_name_is_hallucinated
+        and not_empty_response
+        and has_valid_json_schema
     )
