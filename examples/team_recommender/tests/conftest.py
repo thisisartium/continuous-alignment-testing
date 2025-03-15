@@ -1,7 +1,7 @@
-import re
 from pathlib import Path
 
 import pytest
+from helpers import natural_sort_key
 from settings import root_path
 
 
@@ -26,13 +26,6 @@ def pytest_configure(config):
 def example_dirs() -> set[Path]:
     tests_dir = root_path() / "tests"
     return set([d for d in tests_dir.glob("example_*") if d.is_dir()])
-
-
-def natural_sort_key(s: Path):
-    """Sort strings with embedded numbers in natural order."""
-    return [
-        int(text) if text.isdigit() else text.lower() for text in re.split(r"(\d+)", str(s.name))
-    ]
 
 
 def find_latest_example() -> str | None:
