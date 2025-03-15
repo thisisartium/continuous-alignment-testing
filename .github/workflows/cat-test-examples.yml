@@ -86,17 +86,7 @@ jobs:
 
       - name: Show CAT AI Statistical Report
         if: always()
-        run: |          
-          FAILURE_COUNT=$(find "$TEST_RESULTS_FOLDER" -type f -name "fail-*.json" | wc -l)
-          PASS_COUNT=$(find "$TEST_RESULTS_FOLDER" -type f -name "pass-*.json" | wc -l)
-          TOTAL_COUNT=$((FAILURE_COUNT + PASS_COUNT))
-          PYTHONPATH=src uv run python -m cat_ai.reporter \
-            "$FAILURE_COUNT" \
-            "$TOTAL_COUNT" \
-            >> "$GITHUB_STEP_SUMMARY"
-          echo "::notice:: CAT AI Statistical Report"
-          echo "::notice:: Failures: $FAILURE_COUNT from sample size: $TOTAL_COUNT"
-          echo "::notice:: Successes: $PASS_COUNT from sample size: $TOTAL_COUNT"
+        run: ./.github/workflows/show-statistical-report.sh
 
       - name: Upload main artifacts to Google Drive
         if: always() && github.ref_name == 'main'
