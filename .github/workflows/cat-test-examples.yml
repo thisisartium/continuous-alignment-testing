@@ -94,9 +94,9 @@ jobs:
             "$FAILURE_COUNT" \
             "$TOTAL_COUNT" \
             >> "$GITHUB_STEP_SUMMARY"
-          echo ":notice: CAT AI Statistical Report"
-          echo ":notice: Failures: $FAILURE_COUNT from sample size: $TOTAL_COUNT"
-          echo ":notice: Successes: $PASS_COUNT from sample size: $TOTAL_COUNT"
+          echo "::notice:: CAT AI Statistical Report"
+          echo "::notice:: Failures: $FAILURE_COUNT from sample size: $TOTAL_COUNT"
+          echo "::notice:: Successes: $PASS_COUNT from sample size: $TOTAL_COUNT"
 
       - name: Upload main artifacts to Google Drive
         if: always() && github.ref_name == 'main'
