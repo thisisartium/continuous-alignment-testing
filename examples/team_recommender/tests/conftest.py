@@ -25,7 +25,8 @@ def pytest_configure(config):
 
 def example_dirs() -> set[Path]:
     tests_dir = root_path() / "tests"
-    return set([d for d in tests_dir.glob("example_*") if d.is_dir()])
+    matching_examples = tests_dir.glob("example_*")
+    return {d for d in matching_examples if d.is_dir()}
 
 
 def find_latest_example() -> str | None:
@@ -43,18 +44,18 @@ def find_latest_example() -> str | None:
         return None
 
 
-def number_of_examples(items):
+def number_of_unique_examples(items):
     examples = {
-        Path(item.fspath).parent.name
+        parent_name
         for item in items
-        if Path(item.fspath).parent.name.startswith("example_")
+        if (parent_name := Path(item.fspath).parent.name).startswith("example_")
     }
     return len(examples)
 
 
 def pytest_collection_modifyitems(config, items):
     if not config.getoption("--all"):
-        examples = number_of_examples(items)
+        examples = number_of_unique_examples(items)
 
         if examples != len(example_dirs()):
             return

@@ -192,7 +192,7 @@ def assert_success_rate():
         assert expected > lower_boundary, f"""
             Broken Record:  
             New Success rate {analysis.proportion:.3f} with 90% confidence exceeds expected: {expected}
-            Expecting: {lower_boundary:.2f} <= {expected:.2f} <= {higher_boundary:.2f}
+            Expecting: {lower_boundary:.3f} <= {expected:.3f} <= {higher_boundary:.3f}
             Got: expected={expected} <= analysis.lower_interval={lower_boundary}
             """
         assert expected < higher_boundary, f"""
@@ -229,18 +229,40 @@ def generate_examples(failure_count, total_test_runs):
 @pytest.mark.parametrize(
     "row",
     [
-        (1, 10, 0.70, "New Success rate 0.900 with 90% confidence exceeds expected: 0.7"),
-        (1, 1000, 0.98, "New Success rate 0.999 with 90% confidence exceeds expected: 0.98"),
+        (
+            1,
+            10,
+            0.70,
+            [
+                "New Success rate 0.900 with 90% confidence exceeds expected: 0.7",
+                "Expecting: 0.74 <= 0.70 <= 1.06",
+                "Got: expected=0.7 <= analysis.lower_interval=0.74",
+                "assert 0.7 > 0.74",
+            ],
+        ),
+        (
+            1,
+            1000,
+            0.98,
+            [
+                "New Success rate 0.999 with 90% confidence exceeds expected: 0.98",
+                "Expecting: 1.00 <= 0.98 <= 1.00",
+                "Got: expected=0.98 <= analysis.lower_interval=0.997",
+                "assert 0.98 > 0.997",
+            ],
+        ),
     ],
+    ids=lambda row: row[-1][0],
 )
 def test_beyond_expected_success_rate(assert_success_rate, row):
-    failure_count, total_test_runs, expected_rate, new_success_message = row
+    failure_count, total_test_runs, expected_rate, success_messages = row
     results = generate_examples(failure_count, total_test_runs)
     with pytest.raises(AssertionError) as excinfo:
         assert_success_rate(results, expected_rate)
 
     message = str(excinfo.value)
-    assert new_success_message in message
+    for expected_message in success_messages:
+        assert expected_message in message
     assert "Expecting: " in message
     assert "Got: expected=0" in message
     assert "<= analysis.lower_interval=0." in message
