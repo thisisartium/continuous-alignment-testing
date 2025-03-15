@@ -2,9 +2,9 @@ import json
 
 import openai
 from helpers import load_json_fixture
-from jsonschema import FormatChecker, validate
 from openai import OpenAI
 from openai.types.chat.chat_completion import Choice
+from response_matches_json_schema import response_matches_json_schema
 from retry import retry
 from settings import ROOT_DIR
 
@@ -22,22 +22,6 @@ def get_all_developer_names(skills_data) -> set[str]:
 
 def get_developer_names_from_response(response) -> set[str]:
     return {developer["name"] for developer in response["developers"]}
-
-
-def response_matches_json_schema(response: str, schema: any) -> bool:
-    """
-    Validates if a given response matches the provided JSON schema.
-
-    :param response: The response JSON data as a string.
-    :param schema: The schema to validate against.
-    :return: True if the response matches the schema, otherwise False.
-    """
-    try:
-        validate(instance=response, schema=schema, format_checker=FormatChecker())
-        return True
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return False
 
 
 def test_response_matches_json_schema():
