@@ -7,8 +7,15 @@ Usage: $(basename "$0") TEST_RESULTS_FOLDER
 Arguments:
   TEST_RESULTS_FOLDER  Path to the folder containing test result files.
 
+Environment Variables:
+  GITHUB_STEP_SUMMARY  Path to the file where the step summary is stored.
+
 Description:
-  This script generates a statistical report of the project's test results by counting the number of passed and failed tests within the specified folder.
+  This script generates a statistical report of the project's test results
+  by counting the number of passed and failed tests within the specified folder.
+
+  Failures: fail-*.json
+  Passing: pass-*.json
 
 EOF
 }
