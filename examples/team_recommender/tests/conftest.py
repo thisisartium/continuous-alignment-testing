@@ -31,6 +31,7 @@ def example_dirs() -> set[Path]:
 def find_latest_example() -> str | None:
     """Find the latest example directory without relying on interactive commands"""
     # Avoid debugger evaluation of non-essential code branches
+    # noinspection PyBroadException
     try:
         examples = list(example_dirs())
         examples.sort(
