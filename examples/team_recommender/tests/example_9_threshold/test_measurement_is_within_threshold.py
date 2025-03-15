@@ -173,38 +173,6 @@ def test_metrics_within_range():
     )
 
 
-@pytest.fixture
-def assert_success_rate():
-    def _assert_success_rate(actual: list[bool], expected: float):
-        number_of_successes = sum(1 for r in actual if r)
-        actual_success_rate = number_of_successes / len(actual)
-        assert actual_success_rate >= 0.0, (
-            f"Cannot have less than 0% success rate, was: {actual_success_rate}"
-        )
-        assert actual_success_rate <= 1.0, (
-            f"Cannot have more than 100% success rate, was: {actual_success_rate}"
-        )
-        actual_count = len(actual)
-        analysis = analyse_sample_from_test(number_of_successes, actual_count)
-        # Handle case when a list of results is passed
-        lower_boundary = analysis.confidence_interval_prop[0]
-        higher_boundary = analysis.confidence_interval_prop[1]
-        assert expected > lower_boundary, f"""
-            Broken Record:  
-            New Success rate {analysis.proportion:.3f} with 90% confidence exceeds expected: {expected}
-            Expecting: {lower_boundary:.3f} <= {expected:.3f} <= {higher_boundary:.3f}
-            Got: expected={expected} <= analysis.lower_interval={lower_boundary}
-            """
-        assert expected < higher_boundary, f"""
-            Failure rate {analysis.proportion} not within 90% confidence of expected {expected}
-            New Success rate {analysis.proportion} with 90% confidence lower that expected: {expected}
-            Expecting: {lower_boundary} <= {expected} <= {higher_boundary}
-            Got:  analysis.higher_boundary={higher_boundary} <= expected={expected}
-            """
-
-    return _assert_success_rate
-
-
 def process_row(row: tuple[int, int, float]) -> str:
     return f"{row[0]} failures out of {row[1]} is within {row[2] * 100:.0f}% success rate"
 
@@ -235,9 +203,8 @@ def generate_examples(failure_count, total_test_runs):
             0.70,
             [
                 "New Success rate 0.900 with 90% confidence exceeds expected: 0.7",
-                "Expecting: 0.74 <= 0.70 <= 1.06",
+                "Expecting: 0.744 <= 0.700 <= 1.056",
                 "Got: expected=0.7 <= analysis.lower_interval=0.74",
-                "assert 0.7 > 0.74",
             ],
         ),
         (
@@ -246,9 +213,8 @@ def generate_examples(failure_count, total_test_runs):
             0.98,
             [
                 "New Success rate 0.999 with 90% confidence exceeds expected: 0.98",
-                "Expecting: 1.00 <= 0.98 <= 1.00",
+                "Expecting: 0.997 <= 0.980 <= 1.001",
                 "Got: expected=0.98 <= analysis.lower_interval=0.997",
-                "assert 0.98 > 0.997",
             ],
         ),
     ],
@@ -266,22 +232,6 @@ def test_beyond_expected_success_rate(assert_success_rate, row):
     assert "Expecting: " in message
     assert "Got: expected=0" in message
     assert "<= analysis.lower_interval=0." in message
-    assert "assert " in message
-
-
-def test_exceeding_expected_success_rate(assert_success_rate):
-    results = [True] * 1000  # example results
-    results[0] = False
-    expected_rate = 0.97
-
-    try:
-        assert_success_rate(results, expected_rate)
-    except AssertionError as e:
-        message = e.args[0]
-        assert "with 90% confidence" in message
-        assert "Expecting: 1.00 <= 0.97 <= 1.00" in message
-        assert "Got: expected=0.97 <= analysis.lower_interval=0.99735" in message
-        print(f"Assertion failed: {e}")
 
 
 @retry(

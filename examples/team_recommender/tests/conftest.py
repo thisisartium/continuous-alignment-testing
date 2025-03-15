@@ -1,8 +1,13 @@
 from pathlib import Path
 
 import pytest
-from helpers import natural_sort_key
+from helpers import _assert_success_rate, natural_sort_key
 from settings import root_path
+
+
+@pytest.fixture
+def assert_success_rate():
+    return _assert_success_rate
 
 
 def pytest_addoption(parser):
