@@ -86,7 +86,9 @@ jobs:
 
       - name: Show CAT AI Statistical Report
         if: always()
-        run: ./.github/workflows/show-statistical-report.sh
+        run: >
+          ./.github/workflows/show-statistical-report.sh
+          $TEST_RESULTS_FOLDER
 
       - name: Upload main artifacts to Google Drive
         if: always() && github.ref_name == 'main'
