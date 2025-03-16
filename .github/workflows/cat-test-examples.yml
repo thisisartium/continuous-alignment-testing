@@ -20,6 +20,24 @@ jobs:
       PYTHONUNBUFFERED: 1
 
     steps:
+      - name: Set number of runs
+        id: set-number-of-runs
+        env:
+          INPUTS_ROUNDS_OR_EMPTY: ${{ inputs.rounds }}
+        run: |
+          [[ "${GITHUB_REF_NAME}" =~ ^ci-experiment/ ]] && ROUNDS=1 || ROUNDS=10
+          ROUNDS=${INPUTS_ROUNDS_OR_EMPTY:-$ROUNDS}
+          
+          if [ "$ROUNDS" -gt 128 ] || [ "$ROUNDS" -le 0 ]
+          then
+            echo "Invalid number of rounds: $ROUNDS"
+            exit 1
+          fi
+
+          echo "::notice::Starting ${ROUNDS} run$([ "$ROUNDS" -eq 1 ] || echo "s")"
+          echo "number_of_runs=$ROUNDS" >> "$GITHUB_OUTPUT"
+          echo "CAT_AI_SAMPLE_SIZE=$ROUNDS" >> $GITHUB_ENV
+
       - uses: actions/checkout@v4
 
       - name: Install uv
@@ -47,24 +65,6 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
-
-      - name: Set number of runs
-        id: set-number-of-runs
-        env:
-          INPUTS_ROUNDS_OR_EMPTY: ${{ inputs.rounds }}
-        run: |
-          [[ "${GITHUB_REF_NAME}" =~ ^ci-experiment/ ]] && ROUNDS=1 || ROUNDS=10
-          ROUNDS=${INPUTS_ROUNDS_OR_EMPTY:-$ROUNDS}
-          
-          if [ "$ROUNDS" -gt 128 ] || [ "$ROUNDS" -le 0 ]
-          then
-            echo "Invalid number of rounds: $ROUNDS"
-            exit 1
-          fi
-
-          echo "::notice::Starting ${ROUNDS} run$([ "$ROUNDS" -eq 1 ] || echo "s")"
-          echo "number_of_runs=$ROUNDS" >> "$GITHUB_OUTPUT"
-          echo "CAT_AI_SAMPLE_SIZE=$ROUNDS" >> $GITHUB_ENV
 
       - name: Run Latest Example tests
         run: >
