@@ -51,10 +51,7 @@ PYTHONPATH=src uv run python -m cat_ai.reporter \
   >> "$GITHUB_STEP_SUMMARY"
 
 cat <<________Github_Job_Summary_Notice
-::notice title=Statistical Report::
-CAT AI Statistical Report
-::notice title=Failures::
-Failures: $FAILURE_COUNT from sample size: $TOTAL_COUNT
-::notice  title=Successes::
-Successes: $PASS_COUNT from sample size: $TOTAL_COUNT
+::notice title=Statistical Report::CAT AI Statistical Report
+::notice title=Failures::Failures: $FAILURE_COUNT from sample size: $TOTAL_COUNT
+::notice title=Successes::Successes: $PASS_COUNT from sample size: $TOTAL_COUNT
 ________Github_Job_Summary_Notice
