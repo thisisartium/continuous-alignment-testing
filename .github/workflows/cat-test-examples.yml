@@ -92,7 +92,7 @@ jobs:
             path: ${{ env.TEST_RESULTS_FOLDER }}
 
       - name: Debugging with tmate
-        if: ${{ env.ACTIONS_RUNNER_DEBUG != '' && contains('true 1 yes TRUE True YES y Y', env.ACTIONS_RUNNER_DEBUG) }}
+        if: failure()
         uses: lhotari/action-upterm@v1
         with:
           wait-timeout-minutes: 5
