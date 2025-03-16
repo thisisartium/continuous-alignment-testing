@@ -20,7 +20,7 @@ EOF
 }
 
 # Check if no arguments are provided or if help is requested
-if [ $# -eq 0 ] || [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
+if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
   show_usage
   exit 1
 fi
