@@ -42,14 +42,13 @@ TOTAL_COUNT=$((FAILURE_COUNT + PASS_COUNT))
 
 if [ "$TOTAL_COUNT" -eq 0 ]
 then
-  echo "::error:: TOTAL_COUNT of test results is zero. FAILURE_COUNT=$FAILURE_COUNT, PASS_COUNT=$PASS_COUNT"
+  echo "::error file:show-statistical-report.sh,line=$LINENO,title=Total Count is Zero:: TOTAL_COUNT of test results is zero. FAILURE_COUNT=$FAILURE_COUNT, PASS_COUNT=$PASS_COUNT"
   exit 0
 fi
 
 if [ -n "$CAT_AI_SAMPLE_SIZE" ] && [ $TOTAL_COUNT -ne $CAT_AI_SAMPLE_SIZE ]
 then
-  echo "::error:: CAT_AI_SAMPLE_SIZE != TOTAL_COUNT: CAT_AI_SAMPLE_SIZE=$CAT_AI_SAMPLE_SIZE, TOTAL_COUNT=$TOTAL_COUNT"
-  exit 0
+  echo "::error file:show-statistical-report.sh,line=$LINENO,title=Not all tests succeeded:: CAT_AI_SAMPLE_SIZE != TOTAL_COUNT: CAT_AI_SAMPLE_SIZE=$CAT_AI_SAMPLE_SIZE, TOTAL_COUNT=$TOTAL_COUNT"
 fi
 
 PYTHONPATH=src uv run python -m cat_ai.reporter \
