@@ -80,20 +80,36 @@ def test_edges_cases(failures, total, expected_error, expected_ci):
     assert result.confidence_interval_count == expected_ci
 
 
+next_success_after_97 = 0.9709704495337362
+next_success_after_90 = 0.925327195595728
+digress_from_0_999 = 0.9986779845027858
+
+progress_from_0_999 = 0.9992400558756847
+
+
+def test_measured_constants():
+    assert 1.0 > progress_from_0_999 > 0.999
+    assert 0.99 < digress_from_0_999 < 0.999
+    assert 1.0 > next_success_after_90 > 0.90
+    assert 1.0 > next_success_after_97 > 0.97
+
+
 @pytest.mark.parametrize(
     "failures, total, current_success_rate, next_success_rate",
     [
-        (0, 100, 0.97, 0.9709704495337362),
-        (0, 100, 0.9709704495337362, 0.9716775540067631),
-        (0, 100, 0.9716775540067631, 0.9721953420380238),
-        (1, 100, 0.97, 0.9709704495337362),
-        (6, 100, 0.90, 0.925327195595728),
-        (10, 100, 0.90, 0.925327195595728),
-        (1, 100, 0.90, 0.925327195595728),
+        (0, 100, 0.97, next_success_after_97),
+        (0, 100, next_success_after_97, next_success_after_97),
+        (1, 100, 0.97, next_success_after_97),
+        (6, 100, 0.90, next_success_after_90),
+        (10, 100, 0.90, next_success_after_90),
+        (1, 100, 0.90, next_success_after_90),
         (50, 100, 0.5, 0.7088786593262133),
-        # (2, 100, 0.98),
-        # (1, 100, 0.99),
-        # (1, 1000, 0.999),
+        (2, 100, 0.98, 0.9784860246113397),
+        (1, 100, 0.99, 0.9868169565265201),
+        (1, 1000, 0.999, digress_from_0_999),
+        (0, 1000, 0.999, digress_from_0_999),
+        (2, 1000, 0.999, digress_from_0_999),
+        (1, 10000, 0.999, progress_from_0_999),
     ],
 )
 def test_next_success_rate(failures, total, current_success_rate, next_success_rate):

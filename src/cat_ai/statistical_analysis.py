@@ -46,7 +46,7 @@ class StatisticalAnalysis:
         return headers
 
     def next_success_rate(self, current_success_rate: float) -> float:
-        current_success_count = current_success_rate * self.sample_size
+        current_success_count = int(round(current_success_rate * self.sample_size, 0))
         success_analysis = analyse_measure_from_test_sample(current_success_count, self.sample_size)
         lower_boundary = success_analysis.confidence_interval_prop[0]
         return (
