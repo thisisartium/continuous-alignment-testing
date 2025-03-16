@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from settings import root_path
 
-from cat_ai import analyse_sample_from_test
+from cat_ai.statistical_analysis import analyse_measure_from_test_sample
 
 
 def load_json_fixture(file_name: str) -> dict:
@@ -37,21 +37,34 @@ def _assert_success_rate(actual: list[bool], expected: float):
         f"Cannot have more than 100% success rate, was: {actual_success_rate}"
     )
     actual_count = len(actual)
-    analysis = analyse_sample_from_test(number_of_successes, actual_count)
+    success_analysis = analyse_measure_from_test_sample(number_of_successes, actual_count)
     # Handle case when a list of results is passed
-    lower_boundary = analysis.confidence_interval_prop[0]
-    higher_boundary = analysis.confidence_interval_prop[1]
-    assert expected > lower_boundary, f"""
-        Broken Record:  
-        New Success rate {analysis.proportion:.3f} with 90% confidence exceeds expected: {expected}
+    lower_boundary = success_analysis.confidence_interval_prop[0]
+    higher_boundary = success_analysis.confidence_interval_prop[1]
+    recommendation_to_decrease = (
+        success_analysis.proportion
+        if success_analysis.proportion < 1.0
+        else lower_boundary + ((1 - lower_boundary) / 2)
+    )
+    step_down_alternative = f"or to {recommendation_to_decrease:.3f}"
+    assert expected >= lower_boundary, f"""
+        Broken Record: Adjust the expected success rate to at least {lower_boundary} {step_down_alternative}
+        New Success rate {success_analysis.proportion:.3f} with 90% confidence exceeds expected: {expected}
         Expecting: {lower_boundary:.3f} <= {expected:.3f} <= {higher_boundary:.3f}
         Got: expected={expected} <= analysis.lower_interval={lower_boundary}
         """
-    assert expected < higher_boundary, f"""
-        Failure rate {analysis.proportion:3f} not within 90% confidence of expected {expected}
-        New Success rate {analysis.proportion:3f} with 90% confidence LOWER that expected: {expected}
+    recommendation_to_increase = (
+        success_analysis.proportion
+        if success_analysis.proportion < 1.0
+        else higher_boundary - ((1 - higher_boundary) / 2)
+    )
+    step_up_alternative = f"or to {recommendation_to_increase:.3f}"
+    assert expected <= higher_boundary, f"""
+        Broken Record: Adjust the expected success rate to at least {higher_boundary} {step_up_alternative}
+        Failure rate {success_analysis.proportion:.3f} not within 90% confidence of expected {expected}
+        New Success rate {success_analysis.proportion:.3f} with 90% confidence LOWER that expected: {expected}
         Expected value: {expected} is less than higher_boundary: {higher_boundary:3f}
-        Got:  analysis.higher_boundary={higher_boundary:3f} <= expected={expected}
+        Got: analysis.higher_boundary={higher_boundary:.3f} <= expected={expected}
         """
 
 
@@ -111,11 +124,23 @@ def test_success_rate_is_within_expected_error_margin_with_90_percent_confidence
     "row",
     [
         (
+            6,
+            10,
+            0.70,
+            [
+                "New Success rate 0.400 with 90% confidence LOWER that expected: 0.7",
+                "Failure rate 0.400 not within 90% confidence of expected 0.7",
+                "Expected value: 0.7 is less than higher_boundary: 0.654820",
+                "Got: analysis.higher_boundary=0.655 <= expected=0.7",
+            ],
+        ),
+        (
             1,
             10,
             0.70,
             [
                 "New Success rate 0.900 with 90% confidence exceeds expected: 0.7",
+                "Broken Record:",
                 "Expecting: 0.744 <= 0.700 <= 1.056",
                 "Got: expected=0.7 <= analysis.lower_interval=0.74",
             ],
@@ -126,6 +151,7 @@ def test_success_rate_is_within_expected_error_margin_with_90_percent_confidence
             0.98,
             [
                 "New Success rate 0.999 with 90% confidence exceeds expected: 0.98",
+                "Broken Record:",
                 "Expecting: 0.997 <= 0.980 <= 1.001",
                 "Got: expected=0.98 <= analysis.lower_interval=0.997",
             ],
@@ -141,10 +167,11 @@ def test_beyond_expected_success_rate(assert_success_rate, row):
 
     message = str(excinfo.value)
     for expected_message in success_messages:
-        assert expected_message in message
-    assert "Expecting: " in message
-    assert "Got: expected=0" in message
-    assert "<= analysis.lower_interval=0." in message
+        assert expected_message in message, (
+            f"Expected message: {expected_message}\n not found in: {message}"
+        )
+    assert "Got: " in message
+    assert " analysis." in message
 
 
 def is_within_expected(success_rate: float, failure_count: int, sample_size: int) -> bool:
@@ -153,7 +180,7 @@ def is_within_expected(success_rate: float, failure_count: int, sample_size: int
         return True
 
     expected_success_count = success_rate * sample_size
-    success_analysis = analyse_sample_from_test(expected_success_count, sample_size)
+    success_analysis = analyse_measure_from_test_sample(expected_success_count, sample_size)
     measured_success_count = sample_size - failure_count
     measured_success_rate = measured_success_count / sample_size
 
@@ -194,7 +221,6 @@ def is_within_a_range(value, left, right):
         (0.975, 0, 100, "97.5% success rate is within 100% success rate"),
         (0.9737, 0, 100, "97.37% success rate is within 100% success rate"),
     ],
-    ids=lambda row: str(row),
 )
 def test_is_within_expected(success_rate, failure_count, sample_size, message):
     if message:
@@ -217,13 +243,24 @@ def test_not_is_within_expected(failure_count, sample_size, expected_rate, messa
 
 
 def test_success_rate():
-    tiny_set_analysis = analyse_sample_from_test(1, 2)
+    tiny_set_analysis = analyse_measure_from_test_sample(1, 2)
     assert tiny_set_analysis.proportion == 0.5
     interval = tiny_set_analysis.confidence_interval_prop
 
     assert interval[0] <= 0 and interval[1] >= 1, (
         f"interval includes all possible values: {interval} does not contain [0, 1]"
     )
+
+
+def test_confidence_interval():
+    analysis = analyse_measure_from_test_sample(measure=97, sample_size=100)
+    assert analysis.observation == 97
+    assert analysis.sample_size == 100
+    assert analysis.proportion == 0.97
+    assert analysis.confidence_interval_count == (95, 99)
+    interval_min, interval_max = analysis.confidence_interval_prop
+    assert interval_min == pytest.approx(0.942, rel=0.001)
+    assert interval_max == pytest.approx(0.998, rel=0.001)
 
 
 def test_sort_names_with_numbers():

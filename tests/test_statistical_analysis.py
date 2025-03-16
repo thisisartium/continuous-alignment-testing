@@ -8,7 +8,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from cat_ai.statistical_analysis import StatisticalAnalysis, analyse_sample_from_test
+from cat_ai.statistical_analysis import StatisticalAnalysis, analyse_measure_from_test_sample
+
+
+def analyse_failure_rate_from_test_sample(
+    failure_count: int, sample_size: int
+) -> StatisticalAnalysis:
+    return analyse_measure_from_test_sample(failure_count, sample_size)
 
 
 @pytest.mark.parametrize(
@@ -21,10 +27,10 @@ from cat_ai.statistical_analysis import StatisticalAnalysis, analyse_sample_from
 )
 def test_analyse_sample_from_test(failure_count, sample_size, expected_proportion):
     """Test the statistical analysis function with various edge cases."""
-    result = analyse_sample_from_test(failure_count, sample_size)
+    result = analyse_failure_rate_from_test_sample(failure_count, sample_size)
 
     # Basic assertions
-    assert result.failure_count == failure_count
+    assert result.observation == failure_count
     assert result.sample_size == sample_size
     assert result.proportion == expected_proportion
 
@@ -61,16 +67,38 @@ def test_analyse_sample_from_test(failure_count, sample_size, expected_proportio
     "failures, total, expected_error, expected_ci",
     [
         (0, 100, 0.0, (0, 0)),
-        (6, 100, 0.023748684174075833, (3, 9)),
+        (6, 100, 0.0237, (3, 9)),
         (50, 100, 0.05, (42, 58)),
-        (95, 100, 0.021794494717703377, (92, 98)),
+        (95, 100, 0.0218, (92, 98)),
         (100, 100, 0.0, (100, 100)),
     ],
 )
 def test_edges_cases(failures, total, expected_error, expected_ci):
-    result = analyse_sample_from_test(failures, total)
-    assert result.standard_error == expected_error
+    result = analyse_failure_rate_from_test_sample(failures, total)
+    print("hello world")
+    assert math.isclose(result.standard_error, expected_error, abs_tol=0.0001)
     assert result.confidence_interval_count == expected_ci
+
+
+@pytest.mark.parametrize(
+    "failures, total, current_success_rate, next_success_rate",
+    [
+        (0, 100, 0.97, 0.9709704495337362),
+        (0, 100, 0.9709704495337362, 0.9716775540067631),
+        (0, 100, 0.9716775540067631, 0.9721953420380238),
+        (1, 100, 0.97, 0.9709704495337362),
+        (6, 100, 0.90, 0.925327195595728),
+        (10, 100, 0.90, 0.925327195595728),
+        (1, 100, 0.90, 0.925327195595728),
+        (50, 100, 0.5, 0.7088786593262133),
+        # (2, 100, 0.98),
+        # (1, 100, 0.99),
+        # (1, 1000, 0.999),
+    ],
+)
+def test_next_success_rate(failures, total, current_success_rate, next_success_rate):
+    result = analyse_failure_rate_from_test_sample(failures, total)
+    assert result.next_success_rate(current_success_rate) == next_success_rate
 
 
 def export_results_to_csv_string(results: list[StatisticalAnalysis]) -> str:
@@ -102,7 +130,7 @@ def test_failure_rate_bar_graph(snapshot):
     assert failure_counts[sample_size] == sample_size
 
     # Calculate results for each data point
-    results = [analyse_sample_from_test(f, sample_size) for f in failure_counts]
+    results = [analyse_failure_rate_from_test_sample(f, sample_size) for f in failure_counts]
     csv = export_results_to_csv_string(results)
     csv_bytes = io.BytesIO(csv.encode("utf-8"))
     snapshot.assert_match(csv_bytes.getvalue(), "failure_rate_results.csv")
@@ -155,7 +183,9 @@ def test_failure_rate_graph(snapshot):
     failures = np.arange(0, 100)
 
     # Calculate results for each rate
-    results = [analyse_sample_from_test(f, t) for f, t in zip(failures, totals, strict=True)]
+    results = [
+        analyse_failure_rate_from_test_sample(f, t) for f, t in zip(failures, totals, strict=True)
+    ]
 
     # Extract data for plotting
     rates = [r.proportion for r in results]

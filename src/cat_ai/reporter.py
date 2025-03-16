@@ -4,7 +4,10 @@ import sys
 from datetime import datetime
 from typing import Any, Dict, Optional
 
-from .statistical_analysis import StatisticalAnalysis, analyse_sample_from_test
+from .statistical_analysis import (
+    StatisticalAnalysis,
+    analyse_measure_from_test_sample,
+)
 
 
 class Reporter:
@@ -73,7 +76,7 @@ class Reporter:
         """
         output = "> [!NOTE]\n"
         output += (
-            f"> ## {to_report.failure_count} ± {to_report.margin_of_error_count} "
+            f"> ## {to_report.observation} ± {to_report.margin_of_error_count} "
             f"failures detected ({to_report.sample_size} samples)\n"
         )
         output += "> \n"
@@ -102,6 +105,6 @@ if __name__ == "__main__":
     failure_count = int(sys.argv[1])
     sample_size = int(sys.argv[2])
 
-    analysis = analyse_sample_from_test(failure_count, sample_size)
+    failure_analysis = analyse_measure_from_test_sample(failure_count, sample_size)
 
-    print(Reporter.format_summary(analysis))
+    print(Reporter.format_summary(failure_analysis))
