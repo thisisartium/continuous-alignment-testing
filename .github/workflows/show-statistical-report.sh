@@ -9,6 +9,7 @@ Arguments:
 
 Environment Variables:
   GITHUB_STEP_SUMMARY  Path to the file where the step summary is stored.
+  CAT_AI_SAMPLE_SIZE   Number of samples to use for the statistical test.
 
 Description:
   This script generates a statistical report of the project's test results
@@ -45,13 +46,15 @@ then
   exit 0
 fi
 
+if [ -n "$CAT_AI_SAMPLE_SIZE" ] && [ $TOTAL_COUNT -ne $CAT_AI_SAMPLE_SIZE ]
+then
+  echo "::error:: CAT_AI_SAMPLE_SIZE != TOTAL_COUNT: CAT_AI_SAMPLE_SIZE=$CAT_AI_SAMPLE_SIZE, TOTAL_COUNT=$TOTAL_COUNT"
+  exit 0
+fi
+
 PYTHONPATH=src uv run python -m cat_ai.reporter \
   "$FAILURE_COUNT" \
   "$TOTAL_COUNT" \
   >> "$GITHUB_STEP_SUMMARY"
 
-cat <<________Github_Job_Summary_Notice
-::notice title=Statistical Report::CAT AI Statistical Report
-::notice title=Failures::Failures: $FAILURE_COUNT from sample size: $TOTAL_COUNT
-::notice title=Successes::Successes: $PASS_COUNT from sample size: $TOTAL_COUNT
-________Github_Job_Summary_Notice
+echo ::notice title=Statistical Outcome::Successes: $PASS_COUNT, Failures: $FAILURE_COUNT from total: $TOTAL_COUNT, sample size: $CAT_AI_SAMPLE_SIZE
