@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Set number of runs
         id: set-number-of-runs
-        run: .github/workflows/set-number-of-runs.sh
+        run: ./.github/workflows/set-number-of-runs.sh
 
       - uses: actions/checkout@v4
 
