@@ -21,11 +21,11 @@ jobs:
       INPUTS_ROUNDS_OR_EMPTY: ${{ inputs.rounds }}
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Set number of runs
         id: set-number-of-runs
         run: ./.github/workflows/set-number-of-runs.sh
-
-      - uses: actions/checkout@v4
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
