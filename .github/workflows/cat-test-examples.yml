@@ -18,19 +18,18 @@ jobs:
     env:
       TEST_RESULTS_FOLDER: examples/team_recommender/test_runs
       PYTHONUNBUFFERED: 1
+      INPUTS_ROUNDS_OR_EMPTY: ${{ inputs.rounds }}
 
     steps:
       - name: Set number of runs
         id: set-number-of-runs
-        env:
-          INPUTS_ROUNDS_OR_EMPTY: ${{ inputs.rounds }}
         run: |
           [[ "${GITHUB_REF_NAME}" =~ ^ci-experiment/ ]] && ROUNDS=1 || ROUNDS=10
           ROUNDS=${INPUTS_ROUNDS_OR_EMPTY:-$ROUNDS}
           
           if [ "$ROUNDS" -gt 128 ] || [ "$ROUNDS" -le 0 ]
           then
-            echo "Invalid number of rounds: $ROUNDS"
+            echo "::error title=Invalid number of rounds:: ROUNDS=$ROUNDS, must be between 1 and 128"
             exit 1
           fi
 
