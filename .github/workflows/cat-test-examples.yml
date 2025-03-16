@@ -23,25 +23,7 @@ jobs:
     steps:
       - name: Set number of runs
         id: set-number-of-runs
-        run: |
-          [[ "${GITHUB_REF_NAME}" =~ ^ci-experiment/ ]] && ROUNDS=1 || ROUNDS=10
-          ROUNDS=${INPUTS_ROUNDS_OR_EMPTY:-$ROUNDS}
-          
-          # Validate that ROUNDS is a valid integer
-          if ! [[ "$ROUNDS" =~ ^[0-9]+$ ]]; then
-            echo "::error title=Invalid input:: ROUNDS=$ROUNDS is not a valid integer"
-            exit 1
-          fi
-          
-          if [ "$ROUNDS" -gt 128 ] || [ "$ROUNDS" -le 0 ]
-          then
-            echo "::error title=Invalid number of rounds:: ROUNDS=$ROUNDS, must be between 1 and 128"
-            exit 1
-          fi
-
-          echo "::notice::Starting ${ROUNDS} run$([ "$ROUNDS" -eq 1 ] || echo "s")"
-          echo "number_of_runs=$ROUNDS" >> "$GITHUB_OUTPUT"
-          echo "CAT_AI_SAMPLE_SIZE=$ROUNDS" >> $GITHUB_ENV
+        run: .github/workflows/set-number-of-runs.sh
 
       - uses: actions/checkout@v4
 

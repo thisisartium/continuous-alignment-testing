@@ -1,34 +1,44 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Purpose: Determine and validate the number of runs for CI testing
-# Usage: ./set-runs.sh [custom_rounds]
+# Usage: ./set-number-of-runs.sh
+# Environment Variables:
+#   GITHUB_REF_NAME:          The name of the branch or tag
+#   INPUTS_ROUNDS_OR_EMPTY:   The number of rounds to run the tests
+#   GITHUB_OUTPUT:            The path to the file to store the step output
+#   GITHUB_ENV:               The path to the file to store the environment variables
+#
+# This script sets CAT_AI_SAMPLE_SIZE for the statistical test
+# based on input or the branch name
+# and stores the value in the output and environment files
 
-# Check if we're on a CI experiment branch
-if [[ "${GITHUB_REF_NAME}" =~ ^ci-experiment/ ]]; then
-  DEFAULT_ROUNDS=1
-else
-  DEFAULT_ROUNDS=10
-fi
 
-# Use explicitly provided input if available, otherwise use default
-ROUNDS=${1:-${INPUTS_ROUNDS_OR_EMPTY:-$DEFAULT_ROUNDS}}
-          
+[[ "${GITHUB_REF_NAME}" =~ ^ci-experiment/ ]] && ROUNDS=1 || ROUNDS=10
+ROUNDS=${INPUTS_ROUNDS_OR_EMPTY:-$ROUNDS}
+
 # Validate that ROUNDS is a valid integer
 if ! [[ "$ROUNDS" =~ ^[0-9]+$ ]]; then
   echo "::error title=Invalid input:: ROUNDS=$ROUNDS is not a valid integer"
   exit 1
 fi
 
-# Validate range
-if [ "$ROUNDS" -gt 128 ] || [ "$ROUNDS" -le 0 ]; then
+if [ "$ROUNDS" -gt 128 ] || [ "$ROUNDS" -le 0 ]
+then
   echo "::error title=Invalid number of rounds:: ROUNDS=$ROUNDS, must be between 1 and 128"
   exit 1
 fi
 
-# Provide user feedback
-PLURAL_TEXT=$([ "$ROUNDS" -eq 1 ] || echo "s")
-echo "::notice::Starting ${ROUNDS} run${PLURAL_TEXT}"
+PLURAL=$([ "$ROUNDS" -eq 1 ] || echo "s")
+ROUND_RUNS="${ROUNDS} run${PLURAL}"
+echo "::notice::Starting ${ROUND_RUNS}"
 
-# Output for GitHub Actions to consume
-echo "number_of_runs=$ROUNDS"
-echo "CAT_AI_SAMPLE_SIZE=$ROUNDS"
+
+if [ -n "$GITHUB_OUTPUT" ]
+then
+  echo "number_of_runs=$ROUNDS" >> "$GITHUB_OUTPUT"
+fi
+
+if [ -n "$GITHUB_ENV" ]
+then
+  echo "CAT_AI_SAMPLE_SIZE=$ROUNDS" >> "$GITHUB_ENV"
+fi
