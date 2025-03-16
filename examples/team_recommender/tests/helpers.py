@@ -182,25 +182,38 @@ def is_within_a_range(value, left, right):
     return left <= value <= right
 
 
-def test_is_within_expected():
-    assert is_within_expected(0.8, 0, 5)
-    assert is_within_expected(0.8, 2, 5)
-    assert is_within_expected(0.8, 26, 100)
-    assert is_within_expected(0.8, 14, 100)
-    assert is_within_expected(0.97, 1, 8)
-    small_size_warning = "after measuring 2x 100 runs and getting 3 failures"
-    assert is_within_expected(0.97, 0, 1), small_size_warning
-    assert is_within_expected(0.975, 0, 100), "97.5% success rate is within 100% success rate"
-    assert is_within_expected(0.9735, 0, 100), "97.35% success rate is within 100% success rate"
+@pytest.mark.parametrize(
+    "success_rate, failure_count, sample_size, message",
+    [
+        (0.8, 0, 5, None),
+        (0.8, 2, 5, None),
+        (0.8, 26, 100, None),
+        (0.8, 14, 100, None),
+        (0.97, 1, 8, None),
+        (0.97, 0, 1, "after measuring 2x 100 runs and getting 3 failures"),
+        (0.975, 0, 100, "97.5% success rate is within 100% success rate"),
+        (0.9737, 0, 100, "97.37% success rate is within 100% success rate"),
+    ],
+    ids=lambda row: str(row),
+)
+def test_is_within_expected(success_rate, failure_count, sample_size, message):
+    if message:
+        assert is_within_expected(success_rate, failure_count, sample_size), message
+    else:
+        assert is_within_expected(success_rate, failure_count, sample_size)
 
 
-def test_not_is_within_expected():
-    assert not is_within_expected(0.8, 3, 5), "3 failures out of 5 is 40% success rate"
-    assert not is_within_expected(0.97, 1, 2), "1 failure out of 2 is 50% success rate"
-    assert not is_within_expected(0.97, 0, 100), "100% success rate is not within 97% success rate"
-    assert not is_within_expected(0.9736, 0, 100), (
-        "97.35% success rate is not within 100% success rate"
-    )
+@pytest.mark.parametrize(
+    "failure_count, sample_size, expected_rate, message",
+    [
+        (3, 5, 0.8, "40% success rate is below expected 80% success rate"),
+        (1, 2, 0.97, "50% success rate is below expected 97% success rate"),
+        (0, 100, 0.97, "100% success rate is not within 97% success rate"),
+        (0, 100, 0.9736, "97.36% success rate is not within 100% success rate"),
+    ],
+)
+def test_not_is_within_expected(failure_count, sample_size, expected_rate, message):
+    assert not is_within_expected(expected_rate, failure_count, sample_size), message
 
 
 def test_success_rate():
