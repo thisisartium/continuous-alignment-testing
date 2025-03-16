@@ -2,12 +2,10 @@
 
 show_usage() {
   cat << EOF
-Usage: $(basename "$0") TEST_RESULTS_FOLDER
-
-Arguments:
-  TEST_RESULTS_FOLDER  Path to the folder containing test result files.
+Usage: $(basename "$0")
 
 Environment Variables:
+  TEST_RESULTS_FOLDER  Path to the folder containing test result files.
   GITHUB_STEP_SUMMARY  Path to the file where the step summary is stored.
   CAT_AI_SAMPLE_SIZE   Number of samples to use for the statistical test.
 
@@ -27,8 +25,6 @@ if [ $# -eq 0 ] || [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
   exit 1
 fi
 
-TEST_RESULTS_FOLDER=$1
-
 # Validate the provided directory
 if [ ! -d "$TEST_RESULTS_FOLDER" ]; then
   echo "::error:: The test results folder does not exist: $TEST_RESULTS_FOLDER"
@@ -43,12 +39,14 @@ TOTAL_COUNT=$((FAILURE_COUNT + PASS_COUNT))
 if [ "$TOTAL_COUNT" -eq 0 ]
 then
   echo "::error file:show-statistical-report.sh,line=$LINENO,title=Total Count is Zero:: TOTAL_COUNT of test results is zero. FAILURE_COUNT=$FAILURE_COUNT, PASS_COUNT=$PASS_COUNT"
+  echo "Operation completed successfully: prevented generation of inaccurate statistical report"
   exit 0
 fi
 
 if [ -n "$CAT_AI_SAMPLE_SIZE" ] && [ $TOTAL_COUNT -ne $CAT_AI_SAMPLE_SIZE ]
 then
   echo "::error file:show-statistical-report.sh,line=$LINENO,title=Not all tests succeeded:: CAT_AI_SAMPLE_SIZE != TOTAL_COUNT: CAT_AI_SAMPLE_SIZE=$CAT_AI_SAMPLE_SIZE, TOTAL_COUNT=$TOTAL_COUNT"
+  echo "Continuing with the statistical report generation for the available test results with total count: $TOTAL_COUNT"
 fi
 
 PYTHONPATH=src uv run python -m cat_ai.reporter \
