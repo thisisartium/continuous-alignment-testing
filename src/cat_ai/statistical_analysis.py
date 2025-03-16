@@ -90,10 +90,10 @@ def analyse_sample_from_test(failure_count: int, sample_size: int) -> Statistica
     return StatisticalAnalysis(
         failure_count=failure_count,
         sample_size=sample_size,
+        margin_of_error_count=margin_of_error_count,
+        confidence_interval_count=(lower_bound_count, upper_bound_count),
         proportion=p_hat,
         standard_error=se,
         margin_of_error=me,
         confidence_interval_prop=(lower_bound_prop, upper_bound_prop),
-        confidence_interval_count=(lower_bound_count, upper_bound_count),
-        margin_of_error_count=margin_of_error_count,
     )

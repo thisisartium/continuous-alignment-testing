@@ -148,14 +148,22 @@ def test_beyond_expected_success_rate(assert_success_rate, row):
 
 
 def is_within_expected(success_rate: float, failure_count: int, sample_size: int) -> bool:
+    print(f"is_within_expected({success_rate}, {failure_count}, {sample_size})")
     if sample_size <= 1:
         return True
+
     success_portion = int(success_rate * sample_size)
     success_analysis = analyse_sample_from_test(success_portion, sample_size)
+    success_count = sample_size - failure_count
+
+    interval_min, interval_max = success_analysis.confidence_interval_count
+    print(f"Expecting {success_count} to be between {interval_min} and {interval_max}")
+    adjusted_success_rate = int(success_analysis.proportion * sample_size)
+    print(f"Adjusted success rate: {adjusted_success_rate:.3f} with {success_count} successes")
     return is_within_a_range(
-        sample_size - failure_count,
-        success_analysis.confidence_interval_count[0],
-        success_analysis.confidence_interval_count[1],
+        success_count,
+        interval_min,
+        interval_max,
     )
 
 
@@ -174,6 +182,7 @@ def test_is_within_expected():
     assert is_within_expected(0.97, 1, 2)
     small_size_warning = "after measuring 2x 100 runs and getting 3 failures"
     assert is_within_expected(0.97, 0, 1), small_size_warning
+    assert not is_within_expected(0.97, 0, 100)
 
 
 def test_success_rate():

@@ -1,8 +1,25 @@
+import logging
 from pathlib import Path
 
 import pytest
 from helpers import _assert_success_rate, natural_sort_key
 from settings import root_path
+
+
+@pytest.fixture(autouse=True)
+def setup_openai_logger() -> logging.Logger:
+    # Configure the logger you mentioned in your retry decorator
+    logger = logging.getLogger("openai.api")
+    logger.setLevel(logging.DEBUG)
+
+    # Create a console handler if you want it separate from pytest's logging
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    return logger
 
 
 @pytest.fixture

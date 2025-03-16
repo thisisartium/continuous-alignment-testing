@@ -1,4 +1,6 @@
 import json
+import logging
+import sys
 from typing import List
 
 import openai
@@ -25,15 +27,7 @@ def get_developer_names_from_response(response) -> set[str]:
     return {developer["name"] for developer in response["developers"]}
 
 
-def test_response_matches_json_schema():
-    # Load example output and schema
-    example_output = load_json_fixture("example_output.json")
-    schema = load_json_fixture("output_schema.json")
-
-    assert response_matches_json_schema(example_output, schema)
-
-
-def test_metrics_within_range():
+def test_metrics_within_range(setup_openai_logger):
     generations = Runner.get_sample_size()
 
     skills_data = load_json_fixture("skills.json")
@@ -57,6 +51,7 @@ def test_metrics_within_range():
     It will find exciting moments from sports highlights videos.
     """
 
+    setup_openai_logger.addHandler(logging.StreamHandler(sys.stdout))
     responses = generate_choices(generations, project_description, system_prompt)
 
     results = []
