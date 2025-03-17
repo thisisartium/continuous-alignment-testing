@@ -1,16 +1,16 @@
 import json
-import re
+import logging
+import sys
 from typing import List
 
 import openai
-from helpers import load_json_fixture
-from jsonschema import FormatChecker, validate
+from helpers import is_within_expected, load_json_fixture
 from openai import OpenAI
 from openai.types.chat.chat_completion import Choice
+from response_matches_json_schema import response_matches_json_schema
 from retry import retry
 from settings import root_dir
 
-from cat_ai import analyse_sample_from_test
 from cat_ai.reporter import Reporter
 from cat_ai.runner import Runner
 
@@ -27,100 +27,7 @@ def get_developer_names_from_response(response) -> set[str]:
     return {developer["name"] for developer in response["developers"]}
 
 
-def response_matches_json_schema(response: str, schema: any) -> bool:
-    """
-    Validates if a given response matches the provided JSON schema.
-
-    :param response: The response JSON data as a string.
-    :param schema: The schema to validate against.
-    :return: True if the response matches the schema, otherwise False.
-    """
-    try:
-        validate(instance=response, schema=schema, format_checker=FormatChecker())
-        return True
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return False
-
-
-def test_response_matches_json_schema():
-    # Load example output and schema
-    example_output = load_json_fixture("example_output.json")
-    schema = load_json_fixture("output_schema.json")
-
-    assert response_matches_json_schema(example_output, schema)
-
-
-def is_within_a_range(value, left, right):
-    return left <= value <= right
-
-
-def test_is_within_expected():
-    assert is_within_expected(0.8, 0, 5)
-    assert is_within_expected(0.8, 2, 5)
-    assert not is_within_expected(0.8, 3, 5)
-    assert not is_within_expected(0.8, 4, 5)
-    assert not is_within_expected(0.8, 5, 5)
-    assert is_within_expected(0.8, 26, 100)
-    assert is_within_expected(0.8, 14, 100)
-    assert is_within_expected(0.97, 1, 2)
-    small_size_warning =  "after measuring 2x 100 runs and getting 3 failures"
-    assert not is_within_expected(0.97, 0, 1), small_size_warning
-
-
-def is_within_expected(success_rate: float, failure_count: int, sample_size: int):
-    success_portion = int(success_rate * sample_size)
-    success_analysis = analyse_sample_from_test(success_portion, sample_size)
-    return is_within_a_range(
-        sample_size - failure_count,
-        success_analysis.confidence_interval_count[0],
-        success_analysis.confidence_interval_count[1],
-    )
-
-
-def test_success_rate():
-    tiny_set_analysis = analyse_sample_from_test(1, 2)
-    assert tiny_set_analysis.proportion == 0.5
-    interval = tiny_set_analysis.confidence_interval_prop
-
-    assert interval[0] <= 0 and interval[1] >= 1, (
-        f"interval includes all possible values: {interval} does not contain [0, 1]"
-    )
-
-
-def natural_sort_key(s):
-    """Sort strings with embedded numbers in natural order."""
-    return [int(text) if text.isdigit() else text.lower() for text in re.split(r"(\d+)", s)]
-
-
-def test_sort_names_with_numbers():
-    unsorted = [
-        "example_1_text_response",
-        "example_10_threshold",
-        "example_2_unit",
-        "example_8_retry_network",
-        "example_9_retry_with_open_telemetry",
-    ]
-    incorrectly_sorted = [
-        "example_10_threshold",
-        "example_1_text_response",
-        "example_2_unit",
-        "example_8_retry_network",
-        "example_9_retry_with_open_telemetry",
-    ]
-    assert incorrectly_sorted == sorted(unsorted)
-
-    correctly_sorted = [
-        "example_1_text_response",
-        "example_2_unit",
-        "example_8_retry_network",
-        "example_9_retry_with_open_telemetry",
-        "example_10_threshold",
-    ]
-    assert correctly_sorted == sorted(unsorted, key=natural_sort_key)
-
-
-def test_metrics_within_range():
+def test_metrics_within_range(setup_openai_logger):
     generations = Runner.get_sample_size()
 
     skills_data = load_json_fixture("skills.json")
@@ -144,6 +51,7 @@ def test_metrics_within_range():
     It will find exciting moments from sports highlights videos.
     """
 
+    setup_openai_logger.addHandler(logging.StreamHandler(sys.stdout))
     responses = generate_choices(generations, project_description, system_prompt)
 
     results = []
@@ -166,10 +74,12 @@ def test_metrics_within_range():
         )
         results.append(test_runner.run_once(run))
 
-    failure_threshold = 0.97
-    assert generations <= 1 or is_within_expected(
-        failure_threshold, sum(not result for result in results), generations
-    ), f"Expected {failure_threshold} to be within the confidence interval of the success rate"
+    expected_success_rate_measured = 0.97
+    failure_count = sum(not result for result in results)
+    sample_size = len(results)
+    assert is_within_expected(expected_success_rate_measured, failure_count, sample_size), (
+        f"Expected {expected_success_rate_measured} to be within of the success rate"
+    )
 
 
 @retry(
@@ -230,8 +140,8 @@ def run_allocation_test(reporter: Reporter, skills_data, response: str) -> bool:
         },
     )
     return (
-            developer_is_appropriate
-            and no_developer_name_is_hallucinated
-            and not_empty_response
-            and has_valid_json_schema
+        developer_is_appropriate
+        and no_developer_name_is_hallucinated
+        and not_empty_response
+        and has_valid_json_schema
     )

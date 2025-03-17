@@ -1,8 +1,11 @@
 import json
 
+import openai
 from helpers import load_json_fixture
-from jsonschema import FormatChecker, validate
 from openai import OpenAI
+from openai.types.chat.chat_completion import Choice
+from response_matches_json_schema import response_matches_json_schema
+from retry import retry
 from settings import ROOT_DIR
 
 from cat_ai.reporter import Reporter
@@ -19,30 +22,6 @@ def get_all_developer_names(skills_data) -> set[str]:
 
 def get_developer_names_from_response(response) -> set[str]:
     return {developer["name"] for developer in response["developers"]}
-
-
-def response_matches_json_schema(response: str, schema: any) -> bool:
-    """
-    Validates if a given response matches the provided JSON schema.
-
-    :param response: The response JSON data as a string.
-    :param schema: The schema to validate against.
-    :return: True if the response matches the schema, otherwise False.
-    """
-    try:
-        validate(instance=response, schema=schema, format_checker=FormatChecker())
-        return True
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return False
-
-
-def test_response_matches_json_schema():
-    # Load example output and schema
-    example_output = load_json_fixture("example_output.json")
-    schema = load_json_fixture("output_schema.json")
-
-    assert response_matches_json_schema(example_output, schema)
 
 
 def has_expected_success_rate(results: list[bool], expected_success_rate: float) -> bool:
@@ -84,16 +63,7 @@ def test_response_has_valid_schema():
     client = OpenAI()
     assert client is not None
 
-    completion = client.chat.completions.create(
-        model="gpt-4-1106-preview",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": project_description},
-        ],
-        response_format={"type": "json_object"},
-        n=generations,
-    )
-    responses = completion.choices
+    responses = generate_responses(client, generations, project_description, system_prompt)
 
     results = []
     for run in range(0, generations):
@@ -116,6 +86,25 @@ def test_response_has_valid_schema():
 
     failure_threshold = 0.8
     assert has_expected_success_rate(results, failure_threshold)
+
+
+@retry(
+    exceptions=openai.APIConnectionError,
+    initial_delay=30,
+    backoff_factor=1.5,
+)
+def generate_responses(client, generations, project_description, system_prompt) -> Choice:
+    completion = client.chat.completions.create(
+        model="gpt-4-1106-preview",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": project_description},
+        ],
+        response_format={"type": "json_object"},
+        n=generations,
+    )
+    responses = completion.choices
+    return responses
 
 
 def run_allocation_test(reporter, skills_data, response) -> bool:

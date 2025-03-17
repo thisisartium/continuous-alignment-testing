@@ -42,14 +42,6 @@ def response_matches_json_schema(response: str, schema: any) -> bool:
         return False
 
 
-def test_response_matches_json_schema():
-    # Load example output and schema
-    example_output = load_json_fixture("example_output.json")
-    schema = load_json_fixture("output_schema.json")
-
-    assert response_matches_json_schema(example_output, schema)
-
-
 def has_expected_success_rate(results: list[bool], expected_success_rate: float) -> bool:
     if not results:
         return True

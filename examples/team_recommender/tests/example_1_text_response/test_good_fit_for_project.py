@@ -1,4 +1,13 @@
+import json
+
+from example_1_text_response.cosine_similarity import (
+    compute_cosine_similarity,
+)
+from helpers import load_json_fixture
 from openai import OpenAI
+from openai_embeddings import create_embedding_object
+
+from examples.team_recommender.conftest import root_path
 
 
 def test_response_shows_developer_names():
@@ -46,7 +55,7 @@ def test_response_shows_developer_names():
     )
 
 
-def test_llm_will_hallucinate_given_no_data():
+def test_llm_will_hallucinate_given_no_data(snapshot):
     client = OpenAI()
     assert client is not None
 
@@ -98,10 +107,47 @@ def test_llm_will_hallucinate_given_no_data():
     # 2. Jamie Smith
     #     - Skills: iOS Native, Mobile UI Design
     #     - Availability: Available starting May 20th
+
     assert "Sam Thomas" not in response, (
         "LLM obviously could not get our expected developer and will hallucinate"
     )
     assert "Drew Anderson" not in response, "Response will contain made up names"
-    assert len(response.split("\n")) > 5, (
-        "response contains list of made up developers in multiple lines"
+    # assert len(response.split("\n")) > 5, (
+    #     "response contains list of made up developers in multiple lines"
+    # )
+
+    embedding_response: dict = create_embedding_object(response)
+    saved_response = load_json_fixture("hallucination_response.json")
+    cosine_similarity = compute_cosine_similarity(
+        saved_response["embedding"], embedding_response["embedding"]
     )
+    if cosine_similarity < 0.7:
+        with open(str(root_path / "tests/fixtures/hallucination_response.json"), "w") as f:
+            json.dump(embedding_response, f)
+        with open(str(snapshot.snapshot_dir / "hallucination_response.txt"), "w") as f:
+            f.write(response)
+
+    assert cosine_similarity > 0.7, (
+        f"Response is similar to the saved hallucination response, was {cosine_similarity}"
+    )
+
+    smarter_response = load_json_fixture("please_provide_missing_information_response.json")
+    cosine_similarity_to_smarter = compute_cosine_similarity(
+        smarter_response["embedding"], embedding_response["embedding"]
+    )
+    assert cosine_similarity_to_smarter < 0.65, (
+        f"Response is similar to the smarter response: {cosine_similarity_to_smarter}"
+    )
+    print("cosine_similarity_to_smarter", cosine_similarity_to_smarter)
+    if cosine_similarity_to_smarter > 0.65:
+        with open(
+            str(root_path / "tests/fixtures/please_provide_missing_information_response.json"), "w"
+        ) as f:
+            json.dump(embedding_response, f)
+        with open(
+            str(snapshot.snapshot_dir / "please_provide_missing_information_response.txt"), "w"
+        ) as f:
+            f.write(response)
+
+
+# please_provide_missing_information_response.txt

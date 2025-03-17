@@ -18,9 +18,14 @@ jobs:
     env:
       TEST_RESULTS_FOLDER: examples/team_recommender/test_runs
       PYTHONUNBUFFERED: 1
+      INPUTS_ROUNDS_OR_EMPTY: ${{ inputs.rounds }}
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set number of runs
+        id: set-number-of-runs
+        run: ./.github/workflows/set-number-of-runs.sh
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -48,24 +53,6 @@ jobs:
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
-      - name: Set number of runs
-        id: set-number-of-runs
-        env:
-          INPUTS_ROUNDS_OR_EMPTY: ${{ inputs.rounds }}
-        run: |
-          [[ "${GITHUB_REF_NAME}" =~ ^ci-experiment/ ]] && ROUNDS=1 || ROUNDS=10
-          ROUNDS=${INPUTS_ROUNDS_OR_EMPTY:-$ROUNDS}
-          
-          if [ "$ROUNDS" -gt 128 ] || [ "$ROUNDS" -le 0 ]
-          then
-            echo "Invalid number of rounds: $ROUNDS"
-            exit 1
-          fi
-
-          echo "::notice::Starting ${ROUNDS} run$([ "$ROUNDS" -eq 1 ] || echo "s")"
-          echo "number_of_runs=$ROUNDS" >> "$GITHUB_OUTPUT"
-          echo "CAT_AI_SAMPLE_SIZE=$ROUNDS" >> $GITHUB_ENV
-
       - name: Run Latest Example tests
         run: >
           uv run pytest
@@ -86,12 +73,7 @@ jobs:
 
       - name: Show CAT AI Statistical Report
         if: always()
-        run: |          
-          FAILURE_COUNT=$(find "$TEST_RESULTS_FOLDER" -type f -name "fail-*.json" | wc -l)
-          PYTHONPATH=src uv run python -m cat_ai.reporter \
-            "$FAILURE_COUNT" \
-            "$CAT_AI_SAMPLE_SIZE" \
-            >> "$GITHUB_STEP_SUMMARY"
+        run: ./.github/workflows/show-statistical-report.sh
 
       - name: Upload main artifacts to Google Drive
         if: always() && github.ref_name == 'main'
@@ -110,7 +92,8 @@ jobs:
             path: ${{ env.TEST_RESULTS_FOLDER }}
 
       - name: Debugging with tmate
-        if: failure()
-        uses: lhotari/action-upterm@v1
+        if: always() && (runner.debug == '1' || env.RUNNER_DEBUG == '1')
+        uses: mxschmitt/action-tmate@v3
         with:
-          wait-timeout-minutes: 5
+          limit-access-to-actor: true
+          connect-timeout-seconds: 300

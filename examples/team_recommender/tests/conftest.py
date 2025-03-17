@@ -1,8 +1,30 @@
-import re
+import logging
 from pathlib import Path
 
 import pytest
+from helpers import _assert_success_rate, natural_sort_key
 from settings import root_path
+
+
+@pytest.fixture(autouse=True)
+def setup_openai_logger() -> logging.Logger:
+    # Configure the logger you mentioned in your retry decorator
+    logger = logging.getLogger("openai.api")
+    logger.setLevel(logging.DEBUG)
+
+    # Create a console handler if you want it separate from pytest's logging
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    return logger
+
+
+@pytest.fixture
+def assert_success_rate():
+    return _assert_success_rate
 
 
 def pytest_addoption(parser):
@@ -25,19 +47,14 @@ def pytest_configure(config):
 
 def example_dirs() -> set[Path]:
     tests_dir = root_path() / "tests"
-    return set([d for d in tests_dir.glob("example_*") if d.is_dir()])
-
-
-def natural_sort_key(s: Path):
-    """Sort strings with embedded numbers in natural order."""
-    return [
-        int(text) if text.isdigit() else text.lower() for text in re.split(r"(\d+)", str(s.name))
-    ]
+    matching_examples = tests_dir.glob("example_*")
+    return {d for d in matching_examples if d.is_dir()}
 
 
 def find_latest_example() -> str | None:
     """Find the latest example directory without relying on interactive commands"""
     # Avoid debugger evaluation of non-essential code branches
+    # noinspection PyBroadException
     try:
         examples = list(example_dirs())
         examples.sort(
@@ -49,18 +66,18 @@ def find_latest_example() -> str | None:
         return None
 
 
-def number_of_examples(items):
+def number_of_unique_examples(items):
     examples = {
-        Path(item.fspath).parent.name
+        parent_name
         for item in items
-        if Path(item.fspath).parent.name.startswith("example_")
+        if (parent_name := Path(item.fspath).parent.name).startswith("example_")
     }
     return len(examples)
 
 
 def pytest_collection_modifyitems(config, items):
     if not config.getoption("--all"):
-        examples = number_of_examples(items)
+        examples = number_of_unique_examples(items)
 
         if examples != len(example_dirs()):
             return

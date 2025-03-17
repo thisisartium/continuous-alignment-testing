@@ -1,6 +1,10 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="true" type="tests" factoryName="py.test">
+  <configuration default="true" type="tests" factoryName="py.test" show_console_on_std_err="true" show_console_on_std_out="true">
     <module name="continuous-alignment-testing" />
+    <selectedOptions>
+      <option name="pytest.parameters" />
+      <option name="log.monitor" />
+    </selectedOptions>
     <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />

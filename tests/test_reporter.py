@@ -2,7 +2,7 @@ import json
 import time
 from unittest.mock import MagicMock, mock_open, patch
 
-from cat_ai import analyse_sample_from_test
+from cat_ai.statistical_analysis import analyse_measure_from_test_sample
 from src.cat_ai.helpers.helpers import root_dir
 from src.cat_ai.reporter import Reporter
 
@@ -53,9 +53,9 @@ def test_report_creates_correct_json(mock_open: MagicMock, mock_makedirs: MagicM
     mock_open().write.assert_called_with(expected_json_string)
 
 
-def test_format_summary():
-    analysis = analyse_sample_from_test(6, 100)
-    assert Reporter.format_summary(analysis) == (
+def test_format_summary_with_failure_analysis():
+    failure_analysis = analyse_measure_from_test_sample(6, 100)
+    assert Reporter.format_summary(failure_analysis) == (
         "> [!NOTE]\n"
         "> ## 6 ± 3 failures detected (100 samples)\n"
         "> \n"

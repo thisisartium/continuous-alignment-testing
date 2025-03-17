@@ -8,7 +8,7 @@ from typing import Any, Tuple
 class StatisticalAnalysis:
     """Class for statistical analysis results of test runs."""
 
-    failure_count: int
+    observation: int
     sample_size: int
     margin_of_error_count: int
     confidence_interval_count: Tuple[int, int]
@@ -45,20 +45,34 @@ class StatisticalAnalysis:
         ]
         return headers
 
+    def next_success_rate(self, current_success_rate: float) -> float:
+        current_success_count = int(round(current_success_rate * self.sample_size, 0))
+        success_analysis = analyse_measure_from_test_sample(current_success_count, self.sample_size)
+        lower_boundary = success_analysis.confidence_interval_prop[0]
+        return (
+            success_analysis.proportion
+            if success_analysis.proportion > 1.0
+            else lower_boundary + ((1 - lower_boundary) / 2)
+        )
 
-def analyse_sample_from_test(failure_count: int, sample_size: int) -> StatisticalAnalysis:
+
+def analyse_sample_from_test(success_count: int, sample_size: int) -> StatisticalAnalysis:
+    return analyse_measure_from_test_sample(measure=success_count, sample_size=sample_size)
+
+
+def analyse_measure_from_test_sample(measure: int, sample_size: int) -> StatisticalAnalysis:
     """
     Calculate the error margin and confidence interval for a given sample.
 
     Args:
-        failure_count (int): Number of failures in the sample
+        measure (int): Number of failures in the sample
         sample_size (int): Total size of the sample
 
     Returns:
         StatisticalAnalysis: Object containing all statistical analysis data
     """
     # Calculate sample proportion
-    p_hat = failure_count / sample_size
+    p_hat = measure / sample_size
 
     # Define our 90% confidence level as a constant
     confidence_for_non_determinism: int = 90
@@ -88,12 +102,12 @@ def analyse_sample_from_test(failure_count: int, sample_size: int) -> Statistica
     margin_of_error_count = int(max(margin_of_error, half_max_distance))
 
     return StatisticalAnalysis(
-        failure_count=failure_count,
+        observation=measure,
         sample_size=sample_size,
+        margin_of_error_count=margin_of_error_count,
+        confidence_interval_count=(lower_bound_count, upper_bound_count),
         proportion=p_hat,
         standard_error=se,
         margin_of_error=me,
         confidence_interval_prop=(lower_bound_prop, upper_bound_prop),
-        confidence_interval_count=(lower_bound_count, upper_bound_count),
-        margin_of_error_count=margin_of_error_count,
     )
