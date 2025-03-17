@@ -316,5 +316,5 @@ ENV/
 
 # Test artifacts
 
-test_runs/
+**/test_runs/
 minio_data/
