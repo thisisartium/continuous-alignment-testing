@@ -216,6 +216,9 @@ def test_failure_rate_bar_graph(snapshot):
     plt.close()
 
 
+# This test is skipped on CI as it fails to render the difference due to Timeout >10.0s
+# https://github.com/thisisartium/continuous-alignment-testing/issues/53
+@pytest.mark.skipif(running_in_ci(), reason="Image comparison fails to produce diff on CI")
 def test_failure_rate_graph(snapshot):
     # Also useful to ensure thread safety and determinism
     matplotlib.rcParams["figure.max_open_warning"] = 0
