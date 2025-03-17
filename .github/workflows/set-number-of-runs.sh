@@ -3,6 +3,7 @@
 # Purpose: Determine and validate the number of runs for CI testing
 # Usage: ./set-number-of-runs.sh
 # Environment Variables:
+#   DEFAULT_RUNS:             The default number of runs to use
 #   GITHUB_REF_NAME:          The name of the branch or tag
 #   INPUTS_ROUNDS_OR_EMPTY:   The number of rounds to run the tests
 #   GITHUB_OUTPUT:            The path to the file to store the step output
@@ -13,7 +14,7 @@
 # and stores the value in the output and environment files
 
 
-[[ "${GITHUB_REF_NAME}" =~ ^ci-experiment/ ]] && ROUNDS=1 || ROUNDS=10
+[[ "${GITHUB_REF_NAME}" =~ ^ci-experiment/ ]] && ROUNDS=1 || ROUNDS=${DEFAULT_RUNS:-10}
 ROUNDS=${INPUTS_ROUNDS_OR_EMPTY:-$ROUNDS}
 
 # Validate that ROUNDS is a valid integer

@@ -1,4 +1,6 @@
 name: CAT
+env:
+  DEFAULT_RUNS: 10
 
 on:
   push:
@@ -9,7 +11,7 @@ on:
         description: "Number of Rounds 1 - 128"
         type: number
         required: true
-        default: 10
+        default: ${{ env.DEFAULT_RUNS }}
 
 jobs:
   ai_tests:
@@ -92,7 +94,7 @@ jobs:
             path: ${{ env.TEST_RESULTS_FOLDER }}
 
       - name: Debugging with tmate
-        if: always() && (runner.debug == 'true' || env.RUNNER_DEBUG == 'true')
+        if: always() && (runner.debug == '1' || env.RUNNER_DEBUG == '1')
         uses: mxschmitt/action-tmate@v3
         with:
           limit-access-to-actor: true
