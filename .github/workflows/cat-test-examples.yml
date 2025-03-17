@@ -92,7 +92,7 @@ jobs:
             path: ${{ env.TEST_RESULTS_FOLDER }}
 
       - name: Debugging with tmate
-        if: ${{ runner.debug == 'true' || env.RUNNER_DEBUG == 'true' }}
+        if: always() && (runner.debug == 'true' || env.RUNNER_DEBUG == 'true')
         uses: mxschmitt/action-tmate@v3
         with:
           limit-access-to-actor: true
