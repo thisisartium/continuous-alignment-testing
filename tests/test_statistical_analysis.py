@@ -1,6 +1,7 @@
 import csv
 import io
 import math
+import os
 from statistics import NormalDist
 
 import matplotlib
@@ -136,6 +137,13 @@ def export_results_to_csv_string(results: list[StatisticalAnalysis]) -> str:
     return output.getvalue()
 
 
+def running_in_ci() -> bool:
+    return os.getenv("CI") is not None
+
+
+# This test is skipped on CI as it fails to render the difference due to Timeout >10.0s
+# https://github.com/thisisartium/continuous-alignment-testing/issues/53
+@pytest.mark.skipif(running_in_ci(), reason="Image comparison fails to produce diff on CI")
 def test_failure_rate_bar_graph(snapshot):
     # Sample data points - choosing strategic values to test boundary conditions
     sample_size = 100
