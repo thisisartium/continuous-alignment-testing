@@ -154,7 +154,8 @@ def test_failure_rate_bar_graph(snapshot):
     errors = [r.margin_of_error for r in results]
 
     # Create the bar plot
-    fig, ax = plt.subplots(figsize=(10, 6))
+    # When creating the figure, set specific dimensions
+    fig, ax = plt.subplots(figsize=(10, 6), dpi=100)  # Explicitly set DPI here too
 
     # Plot bars with error bars
     ax.bar(failure_counts, rates, yerr=errors, capsize=5, color="steelblue", alpha=0.7, width=8)
@@ -182,8 +183,25 @@ def test_failure_rate_bar_graph(snapshot):
     # Deterministic rendering for snapshot testing
     plt.tight_layout()
     buf = io.BytesIO()
-    plt.rcParams["svg.hashsalt"] = "matplotlib"
-    fig.savefig(buf, format="png", metadata={"CreationDate": None})
+
+    # Add these parameters before saving the figure
+    plt.rcParams["svg.hashsalt"] = "matplotlib"  # Fix the hash salt for deterministic rendering
+    plt.rcParams["figure.dpi"] = 100  # Fix the DPI
+    plt.rcParams["savefig.dpi"] = 100  # Fix the saving DPI
+    plt.rcParams["path.simplify"] = False  # Don't simplify paths
+    plt.rcParams["agg.path.chunksize"] = 0  # Disable path chunking
+
+    # Before saving, set more explicit parameters
+    fig.savefig(
+        buf,
+        format="png",
+        metadata={"CreationDate": None},
+        dpi=100,
+        bbox_inches="tight",  # Consistent bounding box
+        pad_inches=0.1,
+    )  # Consistent padding
+
+    # fig.savefig(buf, format="png", metadata={"CreationDate": None})
     buf.seek(0)
 
     # Compare with snapshot
