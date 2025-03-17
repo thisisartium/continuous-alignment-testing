@@ -1,8 +1,11 @@
 import csv
 import io
 import math
-import os
 from statistics import NormalDist
+
+import matplotlib
+
+matplotlib.use("Agg")  # Force CPU-based renderer before any pyplot import
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -133,11 +136,6 @@ def export_results_to_csv_string(results: list[StatisticalAnalysis]) -> str:
     return output.getvalue()
 
 
-def running_in_ci() -> bool:
-    return os.getenv("CI") is not None
-
-
-@pytest.mark.skipif(running_in_ci(), reason="Unstable image comparison in CI")
 def test_failure_rate_bar_graph(snapshot):
     # Sample data points - choosing strategic values to test boundary conditions
     sample_size = 100
@@ -210,8 +208,12 @@ def test_failure_rate_bar_graph(snapshot):
     plt.close()
 
 
-@pytest.mark.skipif(running_in_ci(), reason="Unstable image comparison in CI")
 def test_failure_rate_graph(snapshot):
+    # Also useful to ensure thread safety and determinism
+    matplotlib.rcParams["figure.max_open_warning"] = 0
+    matplotlib.rcParams["pdf.fonttype"] = 42  # Ensures text is stored as text, not paths
+    matplotlib.rcParams["ps.fonttype"] = 42
+
     # Generate a series of failure rates
     totals = np.ones(100) * 100
     failures = np.arange(0, 100)
