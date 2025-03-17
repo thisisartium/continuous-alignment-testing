@@ -1,5 +1,6 @@
 import base64
 
+import requests
 from openai import OpenAI
 
 from examples.graphic_image.conftest import root_path
@@ -44,8 +45,27 @@ def describe_image(path):
 
 
 def test_image_was_described():
-    description = describe_image(
-        root_path / "tests/fixtures/an-afghan-local-policeman-monitors-suspicious-activity.jpg"
+    image_url = (
+        "https://cdn2.picryl.com/photo/2011/08/31/"
+        "an-afghan-local-policeman-monitors-suspicious-activity-7a0054-1024.jpg"
+    )
+    local_path = (
+        root_path
+        / "tests"
+        / "fixtures"
+        / "an-afghan-local-policeman-monitors-suspicious-activity.jpg"
+    )
+    description = (
+        describe_image_by_url(image_url) if check_url(image_url) else describe_image(local_path)
     )
     print("image description:", description)
     assert description is not None
+
+
+def check_url(image_url) -> bool:
+    # noinspection PyBroadException
+    try:
+        response = requests.head(image_url, timeout=5)
+        return response.status_code == 200
+    except Exception:
+        return False
