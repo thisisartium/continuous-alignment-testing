@@ -135,11 +135,11 @@ def test_llm_will_hallucinate_given_no_data(snapshot):
     cosine_similarity_to_smarter = compute_cosine_similarity(
         smarter_response["embedding"], embedding_response["embedding"]
     )
-    assert cosine_similarity_to_smarter > 0.7, (
+    assert cosine_similarity_to_smarter < 0.65, (
         f"Response is similar to the smarter response: {cosine_similarity_to_smarter}"
     )
     print("cosine_similarity_to_smarter", cosine_similarity_to_smarter)
-    if cosine_similarity_to_smarter < 0.7:
+    if cosine_similarity_to_smarter > 0.65:
         with open(
             str(root_path / "tests/fixtures/please_provide_missing_information_response.json"), "w"
         ) as f:
