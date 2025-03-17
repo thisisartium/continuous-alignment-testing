@@ -4,7 +4,7 @@ blank_checker = FormatChecker()
 
 
 def response_matches_json_schema(
-    response: str,
+    response: dict,
     schema: any,
     format_checker: FormatChecker = blank_checker,
 ) -> bool:
