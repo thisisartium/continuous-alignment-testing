@@ -19,7 +19,6 @@ jobs:
       TEST_RESULTS_FOLDER: examples/team_recommender/test_runs
       PYTHONUNBUFFERED: 1
       INPUTS_ROUNDS_OR_EMPTY: ${{ inputs.rounds }}
-      DEFAULT_RUNS: ${{ inputs.rounds.default }}
 
     steps:
       - uses: actions/checkout@v4
