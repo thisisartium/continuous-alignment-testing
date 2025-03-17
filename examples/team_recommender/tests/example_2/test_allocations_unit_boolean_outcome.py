@@ -2,7 +2,7 @@ from helpers import load_json_fixture
 from openai import OpenAI
 
 
-def test_allocations():
+def test_at_least_one_of_acceptable_people_is_allocated():
     client = OpenAI()
     assert client is not None
     skills_data = load_json_fixture("skills.json")
