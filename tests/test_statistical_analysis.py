@@ -102,6 +102,7 @@ def test_measured_constants():
     "failures, total, current_success_rate, next_success_rate",
     [
         (0, 100, 0.97, next_success_after_97),
+        (1, 47, 0.95, 0.9545),
         (0, 100, next_success_after_97, next_success_after_97),
         (1, 100, 0.97, next_success_after_97),
         (6, 100, 0.90, next_success_after_90),
@@ -118,7 +119,7 @@ def test_measured_constants():
 )
 def test_next_success_rate(failures, total, current_success_rate, next_success_rate):
     result = analyse_failure_rate_from_test_sample(failures, total)
-    assert result.next_success_rate(current_success_rate) == next_success_rate
+    assert result.next_success_rate(current_success_rate) == pytest.approx(next_success_rate, rel=0.001)
 
 
 def export_results_to_csv_string(results: list[StatisticalAnalysis]) -> str:
