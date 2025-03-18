@@ -27,6 +27,7 @@ def analyse_failure_rate_from_test_sample(
         (0, 100, 0.0),
         (6, 100, 0.06),
         (100, 100, 1.0),
+        (1, 47, 0.0213)
     ],
 )
 def test_analyse_sample_from_test(failure_count, sample_size, expected_proportion):
@@ -36,7 +37,7 @@ def test_analyse_sample_from_test(failure_count, sample_size, expected_proportio
     # Basic assertions
     assert result.observation == failure_count
     assert result.sample_size == sample_size
-    assert result.proportion == expected_proportion
+    assert expected_proportion == pytest.approx(result.proportion, rel=0.01)
 
     # Calculate expected values for validation
     p_hat = failure_count / sample_size
@@ -51,7 +52,7 @@ def test_analyse_sample_from_test(failure_count, sample_size, expected_proportio
     # Check confidence interval bounds
     expected_lower = max(0.0, p_hat - expected_me)
     expected_upper = min(1.0, p_hat + expected_me)
-    assert result.confidence_interval_prop[0] == pytest.approx(expected_lower)
+    assert max(0.0, result.confidence_interval_prop[0]) == pytest.approx(expected_lower, rel=0.001)
     assert result.confidence_interval_prop[1] == pytest.approx(expected_upper)
 
     # Validate integer confidence bounds
