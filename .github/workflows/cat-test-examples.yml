@@ -43,10 +43,19 @@ jobs:
 
       - name: Check if GOOGLE_CREDENTIALS is set
         run: |
-          if [ -z "${{ secrets.GOOGLE_CREDENTIALS }}" ]; then
+          if [ -z "${{ secrets.GOOGLE_CREDENTIALS }}" ]
+          then
             echo "Error: GOOGLE_CREDENTIALS secret is not set!"
-            exit 1
+            exit 121
           fi
+
+      - name: Check if OPENAI_API_KEY is set
+        run: |
+          if [ -z "${{ secrets.OPENAI_API_KEY }}" ]
+          then
+            echo "Error: OPENAI_API_KEY secret is not set!"
+            exit 122
+          fi          
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
