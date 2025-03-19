@@ -55,6 +55,8 @@ jobs:
 
       - name: Run Graphic Image Example tests
         run: uv run pytest --color=yes --showlocals --capture=no examples/graphic_image
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Run Latest Example from Team Recommender tests
         run: >
