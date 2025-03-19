@@ -57,7 +57,8 @@ jobs:
         run: >
           uv run pytest
           --verbose --verbosity=10 --capture=no --tb=native --color=yes --showlocals
-          examples/team_recommender/tests
+          examples/graphic_image
+          examples/team_recommender
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
