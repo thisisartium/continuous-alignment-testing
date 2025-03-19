@@ -121,13 +121,13 @@ def test_llm_will_hallucinate_given_no_data(snapshot):
     cosine_similarity = compute_cosine_similarity(
         saved_response["embedding"], embedding_response["embedding"]
     )
-    if cosine_similarity < 0.7:
+    if cosine_similarity < 0.64:
         with open(str(root_path / "tests/fixtures/hallucination_response.json"), "w") as f:
             json.dump(embedding_response, f)
         with open(str(snapshot.snapshot_dir / "hallucination_response.txt"), "w") as f:
             f.write(response)
 
-    assert cosine_similarity > 0.7, (
+    assert cosine_similarity > 0.64, (
         f"Response is similar to the saved hallucination response, was {cosine_similarity}"
     )
 

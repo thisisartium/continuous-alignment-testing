@@ -1,21 +1,33 @@
-Here is a list of developers ranked based on their skills and availability for the iOS project starting on June 3rd:
+Here are the available developers who would be a great fit for the iOS project for the telecom company based on their skills:
 
 1. **Sarah Adams**
-   - Skills: iOS Native development, Swift, UIKit, CoreML
-   - Availability: Available starting June 1st
+   - Skills:
+     - iOS Development: 5 years
+     - Objective-C: 4 years
+     - Swift: 4 years
 
-2. **Adam Smith**
-   - Skills: iOS Native development, Swift, CoreImage
-   - Availability: Available starting June 2nd
+2. **Chris Lee**
+   - Skills:
+     - iOS Development: 4 years
+     - Swift: 4 years
+     - Objective-C: 3 years
 
-3. **Emily Garcia**
-   - Skills: iOS Native development, Swift, AVKit
-   - Availability: Available starting June 4th
+3. **Emily Chen**
+   - Skills:
+     - iOS Development: 3 years
+     - Swift: 3 years
+     - Objective-C: 2 years
 
-4. **Chris Roberts**
-   - Skills: iOS Native development, Swift, Core Animation
-   - Availability: Available starting June 5th
+4. **Alex Wu**
+   - Skills:
+     - iOS Development: 3 years
+     - Swift: 3 years
+     - Objective-C: 2 years
 
-5. **Jessica Wong**
-   - Skills: iOS Native development, Swift, CoreData
-   - Availability: Available starting June 6th
+5. **James Kim**
+   - Skills:
+     - iOS Development: 2 years
+     - Swift: 2 years
+     - Objective-C: 1 year
+
+Based on their skills, availability, and experience, I recommend Sarah Adams and Chris Lee as the top choices for this iOS project.
