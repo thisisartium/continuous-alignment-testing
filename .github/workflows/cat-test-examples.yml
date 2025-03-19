@@ -53,11 +53,13 @@ jobs:
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
-      - name: Run Latest Example tests
+      - name: Run Graphic Image Example tests
+        run: uv run pytest --color=yes --showlocals --capture=no examples/graphic_image
+
+      - name: Run Latest Example from Team Recommender tests
         run: >
           uv run pytest
           --verbose --verbosity=10 --capture=no --tb=native --color=yes --showlocals
-          examples/graphic_image
           examples/team_recommender
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
