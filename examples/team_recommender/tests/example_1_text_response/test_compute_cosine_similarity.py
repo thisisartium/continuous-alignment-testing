@@ -3,7 +3,7 @@ import os
 
 import numpy as np
 import pytest
-from example_1_text_response.cosine_similarity import compute_alignment, compute_cosine_similarity
+from example_1_text_response.cosine_similarity import compute_cosine_similarity
 from example_1_text_response.openai_embeddings import create_embedding_object
 from helpers import load_json_fixture
 
