@@ -126,8 +126,8 @@ def test_llm_will_hallucinate_given_no_data(snapshot):
         response_embedding, no_hallucinations_detected_embedding
     )
 
-    assert similarity_to_hallucination > similarity_to_no_hallucinations
-
+    tolerance_margin = 0.05
+    assert similarity_to_hallucination > similarity_to_no_hallucinations + tolerance_margin
 
 def semantic_similarity_score(a: list, b: list) -> float:
     return compute_cosine_similarity(a, b)
