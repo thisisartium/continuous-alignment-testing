@@ -235,7 +235,7 @@ def test_is_within_expected(success_rate, failure_count, sample_size, message):
     "failure_count, sample_size, expected_rate, message",
     [
         (3, 5, 0.8, "40% success rate is below expected 80% success rate"),
-        (1, 50000, 0.9997, "50% success rate is below expected 97% success rate"),
+        (1, 50000, 0.9997, "99.99% success rate is below expected 97% success rate"),
         (0, 100, 0.97, "100% success rate is not within 97% success rate"),
         (0, 100, 0.9736, "97.36% success rate is not within 100% success rate"),
         (1, 134, 0.97, "At 134 we can say that with 90% confidence 1 failure is within 97% success rate"),
