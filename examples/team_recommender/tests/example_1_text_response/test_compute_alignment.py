@@ -1,5 +1,7 @@
 import json
 
+import numpy as np
+
 from example_1_text_response.cosine_similarity import compute_alignment
 from openai_embeddings import create_embedding_object
 
@@ -15,6 +17,7 @@ def test_compute_alignment(snapshot):
 
     # Compute the alignment vector
     alignment_vector = compute_alignment(embedding_a["embedding"], embedding_b["embedding"])
+    alignment_vector = [round(x, 4) for x in alignment_vector]
 
     # Convert the alignment vector to a JSON object
     alignment_json = {"alignment_vector": alignment_vector}
