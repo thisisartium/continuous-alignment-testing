@@ -2,7 +2,6 @@ import json
 
 from example_1_text_response.cosine_similarity import (
     compute_cosine_similarity,
-    compute_alignment,
 )
 from helpers import load_json_fixture
 from openai import OpenAI
