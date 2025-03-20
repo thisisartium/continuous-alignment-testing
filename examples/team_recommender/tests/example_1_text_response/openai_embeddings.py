@@ -20,7 +20,7 @@ def get_embedding(text, model="text-embedding-3-small"):
     client = OpenAI()
 
     # Get the embedding from OpenAI
-    response = client.embeddings.create(input=text, model=model)
+    response = client.embeddings.create(input=text, model=model, encoding_format="base64")
 
     # Extract and return the embedding vector
     return response.data[0].embedding
