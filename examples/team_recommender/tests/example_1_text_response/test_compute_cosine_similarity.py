@@ -44,4 +44,10 @@ def test_embedding_equivalence(snapshot):
     snap_different = load_snapshot_value(snapshot, "hallucination_response_large_different_text_embedding.json")
     # assert snap_same == snap_different
     diff_val = np.subtract(snap_same["embedding"], snap_different["embedding"])
-    np.testing.assert_array_less(np.abs(diff_val), 0.001)
+
+    outside_tolerance_count = np.sum(np.abs(diff_val) >= 0.00001)
+
+    # Assert a specific count (replace 0 with your expected count)
+    assert outside_tolerance_count == 0, (
+        f"Found {outside_tolerance_count} elements outside tolerance"
+    )
