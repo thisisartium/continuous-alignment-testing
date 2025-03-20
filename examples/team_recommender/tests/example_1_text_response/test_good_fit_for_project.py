@@ -1,13 +1,9 @@
-import json
-
 from example_1_text_response.cosine_similarity import (
     compute_cosine_similarity,
 )
 from helpers import load_json_fixture
 from openai import OpenAI
 from openai_embeddings import create_embedding_object
-
-from examples.team_recommender.conftest import root_path
 
 
 def test_response_shows_developer_names():
