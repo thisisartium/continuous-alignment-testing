@@ -123,6 +123,7 @@ def test_llm_will_hallucinate_given_no_data(snapshot):
     )
     if cosine_similarity < 0.64:
         with open(str(root_path / "tests/fixtures/hallucination_response.json"), "w") as f:
+            # noinspection PyTypeChecker
             json.dump(embedding_response, f)
         with open(str(snapshot.snapshot_dir / "hallucination_response.txt"), "w") as f:
             f.write(response)
@@ -142,12 +143,13 @@ def test_llm_will_hallucinate_given_no_data(snapshot):
     if cosine_similarity_to_smarter > 0.65:
         with open(
             str(root_path / "tests/fixtures/please_provide_missing_information_response.json"), "w"
-        ) as f:
-            json.dump(embedding_response, f)
+        ) as fp:
+            # noinspection PyTypeChecker
+            json.dump(embedding_response, fp)
         with open(
             str(snapshot.snapshot_dir / "please_provide_missing_information_response.txt"), "w"
-        ) as f:
-            f.write(response)
+        ) as fp:
+            fp.write(response)
 
 
 # please_provide_missing_information_response.txt
