@@ -117,18 +117,22 @@ def test_llm_will_hallucinate_given_no_data(snapshot):
     #     "response contains list of made up developers in multiple lines"
     # )
 
-    embedding_object: dict = create_embedding_object(response)
+    embedding_object: dict = create_embedding_object(response, model="text-embedding-3-large")
     saved_response = load_json_fixture("hallucination_response.json")
 
     no_hallucinations_response = load_json_fixture("please_provide_missing_information_response.json")
     hallucinations_detected_embedding = saved_response["embedding"]
     no_hallucinations_detected_embedding = no_hallucinations_response["embedding"]
     response_embedding = embedding_object["embedding"]
-    cosine_similarity_to_hallucination = compute_cosine_similarity(
+    similarity_to_hallucination = semantic_similarity_score(
         response_embedding, hallucinations_detected_embedding
     )
-    cosine_similarity_to_no_hallucinations = compute_cosine_similarity(
+    similarity_to_no_hallucinations = semantic_similarity_score(
         response_embedding, no_hallucinations_detected_embedding
     )
 
-    assert cosine_similarity_to_hallucination > cosine_similarity_to_no_hallucinations
+    assert similarity_to_hallucination > similarity_to_no_hallucinations
+
+
+def semantic_similarity_score(a: list, b: list) -> float:
+    return compute_cosine_similarity(a, b)
