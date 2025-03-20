@@ -11,5 +11,5 @@ def compute_alignment(a: list, b: list) -> list:
     norm = np.linalg.norm(difference_vector)
     # Normalize the difference vector
     if norm == 0:
-        return difference_vector  # Return the zero vector if the norm is zero
-    return difference_vector / norm
+        return difference_vector.tolist()  # Return the zero vector as a list if the norm is zero
+    return (difference_vector / norm).tolist()  # Convert numpy array to list before returning
