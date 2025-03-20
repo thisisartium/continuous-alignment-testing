@@ -1,7 +1,5 @@
 import json
 
-import numpy as np
-
 from example_1_text_response.cosine_similarity import compute_alignment
 from openai_embeddings import create_embedding_object
 
