@@ -20,5 +20,5 @@ def test_reproducing_the_same_text_embedding(snapshot):
     saved_response = load_json_fixture("hallucination_response.json")
     embedding_object = create_embedding_object(saved_response["text"], model="text-embedding-3-large")
     embedding_object_string = json.dumps(embedding_object, indent=2)
-    snapshot.assert_match(embedding_object_string, "hallucination_response.json")
+    snapshot.assert_match(embedding_object_string, "hallucination_response_large_same_text_embedding.json")
 
