@@ -15,7 +15,7 @@ def test_compute_alignment(snapshot):
 
     # Compute the alignment vector
     alignment_vector = compute_alignment(embedding_a["embedding"], embedding_b["embedding"])
-    alignment_vector = [round(x, 4) for x in alignment_vector]
+    alignment_vector = stable_embedding(alignment_vector)
 
     # Convert the alignment vector to a JSON object
     alignment_json = {"alignment_vector": alignment_vector}
@@ -25,3 +25,7 @@ def test_compute_alignment(snapshot):
 
     # Assert against the snapshot
     snapshot.assert_match(alignment_json_string, "alignment_vector_json_snapshot.json")
+
+
+def stable_embedding(alignment_vector):
+    return [round(x, 4) for x in alignment_vector]
