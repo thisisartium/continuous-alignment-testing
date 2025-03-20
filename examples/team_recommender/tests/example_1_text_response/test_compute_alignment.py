@@ -28,4 +28,4 @@ def test_compute_alignment(snapshot):
 
 
 def stable_embedding(alignment_vector):
-    return [round(x, 1) for x in alignment_vector]
+    return [0.0 if abs(x) < 0.0001 else round(x, 3) for x in alignment_vector]
