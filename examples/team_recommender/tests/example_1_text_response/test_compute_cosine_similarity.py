@@ -11,7 +11,7 @@ from example_1_text_response.openai_embeddings import (
 from helpers import load_json_fixture
 
 
-def load_snapshot_value(snapshot, snapshot_filename):
+def load_snapshot_value(snapshot_filename):
     """Load a snapshot file and parse it as JSON."""
     snapshot_dir = os.path.join(
         os.path.dirname(__file__),
