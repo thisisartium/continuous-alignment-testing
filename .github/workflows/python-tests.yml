@@ -43,6 +43,7 @@ jobs:
 
       - name: Run ruff linter and formatter
         run: |
+          
           uv run ruff check src tests examples
           uv run ruff format src tests examples
 
