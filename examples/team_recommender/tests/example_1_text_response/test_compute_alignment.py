@@ -28,22 +28,21 @@ def test_compute_alignment(snapshot):
     snapshot.assert_match(alignment_json_string, "alignment_vector_json_snapshot.json")
 
 
-def stable_embedding(alignment_vector):
-    first = alignment_vector[0]
-    first_int_bits = float_to_int_same_bits(first)
-    shifted = (first_int_bits << 16) >> 16
-    print("first_int_bits", first_int_bits)
-    print(f"shifted = {shifted}")
-    return [0.0 if abs(x) < 0.0001 else massage(x) for x in alignment_vector]
+def test_stabilize_float():
+    assert stabilize_float(0.0000000006) == 0.0000000005999999941330714, \
+        "stabilize_float can sometimes reduce the value a little bit"
+    assert stabilize_float(0.000000006) == 0.000000006000000052353016, \
+        "stabilize_float can sometimes increase the value a little bit"
 
-def massage(x: float) -> float:
+
+def stable_embedding(alignment_vector):
+    return [0.0 if abs(x) < 0.0001 else stabilize_float(x) for x in alignment_vector]
+
+
+def stabilize_float(x: float) -> float:
     y = (float_to_int_same_bits(x) << 16) >> 16
     return int_to_float_same_bits(y)
 
-def test_float_to_int_same_bits():
-    float_value = 3.14
-    int_value = float_to_int_same_bits(float_value)
-    assert int_value == 1078523331  # This is the bit representation of 3.14 in IEEE 754 format
 
 def float_to_int_same_bits(float_value):
     # Pack the float into bytes
@@ -53,6 +52,7 @@ def float_to_int_same_bits(float_value):
     int_value = struct.unpack("i", packed)[0]  # 'i' for 32-bit int
 
     return int_value
+
 
 def int_to_float_same_bits(int_value):
     # Pack the integer into bytes
