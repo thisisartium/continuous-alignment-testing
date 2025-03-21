@@ -4,7 +4,10 @@ import os
 import numpy as np
 import pytest
 from example_1_text_response.cosine_similarity import compute_cosine_similarity
-from example_1_text_response.openai_embeddings import create_embedding_object
+from example_1_text_response.openai_embeddings import (
+    create_embedding_object,
+    stabilize_embedding_object,
+)
 from helpers import load_json_fixture
 
 
@@ -38,7 +41,9 @@ def test_reproducing_the_same_text_embedding(snapshot):
     embedding_object = create_embedding_object(
         saved_response["text"], model="text-embedding-3-large"
     )
-    embedding_object_string = json.dumps(embedding_object, indent=2)
+    stabilized_embedding_object = stabilize_embedding_object(embedding_object)
+
+    embedding_object_string = json.dumps(stabilized_embedding_object, indent=2)
     snapshot.assert_match(
         embedding_object_string, "hallucination_response_large_same_text_embedding.json"
     )

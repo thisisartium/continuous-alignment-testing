@@ -36,7 +36,7 @@ def test_stabilize_float():
 
 
 def stable_embedding(alignment_vector):
-    return [0.0 if abs(x) < 0.0001 else stabilize_float(x) for x in alignment_vector]
+    return [stabilize_float(x) for x in alignment_vector]
 
 
 def stabilize_float(x: float) -> float:
