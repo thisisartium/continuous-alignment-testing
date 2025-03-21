@@ -33,7 +33,7 @@ def stabilize_embedding_object(embedding_object):
 
 
 def stabilize_float(x: float) -> float:
-    y = (float_to_int_same_bits(x) << 16) >> 16
+    y = (float_to_int_same_bits(x) << 32) >> 32
     return int_to_float_same_bits(y)
 
 
