@@ -161,6 +161,7 @@ def test_next_success_rate():
     assert next_success_rate(2) == 0.6666666666666667
     assert next_success_rate(3) == 0.75
     assert next_success_rate(4) == 0.8
+    assert next_success_rate(10) == 0.9090909090909091
     assert next_success_rate(12) == 0.9230769230769231
     assert next_success_rate(55) == 0.9821428571428571
     assert next_success_rate(248) == 0.9959839357429718
