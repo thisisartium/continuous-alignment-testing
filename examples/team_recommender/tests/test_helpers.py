@@ -140,6 +140,43 @@ def test_not_is_within_expected(failure_count, sample_size, expected_rate, messa
     assert not is_within_expected(expected_rate, failure_count, sample_size), message
 
 
+def test_seventy_percent_confidence_ranges_from_fifty_to_ninety():
+    starting_rate = 0.7
+    sample_size = 10
+    sample = analyse_measure_from_test_sample(sample_size * starting_rate, sample_size)
+    assert sample.confidence_interval_count == (5, 9)
+    assert sample.proportion == starting_rate
+    assert sample.confidence_interval_prop == (
+        pytest.approx(0.5, rel=0.1),
+        pytest.approx(0.9, rel=0.1),
+    )
+
+
+def next_success_rate(sample_size) -> float:
+    return 1 - 1 / (sample_size + 1)
+
+
+def test_next_success_rate():
+    assert next_success_rate(1) == 0.5
+    assert next_success_rate(2) == 0.6666666666666667
+    assert next_success_rate(3) == 0.75
+    assert next_success_rate(4) == 0.8
+    assert next_success_rate(12) == 0.9230769230769231
+    assert next_success_rate(55) == 0.9821428571428571
+    assert next_success_rate(248) == 0.9959839357429718
+
+
+@pytest.mark.parametrize(
+    "success_rate, largest_sample_size",
+    [(0.7, 12), (next_success_rate(12), 55), (next_success_rate(55), 248)],
+)
+def test_largest_sample_size_for_given_success_rate(success_rate, largest_sample_size):
+    assert is_within_expected(success_rate, 1, largest_sample_size), "should be within expected"
+    assert not is_within_expected(success_rate, 1, largest_sample_size + 1), (
+        "next size should not be within expected"
+    )
+
+
 def test_success_rate():
     tiny_set_analysis = analyse_measure_from_test_sample(1, 2)
     assert tiny_set_analysis.proportion == 0.5
