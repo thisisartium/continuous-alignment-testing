@@ -92,8 +92,15 @@ def test_beyond_expected_success_rate(assert_success_rate, row):
         (0.8, 14, 100, None),
         (0.97, 1, 8, None),
         (0.97, 0, 1, "after measuring 2x 100 runs and getting 3 failures"),
-        (0.975, 0, 100, "97.5% success rate is within 100% success rate"),
-        (0.9737, 0, 100, "97.37% success rate is within 100% success rate"),
+        (
+            0.97,
+            1,
+            133,
+            "At 133 we can say that with 90% confidence 1 failure is within 97% success rate",
+        ),
+        (0.98, 0, 100, "97.5% success rate is within 100% success rate"),
+        (0.97999999999999999, 0, 100, "97.37% success rate is within 100% success rate"),
+        (0.5, 1, 2, None),
     ],
 )
 def test_is_within_expected(success_rate, failure_count, sample_size, message):
@@ -107,9 +114,15 @@ def test_is_within_expected(success_rate, failure_count, sample_size, message):
     "failure_count, sample_size, expected_rate, message",
     [
         (3, 5, 0.8, "40% success rate is below expected 80% success rate"),
-        (1, 2, 0.97, "50% success rate is below expected 97% success rate"),
         (0, 100, 0.97, "100% success rate is not within 97% success rate"),
+        (1, 50000, 0.9997, "99.99% success rate is below expected 97% success rate"),
         (0, 100, 0.9736, "97.36% success rate is not within 100% success rate"),
+        (
+            1,
+            134,
+            0.97,
+            "At 134 we can say that with 90% confidence 1 failure is within 97% success rate",
+        ),
     ],
 )
 def test_not_is_within_expected(failure_count, sample_size, expected_rate, message):
