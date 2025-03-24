@@ -1,4 +1,5 @@
 import pytest
+from helpers import is_within_expected
 from statsmodels.stats.proportion import proportions_ztest
 from test_helpers import next_success_rate
 
@@ -81,3 +82,27 @@ def test_is_statistically_significant_with_next_success_rate():
     assert not is_statistically_significant(next_success_rate(sample_size), 0, sample_size)
     assert is_statistically_significant(next_success_rate(sample_size), 0, 34)
     assert is_statistically_significant(next_success_rate(35), 0, 109)
+
+
+def test_compare_is_within_expected_and_is_statistically_significant():
+    assert is_within_expected(0.7, 3, 10), "not significant result for 3/10=70%"
+    assert not is_statistically_significant(0.7, 3, 10), "not significant for 3/10=70%"
+
+    assert is_within_expected(0.7, 0, 3), "not significant result for 0 out of 3"
+    assert not is_statistically_significant(0.7, 0, 3), "not significant result for 0 out of 3"
+
+
+def test_improvement_from_70_percent():
+    assert is_within_expected(0.7, 0, 3), "no improvement detected at 3"
+    assert not is_statistically_significant(0.7, 0, 10), "no improvement detected at 10"
+
+    assert not is_within_expected(0.7, 0, 4), "improvement detected at 4"
+    assert is_statistically_significant(0.7, 0, 11), "improvement detected at 11"
+
+
+def test_improvement_from_97_percent():
+    assert is_within_expected(0.97, 0, 66), "no improvement detected at 66"
+    assert not is_statistically_significant(0.97, 0, 100), "no improvement detected at 100"
+
+    assert not is_within_expected(0.97, 0, 67), "significantly better at 67"
+    assert is_statistically_significant(0.97, 0, 101), "significantly better at 101"
