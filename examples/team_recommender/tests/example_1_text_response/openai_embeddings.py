@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import struct
 
 from openai import OpenAI
 
@@ -24,6 +25,18 @@ def get_embedding(text, model="text-embedding-3-small"):
 
     # Extract and return the embedding vector
     return response.data[0].embedding
+
+
+def stabilize_embedding(embedding):
+    return list(map(stabilize_float, embedding))
+
+
+def stabilize_embedding_object(embedding_object):
+    return {**embedding_object, "embedding": stabilize_embedding(embedding_object["embedding"])}
+
+
+def stabilize_float(x: float) -> float:
+    return struct.unpack("f", struct.pack("f", x))[0]
 
 
 def create_embedding_object(text, model="text-embedding-3-small"):
