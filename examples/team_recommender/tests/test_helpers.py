@@ -7,7 +7,6 @@ from helpers import (
     generate_examples,
     is_within_expected,
     natural_sort_key,
-    process_row,
 )
 
 from cat_ai.statistical_analysis import analyse_measure_from_test_sample
@@ -16,11 +15,7 @@ from cat_ai.statistical_analysis import analyse_measure_from_test_sample
 @pytest.mark.parametrize(
     "row",
     [
-        (
-            1,
-            5,
-            0.97,
-        ),  # 1 failure out of 5 is 80% and still within 97% success rate on a such small sample
+        (1, 5, 0.97),  # 1 failure out of 5 is 80% success and still within 97% success rate
         (2, 5, 0.95),  # 2 failures out of 5 is 60% success and still within 95% success rate
         (6, 100, 0.97),  # 6 failures out of 100 is 94% success rate, and still within 97% expected
         (15, 100, 0.80),  # 15 failures out of 100 is within 80% success rate, 14 will not
@@ -28,29 +23,10 @@ from cat_ai.statistical_analysis import analyse_measure_from_test_sample
     ],
     ids=lambda row: failures_within_margin_of_error_from_expected(row),
 )
-def test_assert_success_rate(row):
+def test_assert_success_rate_pass(row):
     failure_count, sample_size, expected_success_rate = row
     table = generate_examples(failure_count, sample_size)
     _assert_success_rate(table, expected_success_rate)
-
-
-@pytest.mark.parametrize(
-    "row",
-    [
-        (1, 5, 0.97),  # 1 failure out of 5 is within 97% success rate
-        (2, 5, 0.95),  # 2 failures out of 5 is within 95% success rate
-        (6, 100, 0.97),  # 6 failures out of 100 is within 97% success rate
-        (15, 100, 0.80),  # 15 failures out of 100 is within 80% success rate
-        (27, 100, 0.80),  # 27 failures out of 100 is within 80% success rate
-    ],
-    ids=lambda row: process_row(row),
-)
-def test_success_rate_is_within_expected_error_margin_with_90_percent_confidence(
-    assert_success_rate, row
-):
-    failure_count, total_test_runs, expected_rate = row
-    results = generate_examples(failure_count, total_test_runs)
-    assert_success_rate(results, expected_rate)
 
 
 @pytest.mark.parametrize(
