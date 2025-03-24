@@ -84,7 +84,7 @@ def is_within_expected(success_rate: float, failure_count: int, sample_size: int
     if sample_size <= 1:
         return True
 
-    expected_success_count = success_rate * sample_size
+    expected_success_count = int(success_rate * sample_size)
     success_analysis = analyse_measure_from_test_sample(expected_success_count, sample_size)
     measured_success_count = sample_size - failure_count
     measured_success_rate = measured_success_count / sample_size
@@ -110,7 +110,5 @@ def is_within_expected(success_rate: float, failure_count: int, sample_size: int
     )
 
 
-def is_within_a_range(value, left, right):
+def is_within_a_range(value: float, left: float, right: float) -> bool:
     return left <= value <= right
-
-
