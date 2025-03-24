@@ -27,34 +27,16 @@ def get_embedding(text, model="text-embedding-3-small"):
     return response.data[0].embedding
 
 
+def stabilize_embedding(embedding):
+    return list(map(stabilize_float, embedding))
+
+
 def stabilize_embedding_object(embedding_object):
-    embedding_object["embedding"] = [stabilize_float(x) for x in embedding_object["embedding"]]
-    return embedding_object
+    return {**embedding_object, "embedding": stabilize_embedding(embedding_object["embedding"])}
 
 
 def stabilize_float(x: float) -> float:
-    y = (float_to_int_same_bits(x) << 32) >> 32
-    return int_to_float_same_bits(y)
-
-
-def float_to_int_same_bits(float_value):
-    # Pack the float into bytes
-    packed = struct.pack("f", float_value)  # 'f' for 32-bit float
-
-    # Unpack those same bytes as an integer
-    int_value = struct.unpack("i", packed)[0]  # 'i' for 32-bit int
-
-    return int_value
-
-
-def int_to_float_same_bits(int_value):
-    # Pack the integer into bytes
-    packed = struct.pack("i", int_value)  # 'i' for 32-bit int
-
-    # Unpack those same bytes as a float
-    float_value = struct.unpack("f", packed)[0]  # 'f' for 32-bit float
-
-    return float_value
+    return struct.unpack("f", struct.pack("f", x))[0]
 
 
 def create_embedding_object(text, model="text-embedding-3-small"):

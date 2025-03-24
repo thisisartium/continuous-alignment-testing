@@ -1,5 +1,6 @@
 import json
 import os
+from random import random
 
 import numpy as np
 import pytest
@@ -25,10 +26,26 @@ def load_snapshot_value(snapshot, snapshot_filename):
         return json.loads(f.read())
 
 
-def test_compute_cosine_similarity():
+def test_compute_cosine_similarity_aligned_vectors():
     assert compute_cosine_similarity([1, 2, 3], [1, 2, 3]) == 1.0
     assert compute_cosine_similarity([-1, -2, -3], [1, 2, 3]) == -1.0
 
+
+@pytest.fixture
+def random_vector():
+    return [random() for _ in range(100)]
+
+
+def test_compute_cosine_similarity_random_vector(random_vector):
+    assert compute_cosine_similarity(random_vector, random_vector) == pytest.approx(1.0)
+
+
+def test_compute_cosine_similarity_opposite_vector(random_vector):
+    opposite_vector = [-x for x in random_vector]
+    assert compute_cosine_similarity(opposite_vector, random_vector) == pytest.approx(-1.0)
+
+
+def test_compute_cosine_similarity_saved_response():
     saved_response = load_json_fixture("hallucination_response.json")
     cosine_similarity = compute_cosine_similarity(
         saved_response["embedding"], saved_response["embedding"]
@@ -47,6 +64,19 @@ def test_reproducing_the_same_text_embedding(snapshot):
     snapshot.assert_match(
         embedding_object_string, "hallucination_response_large_same_text_embedding.json"
     )
+
+
+def test_cosine_similarity_generated_responses(snapshot):
+    snap_same = load_snapshot_value(
+        snapshot, "hallucination_response_large_same_text_embedding.json"
+    )
+    snap_different = load_snapshot_value(
+        snapshot, "hallucination_response_large_different_text_embedding.json"
+    )
+    cosine_similarity = compute_cosine_similarity(
+        snap_same["embedding"], snap_different["embedding"]
+    )
+    assert cosine_similarity == pytest.approx(0.99999)
 
 
 def test_embedding_equivalence(snapshot):
