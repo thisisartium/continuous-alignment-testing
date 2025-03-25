@@ -50,7 +50,7 @@ def test_assert_success_rate_pass(row):
             [
                 "New Success rate 0.900 with 90% confidence exceeds expected: 0.7",
                 "Broken Record:",
-                "Expecting: 0.744 <= 0.700 <= 1.056",
+                "Expecting: 0.744 <= 0.700 <= 1.000",
                 "Got: expected=0.7 <= analysis.lower_interval=0.74",
             ],
         ),
@@ -61,7 +61,7 @@ def test_assert_success_rate_pass(row):
             [
                 "New Success rate 0.999 with 90% confidence exceeds expected: 0.98",
                 "Broken Record:",
-                "Expecting: 0.997 <= 0.980 <= 1.001",
+                "Expecting: 0.997 <= 0.980 <= 1.000",
                 "Got: expected=0.98 <= analysis.lower_interval=0.997",
             ],
         ),
@@ -92,8 +92,15 @@ def test_beyond_expected_success_rate(assert_success_rate, row):
         (0.8, 14, 100, None),
         (0.97, 1, 8, None),
         (0.97, 0, 1, "after measuring 2x 100 runs and getting 3 failures"),
-        (0.975, 0, 100, "97.5% success rate is within 100% success rate"),
-        (0.9737, 0, 100, "97.37% success rate is within 100% success rate"),
+        (
+            0.97,
+            1,
+            133,
+            "At 133 we can say that with 90% confidence 1 failure is within 97% success rate",
+        ),
+        (0.98, 0, 100, "97.5% success rate is within 100% success rate"),
+        (0.97999999999999999, 0, 100, "97.37% success rate is within 100% success rate"),
+        (0.5, 1, 2, None),
     ],
 )
 def test_is_within_expected(success_rate, failure_count, sample_size, message):
@@ -107,9 +114,15 @@ def test_is_within_expected(success_rate, failure_count, sample_size, message):
     "failure_count, sample_size, expected_rate, message",
     [
         (3, 5, 0.8, "40% success rate is below expected 80% success rate"),
-        (1, 2, 0.97, "50% success rate is below expected 97% success rate"),
         (0, 100, 0.97, "100% success rate is not within 97% success rate"),
+        (1, 50000, 0.9997, "99.99% success rate is below expected 97% success rate"),
         (0, 100, 0.9736, "97.36% success rate is not within 100% success rate"),
+        (
+            1,
+            134,
+            0.97,
+            "At 134 we can say that with 90% confidence 1 failure is within 97% success rate",
+        ),
     ],
 )
 def test_not_is_within_expected(failure_count, sample_size, expected_rate, message):
@@ -145,13 +158,56 @@ def test_next_success_rate():
 
 @pytest.mark.parametrize(
     "success_rate, largest_sample_size",
-    [(0.7, 12), (next_success_rate(12), 55), (next_success_rate(55), 248)],
+    [
+        (0.7, 10),
+        (next_success_rate(10), 44),
+        (next_success_rate(45), 184),
+        (next_success_rate(185), 744),
+        (next_success_rate(745), 2984),
+    ],
 )
 def test_largest_sample_size_for_given_success_rate(success_rate, largest_sample_size):
     assert is_within_expected(success_rate, 1, largest_sample_size), "should be within expected"
     assert not is_within_expected(success_rate, 1, largest_sample_size + 1), (
         "next size should not be within expected"
     )
+
+
+def test_next_sample_size():
+    ## Next sample size should be larger than the current one by at least 4 times
+    assert next_sample_size(10) == 45, (
+        "passing 10 out of 10 should require 45 successful runs to be statistically significant"
+    )
+    assert next_sample_size(45) == 185, (
+        "passing 45 out of 45 should require 185 successful runs to be statistically significant"
+    )
+    assert next_sample_size(185) == 745
+    assert next_sample_size(745) == 2985
+    assert next_sample_size(29) == 121
+    assert next_sample_size(29) == next_sample_size_via_loop(29), "calculated via loop should match"
+
+    assert 28 / 29 == pytest.approx(0.96, rel=0.01)
+    before = analyse_measure_from_test_sample(28, 29)
+    assert before.proportion == pytest.approx(0.96, rel=0.01)
+    assert before.confidence_interval_prop == pytest.approx((0.91, 1.00), 0.01)
+
+    analysis = analyse_measure_from_test_sample(120, 121)
+    assert analysis.proportion == pytest.approx(0.99, rel=0.01)
+    assert analysis.confidence_interval_prop == pytest.approx((0.98, 1.00), 0.01)
+
+
+def next_sample_size(current):
+    ## How many successful runs are needed to be statistically significant improvement
+    # compared to the current sample size with 100% success rate
+    return 4 * current + 5
+
+
+def next_sample_size_via_loop(sample_size: int) -> int:
+    goal_success_rate = next_success_rate(sample_size)
+    for i in range(sample_size, 5 * sample_size):
+        if not is_within_expected(goal_success_rate, 1, i):
+            return i
+    return 0
 
 
 def test_success_rate():

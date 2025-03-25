@@ -90,8 +90,8 @@ def analyse_measure_from_test_sample(measure: int, sample_size: int) -> Statisti
     me = z * se
 
     # Calculate confidence interval bounds as proportions
-    lower_bound_prop = p_hat - me
-    upper_bound_prop = p_hat + me
+    lower_bound_prop = max(0, p_hat - me)
+    upper_bound_prop = min(1, p_hat + me)
 
     # Convert proportion bounds to integer counts
     lower_bound_count: int = math.ceil(lower_bound_prop * sample_size)
