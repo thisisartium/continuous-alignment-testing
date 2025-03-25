@@ -96,6 +96,7 @@ def test_example_on_wiki():
 
     assert not is_within_expected(0.95, 1, next_size)
     assert not is_within_expected(next_rate, 0, next_size)
+    assert not is_within_expected(next_rate, 1, next_size)
     assert is_within_expected(next_rate, 2, next_size)
 
     assert is_statistically_significant(next_rate, 0, next_size)
