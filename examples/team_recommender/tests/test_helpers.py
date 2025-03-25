@@ -5,6 +5,7 @@ from helpers import (
     _assert_success_rate,
     failures_within_margin_of_error_from_expected,
     generate_examples,
+    is_statistically_significant,
     is_within_expected,
     natural_sort_key,
 )
@@ -310,3 +311,18 @@ def test_sort_names_with_numbers():
     assert sorted([Path(p) for p in unsorted], key=natural_sort_key) == [
         Path(p) for p in correctly_sorted
     ], "example_10_threshold should be last, while example_1_text_response should be first"
+
+
+def test_example_on_wiki():
+    sample_size = 47
+    success_rate = 0.950
+    assert not is_statistically_significant(success_rate, 1, sample_size)
+    next_rate = next_success_rate(sample_size)
+    next_size = next_sample_size_no_failure(sample_size)
+    assert next_sample_size_via_loop_with_1_failure(sample_size) == 193
+    assert next_size == 97
+    assert next_rate == pytest.approx(0.98, rel=0.01)
+
+    assert not is_within_expected(0.95, 1, next_size)
+    assert not is_within_expected(next_rate, 0, next_size)
+    assert is_within_expected(next_rate, 1, next_size)

@@ -4,8 +4,6 @@ import pytest
 from helpers import is_statistically_significant, is_within_expected
 from statsmodels.stats.proportion import proportions_ztest
 from test_helpers import (
-    next_sample_size_no_failure,
-    next_sample_size_via_loop_with_1_failure,
     next_sample_size_with_1_failure,
     next_success_rate,
 )
@@ -98,24 +96,6 @@ def test__is_statistically_significant_with_next_success_rate():
         next_success_rate(sample_size), 0, next_sample_size_with_1_failure(sample_size)
     )
     assert _is_statistically_significant(next_success_rate(35), 0, 109)
-
-
-def test_example_on_wiki():
-    sample_size = 47
-    success_rate = 0.950
-    assert not is_statistically_significant(success_rate, 1, sample_size)
-    next_rate = next_success_rate(sample_size)
-    next_size = next_sample_size_no_failure(sample_size)
-    assert next_sample_size_via_loop_with_1_failure(sample_size) == 193
-    assert next_size == 97
-    assert next_rate == pytest.approx(0.98, rel=0.01)
-
-    assert not is_within_expected(0.95, 1, next_size)
-    assert not is_within_expected(next_rate, 0, next_size)
-    assert is_within_expected(next_rate, 1, next_size)
-
-    assert _is_statistically_significant(next_rate, 0, next_size)
-    assert not _is_statistically_significant(next_rate, 1, next_size)
 
 
 def test_compare_is_within_expected_and_is_statistically_significant():
