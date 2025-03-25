@@ -24,10 +24,10 @@ def test_proportions_ztest_significantly_better():
     stat, p_value = proportions_ztest(9, 10, 0.7)
     assert p_value < 0.05, "statistically significant improvement"
     assert proportions_ztest(9, 10, 0.7, alternative="larger")[1] < 0.05, (
-        "statistically proportion is larger then expected value"
+        "statistically proportion is larger than expected value"
     )
     assert proportions_ztest(9, 10, 0.7, alternative="two-sided")[1] < 0.05, (
-        "statistically proportion is larger or smaller then expected value"
+        "statistically proportion is larger or smaller than expected value"
     )
 
 
