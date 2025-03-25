@@ -79,6 +79,10 @@ def process_row(row: tuple[int, int, float]) -> str:
     return f"{row[0]} failures out of {row[1]} is within {row[2] * 100:.0f}% success rate"
 
 
+def is_statistically_significant(success_rate: float, failure_count: int, sample_size: int) -> bool:
+    return not is_within_expected(success_rate, failure_count, sample_size)
+
+
 def is_within_expected(success_rate: float, failure_count: int, sample_size: int) -> bool:
     print(f"is_within_expected({success_rate}, {failure_count}, {sample_size})")
     if sample_size <= 1:
