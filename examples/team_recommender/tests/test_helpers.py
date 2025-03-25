@@ -198,7 +198,7 @@ def test_next_sample_size():
 
 def next_sample_size(current):
     ## How many successful runs are needed to be statistically significant improvement
-    # compared to the current sample size with 100% success rate
+    # compared to the current sample size with 100% success rate at 90% confidence
     return 4 * current + 5
 
 

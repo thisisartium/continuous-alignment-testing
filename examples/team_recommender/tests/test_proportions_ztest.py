@@ -1,7 +1,7 @@
 import pytest
 from helpers import is_within_expected
 from statsmodels.stats.proportion import proportions_ztest
-from test_helpers import next_success_rate
+from test_helpers import next_sample_size, next_success_rate
 
 
 def test_proportions_ztest_improvement():
@@ -53,9 +53,7 @@ def calculate_p_value(success, failure, sample_size) -> float:
 
 
 def calculate_ztest(success, failure, sample_size) -> tuple[float, float]:
-    measurements = [int(success * sample_size), sample_size - failure]
-    samples = [sample_size, sample_size]
-    zstat, p_value = proportions_ztest(measurements, samples)
+    zstat, p_value = proportions_ztest(sample_size - failure, sample_size, value=success)
     return zstat, p_value
 
 
@@ -67,10 +65,10 @@ def test_not_is_statistically_significant():
     assert not is_statistically_significant(0.7, 3, 10), "same proportion"
     assert not is_statistically_significant(0.9, 10, 100), "same proportion"
     assert not is_statistically_significant(0.7, 30, 100), "same proportion"
-    assert not is_statistically_significant(0.7, 0, 10), "covers 100% success rate"
 
 
 def test_is_statistically_significant():
+    assert is_statistically_significant(0.7, 0, 10), "70% does not covers 100% success rate"
     assert is_statistically_significant(0.9, 0, 100), "0 out of 100 > 90% success rate"
     assert is_statistically_significant(0.7, 0, 11), "0 out of 11 > 70% success rate"
     assert is_statistically_significant(0.9, 0, 31), "0 out of 31 > 90% success rate"
@@ -79,9 +77,30 @@ def test_is_statistically_significant():
 
 def test_is_statistically_significant_with_next_success_rate():
     sample_size = 10
-    assert not is_statistically_significant(next_success_rate(sample_size), 0, sample_size)
-    assert is_statistically_significant(next_success_rate(sample_size), 0, 34)
+    assert is_statistically_significant(next_success_rate(sample_size), 0, sample_size)
+    assert is_statistically_significant(
+        next_success_rate(sample_size), 0, next_sample_size(sample_size)
+    )
     assert is_statistically_significant(next_success_rate(35), 0, 109)
+
+
+def test_example_on_wiki():
+    sample_size = 47
+    success_rate = 0.950
+    assert is_within_expected(success_rate, 1, sample_size)
+    assert not is_statistically_significant(success_rate, 1, sample_size)
+    next_rate = next_success_rate(sample_size)
+    next_size = next_sample_size(sample_size)
+    assert next_size == 193
+    assert next_rate == pytest.approx(0.98, rel=0.01)
+
+    assert not is_within_expected(0.95, 1, next_size)
+    assert not is_within_expected(next_rate, 0, next_size)
+    assert is_within_expected(next_rate, 2, next_size)
+
+    assert is_statistically_significant(next_rate, 0, next_size)
+    assert is_statistically_significant(next_rate, 1, next_size)
+    assert not is_statistically_significant(next_rate, 2, next_size)
 
 
 def test_compare_is_within_expected_and_is_statistically_significant():
