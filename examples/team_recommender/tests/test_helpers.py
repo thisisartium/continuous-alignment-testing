@@ -50,7 +50,7 @@ def test_assert_success_rate_pass(row):
             [
                 "New Success rate 0.900 with 90% confidence exceeds expected: 0.7",
                 "Broken Record:",
-                "Expecting: 0.744 <= 0.700 <= 1.056",
+                "Expecting: 0.744 <= 0.700 <= 1.000",
                 "Got: expected=0.7 <= analysis.lower_interval=0.74",
             ],
         ),
@@ -61,7 +61,7 @@ def test_assert_success_rate_pass(row):
             [
                 "New Success rate 0.999 with 90% confidence exceeds expected: 0.98",
                 "Broken Record:",
-                "Expecting: 0.997 <= 0.980 <= 1.001",
+                "Expecting: 0.997 <= 0.980 <= 1.000",
                 "Got: expected=0.98 <= analysis.lower_interval=0.997",
             ],
         ),
@@ -174,14 +174,31 @@ def test_largest_sample_size_for_given_success_rate(success_rate, largest_sample
 
 
 def test_next_sample_size():
-    assert next_sample_size(10) == 45
-    assert next_sample_size(45) == 185
+    ## Next sample size should be larger than the current one by at least 4 times
+    assert next_sample_size(10) == 45, (
+        "passing 10 out of 10 should require 45 successful runs to be statistically significant"
+    )
+    assert next_sample_size(45) == 185, (
+        "passing 45 out of 45 should require 185 successful runs to be statistically significant"
+    )
     assert next_sample_size(185) == 745
     assert next_sample_size(745) == 2985
-    assert next_sample_size(29) == next_sample_size_via_loop(29)
+    assert next_sample_size(29) == 121
+    assert next_sample_size(29) == next_sample_size_via_loop(29), "calculated via loop should match"
+
+    assert 28 / 29 == pytest.approx(0.96, rel=0.01)
+    before = analyse_measure_from_test_sample(28, 29)
+    assert before.proportion == pytest.approx(0.96, rel=0.01)
+    assert before.confidence_interval_prop == pytest.approx((0.91, 1.00), 0.01)
+
+    analysis = analyse_measure_from_test_sample(120, 121)
+    assert analysis.proportion == pytest.approx(0.99, rel=0.01)
+    assert analysis.confidence_interval_prop == pytest.approx((0.98, 1.00), 0.01)
 
 
 def next_sample_size(current):
+    ## How many successful runs are needed to be statistically significant improvement
+    # compared to the current sample size with 100% success rate
     return 4 * current + 5
 
 
