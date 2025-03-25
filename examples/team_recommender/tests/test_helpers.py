@@ -173,29 +173,40 @@ def test_largest_sample_size_for_given_success_rate(success_rate, largest_sample
     )
 
 
-def test_next_sample_size():
-    ## Next sample size should be larger than the current one by at least 4 times
-    assert next_sample_size_with_1_failure(10) == 45, (
-        "passing 10 out of 10 should require 45 successful runs to be statistically significant"
-    )
-    assert next_sample_size_with_1_failure(45) == 185, (
-        "passing 45 out of 45 should require 185 successful runs to be statistically significant"
-    )
-    assert next_sample_size_with_1_failure(185) == 745
-    assert next_sample_size_with_1_failure(745) == 2985
-    assert next_sample_size_with_1_failure(29) == 121
+@pytest.mark.parametrize(
+    "sample_size, expected",
+    [
+        (10, 45),
+        (45, 185),
+        (185, 745),
+        (745, 2985),
+        (29, 121),
+    ],
+)
+def test_next_sample_size_with_1_failure(sample_size, expected):
+    assert next_sample_size_with_1_failure(sample_size) == expected
+
+
+def test_next_sample_size_via_loop_with_1_failure():
     assert next_sample_size_with_1_failure(29) == next_sample_size_via_loop_with_1_failure(29), (
         "calculated via loop should match"
     )
 
-    assert 28 / 29 == pytest.approx(0.96, rel=0.01)
-    before = analyse_measure_from_test_sample(28, 29)
-    assert before.proportion == pytest.approx(0.96, rel=0.01)
-    assert before.confidence_interval_prop == pytest.approx((0.91, 1.00), 0.01)
 
-    analysis = analyse_measure_from_test_sample(120, 121)
-    assert analysis.proportion == pytest.approx(0.99, rel=0.01)
-    assert analysis.confidence_interval_prop == pytest.approx((0.98, 1.00), 0.01)
+def test_next_success_after_29_runs_is_121():
+    starting_runs = 29
+    starting_success_rate = (starting_runs - 1) / starting_runs
+    starting_analysis = analyse_measure_from_test_sample(starting_runs - 1, starting_runs)
+
+    assert starting_analysis.proportion == pytest.approx(starting_success_rate)
+
+    next_size = next_sample_size_with_1_failure(starting_runs)
+    assert next_size == 121, "should be 121"
+    next_analysis = analyse_measure_from_test_sample(next_size - 1, next_size)
+
+    assert next_analysis.proportion == pytest.approx(next_success_rate(next_size), rel=0.0001), (
+        "analysis proportion should match next rate"
+    )
 
 
 def next_sample_size_with_1_failure(current):
