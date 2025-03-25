@@ -142,12 +142,12 @@ def test_seventy_percent_confidence_ranges_from_fifty_to_ninety():
 
 
 def next_success_rate(sample_size) -> float:
-    return 1 - 1 / (sample_size + 1)
+    return sample_size / (sample_size + 1)
 
 
 def test_next_success_rate():
     assert next_success_rate(1) == 0.5
-    assert next_success_rate(2) == 0.6666666666666667
+    assert next_success_rate(2) == pytest.approx(0.6667, rel=0.01)
     assert next_success_rate(3) == 0.75
     assert next_success_rate(4) == 0.8
     assert next_success_rate(10) == 0.9090909090909091
@@ -175,16 +175,18 @@ def test_largest_sample_size_for_given_success_rate(success_rate, largest_sample
 
 def test_next_sample_size():
     ## Next sample size should be larger than the current one by at least 4 times
-    assert next_sample_size(10) == 45, (
+    assert next_sample_size_with_1_failure(10) == 45, (
         "passing 10 out of 10 should require 45 successful runs to be statistically significant"
     )
-    assert next_sample_size(45) == 185, (
+    assert next_sample_size_with_1_failure(45) == 185, (
         "passing 45 out of 45 should require 185 successful runs to be statistically significant"
     )
-    assert next_sample_size(185) == 745
-    assert next_sample_size(745) == 2985
-    assert next_sample_size(29) == 121
-    assert next_sample_size(29) == next_sample_size_via_loop(29), "calculated via loop should match"
+    assert next_sample_size_with_1_failure(185) == 745
+    assert next_sample_size_with_1_failure(745) == 2985
+    assert next_sample_size_with_1_failure(29) == 121
+    assert next_sample_size_with_1_failure(29) == next_sample_size_via_loop_with_1_failure(29), (
+        "calculated via loop should match"
+    )
 
     assert 28 / 29 == pytest.approx(0.96, rel=0.01)
     before = analyse_measure_from_test_sample(28, 29)
@@ -196,18 +198,58 @@ def test_next_sample_size():
     assert analysis.confidence_interval_prop == pytest.approx((0.98, 1.00), 0.01)
 
 
-def next_sample_size(current):
+def next_sample_size_with_1_failure(current):
     ## How many successful runs are needed to be statistically significant improvement
     # compared to the current sample size with 100% success rate at 90% confidence
     return 4 * current + 5
 
 
-def next_sample_size_via_loop(sample_size: int) -> int:
+def next_sample_size_via_loop_with_1_failure(sample_size: int) -> int:
     goal_success_rate = next_success_rate(sample_size)
     for i in range(sample_size, 5 * sample_size):
         if not is_within_expected(goal_success_rate, 1, i):
             return i
     return 0
+
+
+def next_sample_size_via_loop_no_failure(sample_size: int) -> int:
+    goal_success_rate = next_success_rate(sample_size)
+    for i in range(sample_size, 5 * sample_size):
+        if not is_within_expected(goal_success_rate, 0, i):
+            return i
+    return 0
+
+
+def next_sample_size_no_failure(sample_size: int) -> int:
+    return 2 * sample_size + 3
+
+
+@pytest.mark.parametrize(
+    "sample_size, expected",
+    [
+        (10, 45),
+        (45, 185),
+        (185, 745),
+        (745, 2985),
+        (29, 121),
+    ],
+)
+def test_next_sample_size_via_loop(sample_size, expected):
+    assert next_sample_size_via_loop_with_1_failure(sample_size) == expected
+
+
+@pytest.mark.parametrize(
+    "sample_size, expected",
+    [
+        (10, 23),
+        (23, 49),
+        (49, 101),
+        (101, 205),
+        (205, 413),
+    ],
+)
+def test_next_no_failure_sample_size_via_loop(sample_size, expected):
+    assert next_sample_size_via_loop_no_failure(sample_size) == expected
 
 
 def test_success_rate():
