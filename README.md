@@ -8,7 +8,7 @@ CAT provides the infrastructure to:
 - Store and analyze AI test results over iterations.
 - Monitor reliability changes in an AI application as prompts, models, code, and data evolve.
 - Integrate AI tests into the CI pipeline.
-- Build the AI application as an API service.
+- Build the AI application as an API service using Python and use any language to invoke it.
 - Ensure AI applications are reliable while maintaining creativity.
 - Iterate on prompts and code while measuring improvements.
   
@@ -20,7 +20,7 @@ CAT provides the infrastructure to:
 ## Documentation
 [Github Pages][github-pages-index]
 
-Pages Source in [docs](docs) [![github-pages-badge]][github-pages-deploy-link]
+Edit Pages in [docs](docs) and deploy using CI: [![github-pages-badge]][github-pages-deploy-link]
 
 ## Wiki
 [Wiki Pages][wiki]
