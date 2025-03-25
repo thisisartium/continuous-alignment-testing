@@ -180,7 +180,7 @@ def test_largest_sample_size_for_given_success_rate(success_rate, largest_sample
         (45, 185),
         (185, 745),
         (745, 2985),
-        (29, 121),
+        (2985, 11945),  # 1/11945=0.00008372 = 99.99%
     ],
 )
 def test_next_sample_size_with_1_failure(sample_size, expected):
@@ -209,10 +209,10 @@ def test_next_success_after_29_runs_is_121():
     )
 
 
-def next_sample_size_with_1_failure(current):
+def next_sample_size_with_1_failure(sample_size: int) -> int:
     ## How many successful runs are needed to be statistically significant improvement
     # compared to the current sample size with 100% success rate at 90% confidence
-    return 4 * current + 5
+    return 4 * sample_size + 5
 
 
 def next_sample_size_via_loop_with_1_failure(sample_size: int) -> int:
