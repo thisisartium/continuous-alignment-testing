@@ -41,10 +41,10 @@ def test_proportions_ztest_significantly_worse():
     stat, p_value = proportions_ztest(3, 10, 0.7)
     assert p_value < 0.05, "statistically significant result"
     assert proportions_ztest(3, 10, 0.7, alternative="smaller")[1] < 0.05, (
-        "statistically proportion is smaller then expected value"
+        "statistically proportion is smaller than expected value"
     )
     assert proportions_ztest(3, 10, 0.7, alternative="two-sided")[1] < 0.05, (
-        "statistically proportion is smaller then expected value"
+        "statistically proportion is smaller than expected value"
     )
 
 
