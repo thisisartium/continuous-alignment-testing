@@ -23,12 +23,7 @@ def analyse_failure_rate_from_test_sample(
 
 @pytest.mark.parametrize(
     "failure_count,sample_size,expected_proportion",
-    [
-        (0, 100, 0.0),
-        (6, 100, 0.06),
-        (100, 100, 1.0),
-        (1, 47, 0.0213)
-    ],
+    [(0, 100, 0.0), (6, 100, 0.06), (100, 100, 1.0), (1, 47, 0.0213)],
 )
 def test_analyse_sample_from_test(failure_count, sample_size, expected_proportion):
     """Test the statistical analysis function with various edge cases."""
@@ -120,7 +115,9 @@ def test_measured_constants():
 )
 def test_next_success_rate(failures, total, current_success_rate, next_success_rate):
     result = analyse_failure_rate_from_test_sample(failures, total)
-    assert result.next_success_rate(current_success_rate) == pytest.approx(next_success_rate, rel=0.001)
+    assert result.next_success_rate(current_success_rate) == pytest.approx(
+        next_success_rate, rel=0.001
+    )
 
 
 def export_results_to_csv_string(results: list[StatisticalAnalysis]) -> str:
