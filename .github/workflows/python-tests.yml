@@ -51,8 +51,7 @@ jobs:
           --timeout=10
           --color=yes
           --verbose --verbosity=10 --capture=no --tb=native --showlocals
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          -k "not test_compute_alignment"
 
       - name: Type check Python code
         run: uv run mypy src
