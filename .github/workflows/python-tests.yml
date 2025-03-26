@@ -43,7 +43,14 @@ jobs:
           uv run pytest examples/team_recommender/tests/*.py
           --timeout=10
           --color=yes
-          --verbose --verbosity=10 --capture=no --tb=native --showlocals 
+          --verbose --verbosity=10 --capture=no --tb=native --showlocals
+
+      - name: Run all tests for example 1
+        run: >
+          uv run pytest examples/team_recommender/tests/example_1_text_response
+          --timeout=10
+          --color=yes
+          --verbose --verbosity=10 --capture=no --tb=native --showlocals
 
       - name: Type check Python code
         run: uv run mypy src
