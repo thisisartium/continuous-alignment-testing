@@ -20,7 +20,7 @@ CAT provides the infrastructure to:
 ## Documentation
 [Github Pages][github-pages-index]
 
-Edit Pages in [docs](docs) and deploy using CI: [![github-pages-badge]][github-pages-deploy-link]
+Edit Pages in [docs folder](docs) to automatically deploy: [![github-pages-badge]][github-pages-deploy-link]
 
 ## Wiki
 [Wiki Pages][wiki]
