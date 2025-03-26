@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 from pathlib import Path
 
@@ -83,8 +84,11 @@ def is_statistically_significant(success_rate: float, failure_count: int, sample
     return not is_within_expected(success_rate, failure_count, sample_size)
 
 
+logger = logging.getLogger(__name__)
+
+
 def is_within_expected(success_rate: float, failure_count: int, sample_size: int) -> bool:
-    print(f"is_within_expected({success_rate}, {failure_count}, {sample_size})")
+    logger.info(f"is_within_expected({success_rate}, {failure_count}, {sample_size})")
     if sample_size <= 1:
         return True
 
@@ -94,15 +98,17 @@ def is_within_expected(success_rate: float, failure_count: int, sample_size: int
     measured_success_rate = measured_success_count / sample_size
 
     interval_min, interval_max = success_analysis.confidence_interval_count
-    print(f"Expecting {measured_success_count} to be between {interval_min} and {interval_max}")
+    logger.info(
+        f"Expecting {measured_success_count} to be between {interval_min} and {interval_max}"
+    )
     if measured_success_count < interval_min:
-        print(
+        logger.info(
             f"Failure count {failure_count} is below the minimum of {interval_min},"
             + f" current success rate {measured_success_rate} < "
             + f"lower limit:{success_analysis.confidence_interval_prop[0]:.3f}"
         )
     if measured_success_count > interval_max:
-        print(
+        logger.info(
             f"Failure count {failure_count} is above the maximum of {interval_max},"
             + f" current success rate {measured_success_rate} > "
             + f"higher limit:{success_analysis.confidence_interval_prop[1]:.3f}"

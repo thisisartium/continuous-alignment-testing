@@ -39,7 +39,7 @@ def stabilize_float(x: float) -> float:
     return struct.unpack("f", struct.pack("f", x))[0]
 
 
-def create_embedding_object(text, model="text-embedding-3-small"):
+def create_embedding_object(text: str, model="text-embedding-3-small") -> dict:
     """
     Create an embedding object with metadata
 
