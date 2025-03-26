@@ -1,3 +1,5 @@
+import json
+
 from example_1_text_response.cosine_similarity import (
     compute_cosine_similarity,
 )
@@ -112,11 +114,15 @@ def test_llm_will_hallucinate_given_no_data(snapshot):
     #     "response contains list of made up developers in multiple lines"
     # )
 
-    embedding_object: dict = create_embedding_object(response, model="text-embedding-3-large")
-    saved_response = load_json_fixture("hallucination_response.json")
+    embedding_object = create_embedding_object(response, model="text-embedding-3-large")
+    assert len(embedding_object["embedding"]) == 3072
+    snapshot.assert_match(json.dumps(embedding_object, indent=2), "hallucination_response.json")
+    hallucination_response = load_json_fixture("hallucination_response.json")
 
-    no_hallucinations_response = load_json_fixture("please_provide_missing_information_response.json")
-    hallucinations_detected_embedding = saved_response["embedding"]
+    no_hallucinations_response = load_json_fixture(
+        "please_provide_missing_information_response.json"
+    )
+    hallucinations_detected_embedding = hallucination_response["embedding"]
     no_hallucinations_detected_embedding = no_hallucinations_response["embedding"]
     response_embedding = embedding_object["embedding"]
     similarity_to_hallucination = semantic_similarity_score(
@@ -128,6 +134,7 @@ def test_llm_will_hallucinate_given_no_data(snapshot):
 
     tolerance_margin = 0.05
     assert similarity_to_hallucination > similarity_to_no_hallucinations + tolerance_margin
+
 
 def semantic_similarity_score(a: list, b: list) -> float:
     return compute_cosine_similarity(a, b)

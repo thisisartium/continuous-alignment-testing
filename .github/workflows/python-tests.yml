@@ -38,6 +38,13 @@ jobs:
           --color=yes
           --verbose --verbosity=10 --capture=no --tb=native --showlocals 
 
+      - name: Run unit tests for examples
+        run: >
+          uv run pytest examples/team_recommender/tests/*.py
+          --timeout=10
+          --color=yes
+          --verbose --verbosity=10 --capture=no --tb=native --showlocals 
+
       - name: Type check Python code
         run: uv run mypy src
 
