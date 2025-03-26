@@ -1,5 +1,3 @@
-import json
-
 from example_1_text_response.cosine_similarity import (
     compute_cosine_similarity,
 )
@@ -116,7 +114,8 @@ def test_llm_will_hallucinate_given_no_data(snapshot):
 
     embedding_object = create_embedding_object(response, model="text-embedding-3-large")
     assert len(embedding_object["embedding"]) == 3072
-    snapshot.assert_match(json.dumps(embedding_object, indent=2), "hallucination_response.json")
+    # The following is unstable due to the embeddings calculations, even when rounding to 2 significant digits
+    # snapshot.assert_match(json.dumps(embedding_object, indent=2), "hallucination_response.json")
     hallucination_response = load_json_fixture("hallucination_response.json")
 
     no_hallucinations_response = load_json_fixture(

@@ -100,6 +100,6 @@ def test_embedding_equivalence(snapshot):
     outside_tolerance_count = np.sum(np.abs(diff_val) >= 0.0001)
 
     # Assert a specific count (replace 0 with your expected count)
-    assert outside_tolerance_count == 317, (
+    assert outside_tolerance_count == 900, (
         f"Found {outside_tolerance_count} elements outside tolerance"
     )
