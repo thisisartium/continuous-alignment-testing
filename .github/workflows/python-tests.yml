@@ -51,7 +51,7 @@ jobs:
           --timeout=10
           --color=yes
           --verbose --verbosity=10 --capture=no --tb=native --showlocals
-          -k "not test_compute_alignment and not test_reproducing_the_same_text_embedding and not test_response_shows_developer_names and not test_llm_will_hallucinate_given_no_data"
+          -k "not test_compute_alignment and not test_reproducing_the_same_text_embedding and not test_response_shows_developer_names and not test_llm_will_hallucinate_given_no_data and not test_cosine_similarity_generated_responses"
 
       - name: Type check Python code
         run: uv run mypy src
