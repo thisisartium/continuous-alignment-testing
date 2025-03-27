@@ -53,22 +53,15 @@ def test_compute_cosine_similarity_saved_response():
     assert cosine_similarity == pytest.approx(1.0)
 
 
-@pytest.mark.xfail(
-    reason="Snapshot fails to match and is expected to fail"
-    ", but snapshot raises AssertionError in teardown"
-)
 def test_reproducing_the_same_text_embedding(snapshot):
     saved_response = load_json_fixture("hallucination_response.json")
-    embedding_object = create_embedding_object(
-        saved_response["text"], model="text-embedding-3-large"
-    )
+    embedding_object = create_embedding_object(saved_response["text"])
     stabilized_embedding_object = stabilize_embedding_object(embedding_object)
 
     embedding_object_string = json.dumps(stabilized_embedding_object, indent=2)
-    with pytest.raises(AssertionError):
-        snapshot.assert_match(
-            embedding_object_string, "hallucination_response_large_same_text_embedding.json"
-        )
+    snapshot.assert_match(
+        embedding_object_string, "hallucination_response_large_same_text_embedding.json"
+    )
 
 
 def Xtest_cosine_similarity_generated_responses(snapshot):

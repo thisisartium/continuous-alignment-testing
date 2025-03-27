@@ -112,7 +112,7 @@ def test_llm_will_hallucinate_given_no_data(snapshot):
     #     "response contains list of made up developers in multiple lines"
     # )
 
-    embedding_object = create_embedding_object(response, model="text-embedding-3-large")
+    embedding_object = create_embedding_object(response)
     assert len(embedding_object["embedding"]) == 3072
     # The following is unstable due to the embeddings calculations, even when rounding to 2 significant digits
     # snapshot.assert_match(json.dumps(embedding_object, indent=2), "hallucination_response.json")
