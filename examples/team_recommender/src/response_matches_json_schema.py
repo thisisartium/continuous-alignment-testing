@@ -1,3 +1,5 @@
+from typing import Any
+
 from jsonschema import FormatChecker, validate
 
 blank_checker = FormatChecker()
@@ -5,7 +7,7 @@ blank_checker = FormatChecker()
 
 def response_matches_json_schema(
     response: dict,
-    schema: any,
+    schema: Any,
     format_checker: FormatChecker = blank_checker,
 ) -> bool:
     """
