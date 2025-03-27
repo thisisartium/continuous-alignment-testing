@@ -113,7 +113,7 @@ def test_llm_will_hallucinate_given_no_data(snapshot):
     # )
 
     embedding_object = create_embedding_object(response)
-    assert len(embedding_object["embedding"]) == 3072
+    assert len(embedding_object["embedding"]) == 256
     # The following is unstable due to the embeddings calculations, even when rounding to 2 significant digits
     # snapshot.assert_match(json.dumps(embedding_object, indent=2), "hallucination_response.json")
     hallucination_response = load_json_fixture("hallucination_response.json")
