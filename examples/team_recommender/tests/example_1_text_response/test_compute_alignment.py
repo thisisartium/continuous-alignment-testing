@@ -10,10 +10,10 @@ from openai_embeddings import (
 def test_compute_alignment(snapshot):
     # Create embeddings using create_embedding_object
     embedding_a = create_embedding_object(
-        "This is a test sentence.", model="text-embedding-3-large"
+        "This is a test sentence."
     )
     embedding_b = create_embedding_object(
-        "This is another test sentence.", model="text-embedding-3-large"
+        "This is another test sentence."
     )
 
     # Compute the alignment vector

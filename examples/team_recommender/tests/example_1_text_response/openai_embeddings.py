@@ -39,7 +39,7 @@ def stabilize_float(x: float) -> float:
     return struct.unpack("f", struct.pack("f", x))[0]
 
 
-def create_embedding_object(text: str, model="text-embedding-3-small") -> dict:
+def create_embedding_object(text: str) -> dict:
     """
     Create an embedding object with metadata
 
@@ -51,6 +51,8 @@ def create_embedding_object(text: str, model="text-embedding-3-small") -> dict:
     Returns:
         dict: Object with text, model and embedding
     """
+    model = "text-embedding-3-small"
+
     if not os.environ.get("OPENAI_API_KEY"):
         raise ValueError("OPENAI_API_KEY not provided or set in environment")
 
