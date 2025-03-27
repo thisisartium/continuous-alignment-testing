@@ -14,7 +14,7 @@ CAT provides the infrastructure to:
   
 ## Example Apps
 
-- [team_recommender - Team Recommender](examples/team_recommender/readme.md)
+- [Team Recommender - AI assembles team of developers](examples/team_recommender/readme.md)
 - you next idea?
   
 ## Documentation
