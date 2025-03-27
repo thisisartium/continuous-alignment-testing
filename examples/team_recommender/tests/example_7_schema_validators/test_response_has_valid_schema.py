@@ -117,6 +117,7 @@ def run_allocation_test(reporter, skills_data, response) -> bool:
     not_empty_response = True
     no_developer_name_is_hallucinated = True
     developer_is_appropriate = True
+    json_object = {}
     try:
         json_object = json.loads(response)
         has_valid_json_schema = response_matches_json_schema(json_object, schema)
