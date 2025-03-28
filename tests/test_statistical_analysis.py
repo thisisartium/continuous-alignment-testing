@@ -230,7 +230,8 @@ def test_failure_rate_graph(snapshot):
 
     # Calculate results for each rate
     results = [
-        analyse_failure_rate_from_test_sample(f, t) for f, t in zip(failures, totals, strict=True)
+        analyse_failure_rate_from_test_sample(int(f), int(t))
+        for f, t in zip(failures, totals, strict=True)
     ]
 
     # Extract data for plotting

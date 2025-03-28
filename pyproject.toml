@@ -68,6 +68,10 @@ namespace_packages = true
 explicit_package_bases = true
 mypy_path = ["src"]
 
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
 [tool.black]
 line-length = 120
 target-version = ['py313']
