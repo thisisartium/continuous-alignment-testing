@@ -225,13 +225,12 @@ def test_failure_rate_graph(snapshot):
     matplotlib.rcParams["ps.fonttype"] = 42
 
     # Generate a series of failure rates
-    totals = np.ones(100) * 100
-    failures = np.arange(0, 100)
-
+    totals = [100] * 100
+    failures = list(range(100))
+    assert len(failures) == len(totals)
     # Calculate results for each rate
     results = [
-        analyse_failure_rate_from_test_sample(int(f), int(t))
-        for f, t in zip(failures, totals, strict=True)
+        analyse_failure_rate_from_test_sample(f, t) for f, t in zip(failures, totals, strict=True)
     ]
 
     # Extract data for plotting
