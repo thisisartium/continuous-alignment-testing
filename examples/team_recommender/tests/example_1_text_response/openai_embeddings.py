@@ -38,7 +38,7 @@ def stabilize_embedding_object(embedding_object):
 
 
 def stabilize_float(x: float) -> float:
-    return struct.unpack("f", struct.pack("f", x))[0]
+    return float(struct.unpack("f", struct.pack("f", x))[0])
 
 
 def create_embedding_object(text: str) -> dict:

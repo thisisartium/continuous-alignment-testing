@@ -53,12 +53,11 @@ jobs:
           --verbose --verbosity=10 --capture=no --tb=native --showlocals
           -k "not test_compute_alignment and not test_reproducing_the_same_text_embedding and not test_response_shows_developer_names and not test_llm_will_hallucinate_given_no_data and not test_cosine_similarity_generated_responses"
 
-      - name: Type check Python code
-        run: uv run mypy src
+      - name: Type check
+        run: uv run mypy src tests examples/team_recommender/src
 
-      - name: Run ruff linter and formatter
+      - name: Linter and formatter
         run: |
-          
           uv run ruff check src tests examples
           uv run ruff format src tests examples
 
