@@ -132,7 +132,10 @@ def test_llm_will_hallucinate_given_no_data(snapshot):
     )
 
     tolerance_margin = 0.05
-    assert similarity_to_hallucination > similarity_to_no_hallucinations + tolerance_margin
+    likely_hallucination = (
+        similarity_to_hallucination > similarity_to_no_hallucinations + tolerance_margin
+    )
+    assert likely_hallucination
 
 
 def semantic_similarity_score(a: list, b: list) -> float:
