@@ -2,6 +2,11 @@
 [![CAT][cat-badge]][cat-link]
 # Continuous Alignment Testing (CAT) Framework
 A framework for implementing Continuous Alignment Testing (CAT) for LLM-based applications.
+
+<p align="center">
+  <img src="https://repository-images.githubusercontent.com/936933212/c5f6816f-f5e4-4f6e-8c7c-35bb905999c0" alt="Cat walking on a line between red and green" width="50%">
+</p>
+
 ## Overview
 CAT provides the infrastructure to:
 - Run and track automated tests against an AI application.
