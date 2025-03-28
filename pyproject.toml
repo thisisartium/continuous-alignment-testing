@@ -16,7 +16,8 @@ dependencies = [
   # this small library should be kept independent
   # consider adding dependencies to one of the dependency groups
 ]
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 
 [dependency-groups]
 test = [
