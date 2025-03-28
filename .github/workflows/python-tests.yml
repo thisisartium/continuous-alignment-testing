@@ -54,7 +54,7 @@ jobs:
           -k "not test_compute_alignment and not test_reproducing_the_same_text_embedding and not test_response_shows_developer_names and not test_llm_will_hallucinate_given_no_data and not test_cosine_similarity_generated_responses"
 
       - name: Type check
-        run: uv run mypy src tests
+        run: uv run mypy src tests examples/team_recommender/src
 
       - name: Linter and formatter
         run: |
