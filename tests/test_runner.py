@@ -1,5 +1,5 @@
-from src.cat_ai.reporter import Reporter
-from src.cat_ai.runner import Runner
+from cat_ai.reporter import Reporter
+from cat_ai.runner import Runner
 
 
 # Dummy test function that will be passed to Runner
