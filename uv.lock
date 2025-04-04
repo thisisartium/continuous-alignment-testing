@@ -34,6 +34,19 @@ wheels = [
 ]
 
 [[package]]
+name = "anyioutils"
+version = "0.7.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "outcome" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/70/29/3386d5be378ef1a8fb8b8879b12010e7b2b2953bc7798bf451be84f2010b/anyioutils-0.7.3.tar.gz", hash = "sha256:68443be47c3d8589ddc4906d0d43f0bcc1187d750cc0b59355805af6cd57a1fe", size = 15022 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9d/5a/eb249853684de193b39d69359d20f825e7babe5497e4eb54cd88ee9976f5/anyioutils-0.7.3-py3-none-any.whl", hash = "sha256:8698f031d90ad346c950939ffa9ba072d00826f1c09bcd52e1cde49784b96c6a", size = 14341 },
+]
+
+[[package]]
 name = "appnope"
 version = "0.1.4"
 source = { registry = "https://pypi.org/simple" }
@@ -170,6 +183,8 @@ source = { virtual = "." }
 
 [package.dev-dependencies]
 dev = [
+    { name = "ipykernel" },
+    { name = "ipython" },
     { name = "notebook" },
     { name = "pydantic" },
     { name = "pydrive2" },
@@ -196,6 +211,8 @@ test = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "ipykernel", specifier = "==7.0.0a1" },
+    { name = "ipython", specifier = "==9.0.2" },
     { name = "notebook", specifier = ">=7.3.2" },
     { name = "pydantic", specifier = ">=2.10.6,<3" },
     { name = "pydrive2", specifier = ">=1.21.3,<2" },
@@ -603,9 +620,10 @@ wheels = [
 
 [[package]]
 name = "ipykernel"
-version = "6.29.5"
+version = "7.0.0a1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "anyio" },
     { name = "appnope", marker = "sys_platform == 'darwin'" },
     { name = "comm" },
     { name = "debugpy" },
@@ -617,17 +635,17 @@ dependencies = [
     { name = "packaging" },
     { name = "psutil" },
     { name = "pyzmq" },
-    { name = "tornado" },
     { name = "traitlets" },
+    { name = "zmq-anyio" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e9/5c/67594cb0c7055dc50814b21731c22a601101ea3b1b50a9a1b090e11f5d0f/ipykernel-6.29.5.tar.gz", hash = "sha256:f093a22c4a40f8828f8e330a9c297cb93dcab13bd9678ded6de8e5cf81c56215", size = 163367 }
+sdist = { url = "https://files.pythonhosted.org/packages/a0/e8/147a81083d3200403d9465330e0daa226a3c6d8130f6bc8c275baab406c2/ipykernel-7.0.0a1.tar.gz", hash = "sha256:7986c167f4501d4fab4873ab878196fd7dcc189a5cdea4bed9f973bbe3859098", size = 169472 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/94/5c/368ae6c01c7628438358e6d337c19b05425727fbb221d2a3c4303c372f42/ipykernel-6.29.5-py3-none-any.whl", hash = "sha256:afdb66ba5aa354b09b91379bac28ae4afebbb30e8b39510c9690afb7a10421b5", size = 117173 },
+    { url = "https://files.pythonhosted.org/packages/a6/40/3e78506d35c863979aea77a125b42125cccaa0ed4199ad20b2bfcba613d7/ipykernel-7.0.0a1-py3-none-any.whl", hash = "sha256:fa4a1401d3f1a86dc2c8e47592ae60d59818d3b597f68198bb99fd41d789d09a", size = 116622 },
 ]
 
 [[package]]
 name = "ipython"
-version = "9.0.0"
+version = "9.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
@@ -641,9 +659,9 @@ dependencies = [
     { name = "stack-data" },
     { name = "traitlets" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/de/39/264894738a202ddaf6abae39b3f84671ddee23fd292dbb3e10039e70300c/ipython-9.0.0.tar.gz", hash = "sha256:9368d65b3d4a471e9a698fed3ea486bbf6737e45111e915279c971b77f974397", size = 4364165 }
+sdist = { url = "https://files.pythonhosted.org/packages/7d/ce/012a0f40ca58a966f87a6e894d6828e2817657cbdf522b02a5d3a87d92ce/ipython-9.0.2.tar.gz", hash = "sha256:ec7b479e3e5656bf4f58c652c120494df1820f4f28f522fb7ca09e213c2aab52", size = 4366102 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/85/a1/894e4c0b6ac994045c6edeb2b6fdf69c59f20fcd2e348a42f4e40889181c/ipython-9.0.0-py3-none-any.whl", hash = "sha256:2cce23069b830a54a5b9d3d66ccd6433047c1503a7b9a3b34593c0b5c2c08477", size = 592040 },
+    { url = "https://files.pythonhosted.org/packages/20/3a/917cb9e72f4e1a4ea13c862533205ae1319bd664119189ee5cc9e4e95ebf/ipython-9.0.2-py3-none-any.whl", hash = "sha256:143ef3ea6fb1e1bffb4c74b114051de653ffb7737a3f7ab1670e657ca6ae8c44", size = 600524 },
 ]
 
 [[package]]
@@ -1226,6 +1244,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/e6/1c/11b520deb71f9ea54ced3c52cd6a5f7131215deba63ad07f23982e328141/openai-1.63.2.tar.gz", hash = "sha256:aeabeec984a7d2957b4928ceaa339e2ead19c61cfcf35ae62b7c363368d26360", size = 356902 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/15/64/db3462b358072387b8e93e6e6a38d3c741a17b4a84171ef01d6c85c63f25/openai-1.63.2-py3-none-any.whl", hash = "sha256:1f38b27b5a40814c2b7d8759ec78110df58c4a614c25f182809ca52b080ff4d4", size = 472282 },
+]
+
+[[package]]
+name = "outcome"
+version = "1.3.0.post0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "attrs" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/98/df/77698abfac98571e65ffeb0c1fba8ffd692ab8458d617a0eed7d9a8d38f2/outcome-1.3.0.post0.tar.gz", hash = "sha256:9dcf02e65f2971b80047b377468e72a268e15c0af3cf1238e6ff14f7f91143b8", size = 21060 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/55/8b/5ab7257531a5d830fc8000c476e63c935488d74609b50f9384a643ec0a62/outcome-1.3.0.post0-py2.py3-none-any.whl", hash = "sha256:e771c5ce06d1415e356078d3bdd68523f284b4ce5419828922b6871e65eda82b", size = 10692 },
 ]
 
 [[package]]
@@ -2150,4 +2180,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e6/30/fba0d96b4b5fbf5948ed3f4681f7da2f9f64512e1d303f94b4cc174c24a5/websocket_client-1.8.0.tar.gz", hash = "sha256:3239df9f44da632f96012472805d40a23281a991027ce11d2f45a6f24ac4c3da", size = 54648 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/5a/84/44687a29792a70e111c5c477230a72c4b957d88d16141199bf9acb7537a3/websocket_client-1.8.0-py3-none-any.whl", hash = "sha256:17b44cc997f5c498e809b22cdf2d9c7a9e71c02c8cc2b6c56e7c2d1239bfa526", size = 58826 },
+]
+
+[[package]]
+name = "zmq-anyio"
+version = "0.3.9"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "anyioutils" },
+    { name = "pyzmq" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/46/88/dcebf3052e2dbe9b81f1d13ad6c1b41eb0e742c7f75a73ce00a78375cb76/zmq_anyio-0.3.9.tar.gz", hash = "sha256:7dc0cdbf039834f16c0dc6412b560e689ca406e4d8b93cb94e0fa8763a87e947", size = 13175 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7e/0b/137721c37bbe04d0a379d349342382edc0c48a0feefd52e69c63b2c7bfe9/zmq_anyio-0.3.9-py3-none-any.whl", hash = "sha256:a922b13409ae49cf51730958f0a37b38d9ce9ebde05f046fec9f8639b58ac709", size = 10513 },
 ]
