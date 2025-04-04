@@ -12,19 +12,24 @@ from cat_ai.statistical_analysis import StatisticalAnalysis, analyse_measure_fro
 
 
 @pytest.fixture
-def reporter_factory() -> Callable:
+def test_name(request) -> str:
+    return request.node.name
+
+
+@pytest.fixture
+def reporter_factory(test_name) -> Callable:
     """Factory fixture for creating Reporter instances with default settings."""
-    def _create_reporter(test_name: str, output_dir: Optional[str] = None, unique_id: Optional[str] = None) -> Reporter:
-        return Reporter(
-            test_name=test_name,
-            output_dir=output_dir or root_dir(),
-            unique_id=unique_id
-        )
+
+    def _create_reporter(
+        unique_id: Optional[str] = None,
+    ) -> Reporter:
+        return Reporter(test_name=test_name, output_dir=root_dir(), unique_id=unique_id)
+
     return _create_reporter
 
 
 @pytest.fixture
-def tmp_reporter() -> 'Reporter':
+def tmp_reporter() -> "Reporter":
     """Creates a reporter that writes to /tmp."""
     return Reporter(test_name="test_fixture", output_dir="/tmp")
 
@@ -32,26 +37,30 @@ def tmp_reporter() -> 'Reporter':
 @pytest.fixture
 def analyze_failure_rate() -> Callable:
     """Helper fixture to analyze failure rates."""
+
     def _analyze(failure_count: int, sample_size: int) -> StatisticalAnalysis:
         return analyse_measure_from_test_sample(failure_count, sample_size)
+
     return _analyze
 
 
 @pytest.fixture
 def export_results_to_csv() -> Callable:
     """Export a list of StatisticalAnalysis objects to a CSV-formatted string."""
+
     def _export(results: list[StatisticalAnalysis]) -> str:
         output = io.StringIO(newline="\n")
         writer = csv.writer(output, lineterminator="\n")
-        
+
         # Write header
         writer.writerow(StatisticalAnalysis.get_csv_headers())
-        
+
         # Write rows
         for result in results:
             writer.writerow(result.as_csv_row())
-            
+
         return output.getvalue()
+
     return _export
 
 
@@ -59,23 +68,26 @@ def export_results_to_csv() -> Callable:
 def configure_matplotlib() -> Generator[None, None, None]:
     """Configure matplotlib for consistent snapshot testing."""
     matplotlib.use("Agg")  # Force CPU-based renderer
-    
+
     # Configure for deterministic rendering
-    matplotlib.rcParams.update({
-        "figure.max_open_warning": 0,
-        "svg.hashsalt": "matplotlib",
-        "figure.dpi": 100,
-        "savefig.dpi": 100,
-        "path.simplify": False,
-        "agg.path.chunksize": 0,
-        "pdf.fonttype": 42,  # Ensures text is stored as text, not paths
-        "ps.fonttype": 42
-    })
-    
+    matplotlib.rcParams.update(
+        {
+            "figure.max_open_warning": 0,
+            "svg.hashsalt": "matplotlib",
+            "figure.dpi": 100,
+            "savefig.dpi": 100,
+            "path.simplify": False,
+            "agg.path.chunksize": 0,
+            "pdf.fonttype": 42,  # Ensures text is stored as text, not paths
+            "ps.fonttype": 42,
+        }
+    )
+
     yield
-    
+
     # Clean up any open figures
     import matplotlib.pyplot as plt
+
     plt.close("all")
 
 

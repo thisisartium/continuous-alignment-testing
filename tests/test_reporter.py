@@ -7,22 +7,22 @@ from cat_ai.helpers.helpers import root_dir
 
 
 def test_reporter_creates_a_unique_folder_path(reporter_factory: Callable) -> None:
-    test_name = "unique_folder_path"
-    reporter1 = reporter_factory(test_name)
-    expected_dir_path = f"{root_dir()}/test_runs/{test_name}"
+    reporter1 = reporter_factory()
+    expected_dir_path = f"{root_dir()}/test_runs/test_reporter_creates_a_unique_folder_path"
     assert expected_dir_path in reporter1.folder_path
-    
+
     time.sleep(2)
-    reporter2 = reporter_factory(test_name)
+    reporter2 = reporter_factory()
     assert str(reporter1.folder_path) != str(reporter2.folder_path)
 
 
 def test_reporter_can_accept_unique_id_override(reporter_factory: Callable) -> None:
-    test_name = "example_test"
     unique_id = "timestamp_or_any_unique_id"
-    reporter = reporter_factory(test_name, unique_id=unique_id)
-    
-    expected_dir_path = f"{root_dir()}/test_runs/{test_name}-{unique_id}"
+    reporter = reporter_factory(unique_id=unique_id)
+
+    expected_dir_path = (
+        f"{root_dir()}/test_runs/test_reporter_can_accept_unique_id_override-{unique_id}"
+    )
     assert str(expected_dir_path) == str(reporter.folder_path)
 
 
@@ -31,9 +31,9 @@ def test_reporter_can_accept_unique_id_override(reporter_factory: Callable) -> N
 def test_report_creates_correct_json(
     mock_open: MagicMock, mock_makedirs: MagicMock, reporter_factory: Callable
 ) -> None:
-    test_name = "report_creates_correct_json"
+    test_name = "test_report_creates_correct_json"
     unique_id = "20231001_120000"
-    reporter = reporter_factory(test_name, unique_id=unique_id)
+    reporter = reporter_factory(unique_id=unique_id)
 
     response = "Sample response"
     results = {"test1": True, "test2": False}
@@ -57,7 +57,7 @@ def test_report_creates_correct_json(
 
 def test_format_summary_with_failure_analysis(analyze_failure_rate):
     from cat_ai.reporter import Reporter
-    
+
     failure_analysis = analyze_failure_rate(6, 100)
     assert Reporter.format_summary(failure_analysis) == (
         "> [!NOTE]\n"
