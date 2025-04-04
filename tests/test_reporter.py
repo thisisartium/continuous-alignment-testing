@@ -31,8 +31,13 @@ def test_reporter_can_accept_unique_id_override(reporter_factory: Callable) -> N
 def test_report_creates_correct_json(test_name: str, snapshot) -> None:
     temp_dir = "/tmp"
     unique_id = "20231001_120000"
-    reporter = Reporter(test_name=test_name, output_dir=temp_dir, unique_id=unique_id)
-    reporter.metadata = {"ai-model": "champion-1"}
+    metadata = {"ai-model": "champion-1"}
+    reporter = Reporter(
+        test_name=test_name,
+        output_dir=temp_dir,
+        unique_id=unique_id,
+        metadata=metadata,
+    )
 
     # Generate test data
     response = "Alice is the oldest."
@@ -49,7 +54,7 @@ def test_report_creates_correct_json(test_name: str, snapshot) -> None:
     expected_metadata_path = expected_dir_path / "metadata.json"
     with open(expected_metadata_path, "r") as file:
         contents = json.load(file)
-    assert contents == {}
+    assert contents == metadata
     expected_output_path = expected_dir_path / "fail-0.json"
     assert os.path.isfile(expected_metadata_path)
     assert os.path.isfile(expected_output_path)
