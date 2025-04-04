@@ -44,24 +44,18 @@ def analyze_failure_rate() -> Callable:
     return _analyze
 
 
-@pytest.fixture
-def export_results_to_csv() -> Callable:
-    """Export a list of StatisticalAnalysis objects to a CSV-formatted string."""
+def export_results_to_csv(results: list[StatisticalAnalysis]) -> str:
+    output = io.StringIO(newline="\n")
+    writer = csv.writer(output, lineterminator="\n")
 
-    def _export(results: list[StatisticalAnalysis]) -> str:
-        output = io.StringIO(newline="\n")
-        writer = csv.writer(output, lineterminator="\n")
+    # Write header
+    writer.writerow(StatisticalAnalysis.get_csv_headers())
 
-        # Write header
-        writer.writerow(StatisticalAnalysis.get_csv_headers())
+    # Write rows
+    for result in results:
+        writer.writerow(result.as_csv_row())
 
-        # Write rows
-        for result in results:
-            writer.writerow(result.as_csv_row())
-
-        return output.getvalue()
-
-    return _export
+    return output.getvalue()
 
 
 @pytest.fixture
