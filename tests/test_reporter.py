@@ -1,9 +1,11 @@
 import json
+import os
 import time
+from pathlib import Path
 from typing import Callable
-from unittest.mock import MagicMock, mock_open, patch
 
 from cat_ai.helpers.helpers import root_dir
+from cat_ai.reporter import Reporter
 
 
 def test_reporter_creates_a_unique_folder_path(reporter_factory: Callable) -> None:
@@ -26,38 +28,38 @@ def test_reporter_can_accept_unique_id_override(reporter_factory: Callable) -> N
     assert str(expected_dir_path) == str(reporter.folder_path)
 
 
-@patch("os.makedirs")
-@patch("builtins.open", new_callable=mock_open)
-def test_report_creates_correct_json(
-    mock_open: MagicMock, mock_makedirs: MagicMock, reporter_factory: Callable
-) -> None:
-    test_name = "test_report_creates_correct_json"
+def test_report_creates_correct_json(test_name: str, snapshot) -> None:
+    temp_dir = "/tmp"
     unique_id = "20231001_120000"
-    reporter = reporter_factory(unique_id=unique_id)
+    reporter = Reporter(test_name=test_name, output_dir=temp_dir, unique_id=unique_id)
+    reporter.metadata = {"ai-model": "champion-1"}
 
-    response = "Sample response"
-    results = {"test1": True, "test2": False}
+    # Generate test data
+    response = "Alice is the oldest."
+    results = {"can-talk": True, "can-think": False}
 
+    # Call report method
     final_result = reporter.report(response, results)
 
+    # Verify return value (should be False because not all results are True)
     assert final_result is False
-    expected_metadata = {
-        "test_name": test_name,
-        "folder_path": f"{root_dir()}/test_runs/{test_name}-{unique_id}",
-        "output_file": "fail-0.json",
-        "metadata_path": f"{root_dir()}/test_runs/{test_name}-{unique_id}/metadata.json",
-        "validations": results,
-        "response": response,
-    }
-    expected_json_string = json.dumps(expected_metadata, indent=4)
 
-    mock_makedirs.assert_called_once_with(reporter.folder_path, exist_ok=True)
-    mock_open().write.assert_called_with(expected_json_string)
+    # Expected output paths
+    expected_dir_path = Path(temp_dir) / "test_runs" / (test_name + "-" + unique_id)
+    expected_metadata_path = expected_dir_path / "metadata.json"
+    with open(expected_metadata_path, "r") as file:
+        contents = json.load(file)
+    assert contents == {}
+    expected_output_path = expected_dir_path / "fail-0.json"
+    assert os.path.isfile(expected_metadata_path)
+    assert os.path.isfile(expected_output_path)
+
+    with open(expected_output_path, "r") as file:
+        content = json.load(file)
+    snapshot.assert_match(json.dumps(content, indent=2), "expected_report.json")
 
 
 def test_format_summary_with_failure_analysis(analyze_failure_rate):
-    from cat_ai.reporter import Reporter
-
     failure_analysis = analyze_failure_rate(6, 100)
     assert Reporter.format_summary(failure_analysis) == (
         "> [!NOTE]\n"

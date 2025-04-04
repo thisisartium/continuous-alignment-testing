@@ -1,0 +1,11 @@
+{
+  "test_name": "test_report_creates_correct_json",
+  "folder_path": "/tmp/test_runs/test_report_creates_correct_json-20231001_120000",
+  "output_file": "fail-0.json",
+  "metadata_path": "/tmp/test_runs/test_report_creates_correct_json-20231001_120000/metadata.json",
+  "validations": {
+    "can-talk": true,
+    "can-think": false
+  },
+  "response": "Alice is the oldest."
+}
