@@ -12,12 +12,12 @@ from cat_ai.statistical_analysis import StatisticalAnalysis, analyse_measure_fro
 
 
 @pytest.fixture
-def test_name(request) -> str:
-    return request.node.name
+def test_name(request: pytest.FixtureRequest) -> str:
+    return str(request.node.name)
 
 
 @pytest.fixture
-def reporter_factory(test_name) -> Callable:
+def reporter_factory(test_name: str) -> Callable:
     """Factory fixture for creating Reporter instances with default settings."""
 
     def _create_reporter(

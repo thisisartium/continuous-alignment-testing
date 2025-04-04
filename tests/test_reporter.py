@@ -2,7 +2,7 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Callable
+from typing import Any, Callable
 
 from cat_ai.helpers.helpers import root_dir
 from cat_ai.reporter import Reporter
@@ -28,7 +28,7 @@ def test_reporter_can_accept_unique_id_override(reporter_factory: Callable) -> N
     assert str(expected_dir_path) == str(reporter.folder_path)
 
 
-def test_report_creates_correct_json(test_name: str, snapshot) -> None:
+def test_report_creates_correct_json(test_name: str, snapshot: Any) -> None:
     temp_dir = "/tmp"
     unique_id = "20231001_120000"
     metadata = {"ai-model": "champion-1"}
@@ -64,7 +64,7 @@ def test_report_creates_correct_json(test_name: str, snapshot) -> None:
     snapshot.assert_match(json.dumps(content, indent=2), "expected_report.json")
 
 
-def test_format_summary_with_failure_analysis(analyze_failure_rate):
+def test_format_summary_with_failure_analysis(analyze_failure_rate: Callable) -> None:
     failure_analysis = analyze_failure_rate(6, 100)
     assert Reporter.format_summary(failure_analysis) == (
         "> [!NOTE]\n"
