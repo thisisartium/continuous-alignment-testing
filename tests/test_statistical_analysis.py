@@ -1,33 +1,21 @@
-import csv
 import io
 import math
-import os
 from statistics import NormalDist
-
-import matplotlib
-
-matplotlib.use("Agg")  # Force CPU-based renderer before any pyplot import
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from cat_ai.statistical_analysis import StatisticalAnalysis, analyse_measure_from_test_sample
-
-
-def analyse_failure_rate_from_test_sample(
-    failure_count: int, sample_size: int
-) -> StatisticalAnalysis:
-    return analyse_measure_from_test_sample(failure_count, sample_size)
+from tests.conftest import running_in_ci
 
 
 @pytest.mark.parametrize(
     "failure_count,sample_size,expected_proportion",
     [(0, 100, 0.0), (6, 100, 0.06), (100, 100, 1.0), (1, 47, 0.0213)],
 )
-def test_analyse_sample_from_test(failure_count, sample_size, expected_proportion):
+def test_analyse_sample_from_test(analyze_failure_rate, failure_count, sample_size, expected_proportion):
     """Test the statistical analysis function with various edge cases."""
-    result = analyse_failure_rate_from_test_sample(failure_count, sample_size)
+    result = analyze_failure_rate(failure_count, sample_size)
 
     # Basic assertions
     assert result.observation == failure_count
@@ -73,17 +61,16 @@ def test_analyse_sample_from_test(failure_count, sample_size, expected_proportio
         (100, 100, 0.0, (100, 100)),
     ],
 )
-def test_edges_cases(failures, total, expected_error, expected_ci):
-    result = analyse_failure_rate_from_test_sample(failures, total)
-    print("hello world")
+def test_edges_cases(analyze_failure_rate, failures, total, expected_error, expected_ci):
+    result = analyze_failure_rate(failures, total)
     assert math.isclose(result.standard_error, expected_error, abs_tol=0.0001)
     assert result.confidence_interval_count == expected_ci
 
 
+# Constants for success rate tests
 next_success_after_97 = 0.9709704495337362
 next_success_after_90 = 0.925327195595728
 digress_from_0_999 = 0.9986779845027858
-
 progress_from_0_999 = 0.9992400558756847
 
 
@@ -113,70 +100,38 @@ def test_measured_constants():
         (1, 10000, 0.999, progress_from_0_999),
     ],
 )
-def test_next_success_rate(failures, total, current_success_rate, next_success_rate):
-    result = analyse_failure_rate_from_test_sample(failures, total)
+def test_next_success_rate(analyze_failure_rate, failures, total, current_success_rate, next_success_rate):
+    result = analyze_failure_rate(failures, total)
     assert result.next_success_rate(current_success_rate) == pytest.approx(
         next_success_rate, rel=0.001
     )
 
 
-def export_results_to_csv_string(results: list[StatisticalAnalysis]) -> str:
-    """Export a list of StatisticalAnalysis objects to a CSV-formatted string."""
-    # Create a CSV writer with MacOS-style newlines to match the snapshot
-    output = io.StringIO(newline="\n")  # Let CSV writer handle newline translation
-    writer = csv.writer(output, lineterminator="\n")  # Explicitly set line terminator
-
-    # Write header
-    writer.writerow(StatisticalAnalysis.get_csv_headers())
-
-    # Write rows
-    for result in results:
-        writer.writerow(result.as_csv_row())
-
-    return output.getvalue()
-
-
-def running_in_ci() -> bool:
-    return os.getenv("CI") is not None
-
-
 # This test is skipped on CI as it fails to render the difference due to Timeout >10.0s
 # https://github.com/thisisartium/continuous-alignment-testing/issues/53
 @pytest.mark.skipif(running_in_ci(), reason="Image comparison fails to produce diff on CI")
-def test_failure_rate_bar_graph(snapshot):
+def test_failure_rate_bar_graph(snapshot, analyze_failure_rate, export_results_to_csv, configure_matplotlib):
     # Sample data points - choosing strategic values to test boundary conditions
     sample_size = 100
     failure_counts = list(range(sample_size + 1))
-    assert failure_counts[0] == 0
-    assert failure_counts[sample_size] == sample_size
-
+    
     # Calculate results for each data point
-    results = [analyse_failure_rate_from_test_sample(f, sample_size) for f in failure_counts]
-    csv = export_results_to_csv_string(results)
+    results = [analyze_failure_rate(f, sample_size) for f in failure_counts]
+    
+    # Export to CSV and validate
+    csv = export_results_to_csv(results)
     csv_bytes = io.BytesIO(csv.encode("utf-8"))
     snapshot.assert_match(csv_bytes.getvalue(), "failure_rate_results.csv")
+    
+    # Extract data for plotting
     rates = [r.proportion for r in results]
     errors = [r.margin_of_error for r in results]
 
     # Create the bar plot
-    # When creating the figure, set specific dimensions
-    fig, ax = plt.subplots(figsize=(10, 6), dpi=100)  # Explicitly set DPI here too
+    fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
 
     # Plot bars with error bars
     ax.bar(failure_counts, rates, yerr=errors, capsize=5, color="steelblue", alpha=0.7, width=8)
-
-    # # Add annotations on top of each bar
-    # for bar, rate, error in zip(bars, rates, errors):
-    #     height = bar.get_height()
-    #     ax.text(
-    #         bar.get_x() + bar.get_width() / 2.0,
-    #         height + error + 0.01,
-    #         f"{rate:.2f}±{error:.2f}",
-    #         ha="center",
-    #         va="bottom",
-    #         rotation=0,
-    #         fontsize=9,
-    #     )
 
     # Add labels and title
     ax.set_xlabel("Number of Failures")
@@ -185,52 +140,35 @@ def test_failure_rate_bar_graph(snapshot):
     ax.set_ylim(0, 1.2)  # Set y-axis to accommodate annotations
     ax.grid(True, linestyle="--", alpha=0.7, axis="both")
 
-    # Deterministic rendering for snapshot testing
+    # Save for snapshot comparison
     plt.tight_layout()
     buf = io.BytesIO()
-
-    # Add these parameters before saving the figure
-    plt.rcParams["svg.hashsalt"] = "matplotlib"  # Fix the hash salt for deterministic rendering
-    plt.rcParams["figure.dpi"] = 100  # Fix the DPI
-    plt.rcParams["savefig.dpi"] = 100  # Fix the saving DPI
-    plt.rcParams["path.simplify"] = False  # Don't simplify paths
-    plt.rcParams["agg.path.chunksize"] = 0  # Disable path chunking
-
-    # Before saving, set more explicit parameters
+    
     fig.savefig(
         buf,
         format="png",
         metadata={"CreationDate": None},
         dpi=100,
-        bbox_inches="tight",  # Consistent bounding box
+        bbox_inches="tight",
         pad_inches=0.1,
-    )  # Consistent padding
-
-    # fig.savefig(buf, format="png", metadata={"CreationDate": None})
+    )
     buf.seek(0)
 
     # Compare with snapshot
     snapshot.assert_match(buf.read(), "failure_rate_bar_graph.png")
 
-    plt.close()
-
 
 # This test is skipped on CI as it fails to render the difference due to Timeout >10.0s
 # https://github.com/thisisartium/continuous-alignment-testing/issues/53
 @pytest.mark.skipif(running_in_ci(), reason="Image comparison fails to produce diff on CI")
-def test_failure_rate_graph(snapshot):
-    # Also useful to ensure thread safety and determinism
-    matplotlib.rcParams["figure.max_open_warning"] = 0
-    matplotlib.rcParams["pdf.fonttype"] = 42  # Ensures text is stored as text, not paths
-    matplotlib.rcParams["ps.fonttype"] = 42
-
+def test_failure_rate_graph(snapshot, analyze_failure_rate, configure_matplotlib):
     # Generate a series of failure rates
     totals = [100] * 100
     failures = list(range(100))
-    assert len(failures) == len(totals)
+    
     # Calculate results for each rate
     results = [
-        analyse_failure_rate_from_test_sample(f, t) for f, t in zip(failures, totals, strict=True)
+        analyze_failure_rate(f, t) for f, t in zip(failures, totals, strict=True)
     ]
 
     # Extract data for plotting
@@ -263,11 +201,8 @@ def test_failure_rate_graph(snapshot):
     # Save to buffer for snapshot comparison
     plt.tight_layout()
     buf = io.BytesIO()
-    plt.rcParams["svg.hashsalt"] = "matplotlib"
     fig.savefig(buf, format="png", metadata={"CreationDate": None})
     buf.seek(0)
 
     # Compare with snapshot
     snapshot.assert_match(buf.read(), "failure_rate_graph.png")
-
-    plt.close()
