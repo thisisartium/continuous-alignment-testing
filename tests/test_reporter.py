@@ -1,60 +1,71 @@
 import json
+import os
 import time
-from unittest.mock import MagicMock, mock_open, patch
+from pathlib import Path
+from typing import Any, Callable
 
 from cat_ai.helpers.helpers import root_dir
 from cat_ai.reporter import Reporter
-from cat_ai.statistical_analysis import analyse_measure_from_test_sample
 
 
-def test_reporter_creates_a_unique_folder_path() -> None:
-    test_name = "unique_folder_path"
-    reporter1 = Reporter(test_name=test_name, output_dir=root_dir())
-    expected_dir_path = f"{root_dir()}/test_runs/{test_name}"
+def test_reporter_creates_a_unique_folder_path(reporter_factory: Callable) -> None:
+    reporter1 = reporter_factory()
+    expected_dir_path = f"{root_dir()}/test_runs/test_reporter_creates_a_unique_folder_path"
     assert expected_dir_path in reporter1.folder_path
+
     time.sleep(2)
-    reporter2 = Reporter(test_name=test_name, output_dir=root_dir())
+    reporter2 = reporter_factory()
     assert str(reporter1.folder_path) != str(reporter2.folder_path)
 
 
-def test_reporter_can_accept_unique_id_override() -> None:
-    test_name = "example_test"
+def test_reporter_can_accept_unique_id_override(reporter_factory: Callable) -> None:
     unique_id = "timestamp_or_any_unique_id"
-    reporter1 = Reporter(test_name=test_name, output_dir=root_dir(), unique_id=unique_id)
-    expected_dir_path = f"{root_dir()}/test_runs/{test_name}-{unique_id}"
-    assert str(expected_dir_path) == str(reporter1.folder_path)
+    reporter = reporter_factory(unique_id=unique_id)
+
+    expected_dir_path = (
+        f"{root_dir()}/test_runs/test_reporter_can_accept_unique_id_override-{unique_id}"
+    )
+    assert str(expected_dir_path) == str(reporter.folder_path)
 
 
-@patch("os.makedirs")
-@patch("builtins.open", new_callable=mock_open)
-def test_report_creates_correct_json(mock_open: MagicMock, mock_makedirs: MagicMock) -> None:
-    test_name = "report_creates_correct_json"
+def test_report_creates_correct_json(test_name: str, snapshot: Any) -> None:
+    temp_dir = "/tmp"
     unique_id = "20231001_120000"
-    reporter = Reporter(test_name=test_name, output_dir=root_dir(), unique_id=unique_id)
+    metadata = {"ai-model": "champion-1"}
+    reporter = Reporter(
+        test_name=test_name,
+        output_dir=temp_dir,
+        unique_id=unique_id,
+        metadata=metadata,
+    )
 
-    response = "Sample response"
-    results = {"test1": True, "test2": False}
+    # Generate test data
+    response = "Alice is the oldest."
+    results = {"can-talk": True, "can-think": False}
 
+    # Call report method
     final_result = reporter.report(response, results)
 
+    # Verify return value (should be False because not all results are True)
     assert final_result is False
-    expected_metadata = {
-        "test_name": test_name,
-        "folder_path": f"{root_dir()}/test_runs/{test_name}-{unique_id}",
-        "output_file": "fail-0.json",
-        "metadata_path": f"{root_dir()}/test_runs/{test_name}-{unique_id}/metadata.json",
-        "validations": results,
-        "response": response,
-    }
-    expected_json_string = json.dumps(expected_metadata, indent=4)
 
-    mock_makedirs.assert_called_once_with(reporter.folder_path, exist_ok=True)
+    # Expected output paths
+    expected_dir_path = Path(temp_dir) / "test_runs" / (test_name + "-" + unique_id)
+    expected_metadata_path = expected_dir_path / "metadata.json"
+    with open(expected_metadata_path, "r") as file:
+        contents = json.load(file)
+    assert contents == metadata
+    expected_output_path = expected_dir_path / "fail-0.json"
+    assert os.path.isfile(expected_metadata_path)
+    assert os.path.isfile(expected_output_path)
 
-    mock_open().write.assert_called_with(expected_json_string)
+    with open(expected_output_path, "r") as file:
+        content = json.load(file)
+    snapshot.assert_match(json.dumps(content, indent=2), "expected_report.json")
 
 
-def test_format_summary_with_failure_analysis():
-    failure_analysis = analyse_measure_from_test_sample(6, 100)
+def test_format_summary_with_failure_analysis(analyze_failure_rate: Callable) -> None:
+    failure_analysis = analyze_failure_rate(6, 100)
     assert Reporter.format_summary(failure_analysis) == (
         "> [!NOTE]\n"
         "> ## 6 ± 3 failures detected (100 samples)\n"
