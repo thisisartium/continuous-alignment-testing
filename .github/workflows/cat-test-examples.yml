@@ -43,21 +43,35 @@ jobs:
 
       - name: Check if GOOGLE_CREDENTIALS is set
         run: |
-          if [ -z "${{ secrets.GOOGLE_CREDENTIALS }}" ]; then
+          if [ -z "${{ secrets.GOOGLE_CREDENTIALS }}" ]
+          then
             echo "Error: GOOGLE_CREDENTIALS secret is not set!"
-            exit 1
+            exit 121
           fi
+
+      - name: Check if OPENAI_API_KEY is set
+        run: |
+          if [ -z "${{ secrets.OPENAI_API_KEY }}" ]
+          then
+            echo "Error: OPENAI_API_KEY secret is not set!"
+            exit 122
+          fi          
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
-      - name: Run Latest Example tests
+      - name: Run Graphic Image Example tests
+        run: uv run pytest --color=yes --showlocals --capture=no examples/graphic_image
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Run Latest Example from Team Recommender tests
         run: >
           uv run pytest
           --verbose --verbosity=10 --capture=no --tb=native --color=yes --showlocals
-          examples/team_recommender/tests
+          examples/team_recommender
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
